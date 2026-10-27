@@ -1,0 +1,351 @@
+{
+  "run_id": "lme_s50_e2b_fc",
+  "dataset": "longmemeval",
+  "mode": "fullcontext",
+  "model": "gemma4:e2b",
+  "n": 50,
+  "f1_mean": 0.02,
+  "em_mean": 0.02,
+  "contains_mean": 0.02,
+  "ingest_seconds_mean": 4e-05,
+  "generate_seconds_mean": 0.9456000000000002,
+  "prompt_tokens_mean": 3498.08,
+  "completion_tokens_mean": 12.12,
+  "total_tokens_mean": 3510.2,
+  "by_category": {
+    "single-session-user": {
+      "n": 50,
+      "f1_mean": 0.02,
+      "em_mean": 0.02,
+      "contains_mean": 0.02
+    }
+  },
+  "by_conversation": {
+    "001be529": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "0862e8bf": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "118b2229": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "15745da0": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "19b5f2b3": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "1e043500": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "21436231": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "25e5aa4f": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "37d43f65": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "3b6f954b": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "3f1e9474": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "4fd1909e": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "51a45a95": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "545bd2b5": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "577d4d32": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "58bf7951": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "58ef2f1c": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "5d3d2817": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "60d45044": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "66f24dbb": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "6ade9755": {
+      "n": 1,
+      "f1_mean": 1.0,
+      "em_mean": 1.0,
+      "contains_mean": 1.0
+    },
+    "6b168ec8": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "6f9b354f": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "726462e0": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "7527f7e2": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "75499fd8": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "853b0a1d": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "8550ddae": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "86b68151": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "8a137a7f": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "8ebdbe50": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "94f70d80": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "95bcc1c8": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "a06e4cfe": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "ad7109d1": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "af8d2e46": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "b320f3f8": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "b86304ba": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "bc8a6e93": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "c5e8278d": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "c8c3f81d": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "c960da58": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "caf9ead2": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "ccb36322": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "d52b4f67": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "dccbc061": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "e01b8e2f": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "e47becba": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "ec81a493": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "f8c5f88b": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    }
+  },
+  "config": {
+    "run_id": "lme_s50_e2b_fc",
+    "output_dir": "results\\lme_s50_e2b_fc",
+    "backend": "ollama",
+    "model": "gemma4:e2b",
+    "extraction_model": "gemma4:e2b",
+    "embed_model": "nomic-embed-text",
+    "host": "http://localhost:18080/api",
+    "num_ctx": 4096,
+    "temperature": 0.0,
+    "max_answer_tokens": 64,
+    "thinking": false,
+    "mode": "fullcontext",
+    "prompt_version": "qa_short_answer_v3",
+    "graph_extraction_prompt_version": "triple_json_v2",
+    "decay_rate": 1.0,
+    "prune_threshold": 0.15,
+    "max_triples": 12,
+    "query_ner": "heuristic",
+    "top_k": 10,
+    "graphrag_batch_size": 5,
+    "limit": 50,
+    "cache_policy": "enabled",
+    "examples_hash": "8c5235071808676ab1fa367e7469800d06b23f15c438f9baa4fe11cbe80bbdf1",
+    "excluded_locomo_categories": []
+  }
+}
