@@ -1,0 +1,14 @@
+{
+  "judge_model": "llama3.1:70b-instruct-q4_K_M",
+  "prompt_style": "official",
+  "base_url": "http://localhost:18080/v1",
+  "dataset": "longmemeval",
+  "temperature": 0,
+  "max_tokens": 256,
+  "reasoning_effort": null,
+  "n_rows": 60,
+  "n_scored": 60,
+  "n_abstention": 3,
+  "judge_accuracy": 0.2667,
+  "judged_at": "2026-09-03T20:51:24+00:00"
+}
