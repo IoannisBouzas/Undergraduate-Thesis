@@ -42,7 +42,7 @@ other script lives in a folder by role and runs as a module, for example
 ```
 run_memory_eval.py   the evaluation harness: runs one memory strategy on one benchmark
 judge.py             scores a run's answers with the LLM judge
-locomo10.json, longmemeval_s_strat60.json   the benchmark files used (see DATA_LICENSES.md)
+data/                rebuilds the 60-question LongMemEval-S subset (benchmarks are downloaded, see Setup)
 analysis/            accuracy tables and statistics
 graph_memory/        graph-memory and SPE diagnostics
 energy/              phone energy, resources and the phone-vs-workstation parity check
@@ -65,6 +65,12 @@ thesis/              LaTeX source of the thesis (main.tex + chapters/)
 |---|---|
 | `run_memory_eval.py` | Runs full context, vector retrieval or graph memory (including SPE) on LoCoMo or LongMemEval through Ollama or a llama.cpp server; writes predictions and a run summary. |
 | `judge.py` | Scores a run with the LLM judge (official LongMemEval prompt); writes `judged.jsonl` and `judge_meta.json`. |
+
+**`data/`: benchmark preparation**
+
+| script | purpose |
+|---|---|
+| `make_lme_subset.py` | Rebuilds the 60-question LongMemEval-S subset from `longmemeval_s_strat60_ids.json` and checks it matches the file the runs used. |
 
 **`analysis/`: accuracy and statistics**
 
@@ -177,17 +183,23 @@ port 18080; set `OLLAMA_URL` and `JUDGE_URL` to point them elsewhere. Phone runs
 
 ### Datasets
 
-The exact benchmark files the runs used are in the repository root, unchanged, under their own
-licenses (not this repository's MIT license). Sources, checksums and license texts are in
-[DATA_LICENSES.md](DATA_LICENSES.md).
+The benchmark files are not included. Download them into the repository root:
 
 | file | source | license |
 |---|---|---|
-| `locomo10.json` | [snap-research/locomo](https://github.com/snap-research/locomo) | CC BY-NC 4.0 (non-commercial) |
-| `longmemeval_s_strat60.json` | 60 questions from [xiaowu0162/longmemeval-cleaned](https://huggingface.co/datasets/xiaowu0162/longmemeval-cleaned) | MIT |
+| `locomo10.json` | [snap-research/locomo](https://github.com/snap-research/locomo) (`data/locomo10.json`) | CC BY-NC 4.0 (non-commercial) |
+| `longmemeval_s_cleaned.json` | [xiaowu0162/longmemeval-cleaned](https://huggingface.co/datasets/xiaowu0162/longmemeval-cleaned) | MIT |
 
-The full `longmemeval_s_cleaned.json` (277 MB) is over GitHub's file limit; download it from the
-link above if you need questions outside the subset.
+The LongMemEval runs used a 60-question subset (ten per question type). Rebuild it from the
+downloaded file; the script checks that the result is byte-identical to the file the runs used:
+
+```bash
+python -m data.make_lme_subset
+```
+
+Checksums and citations are in [DATA_LICENSES.md](DATA_LICENSES.md). The figure scripts and
+`tests.test_figure_inputs` read the conversations, so they need `locomo10.json` and
+`longmemeval_s_strat60.json` in place.
 
 ## Usage
 
@@ -241,9 +253,9 @@ the six long-window full-context runs, which the thesis reports separately
 ## Licenses
 
 - Code: MIT, see [LICENSE](LICENSE).
-- Benchmark files, and the questions and conversation text inside the run records: LoCoMo
-  (CC BY-NC 4.0, non-commercial use only) and LongMemEval (MIT); see
-  [DATA_LICENSES.md](DATA_LICENSES.md). Please credit both datasets when you reuse them.
+- The questions and conversation text inside the run records come from LoCoMo (CC BY-NC 4.0,
+  non-commercial use only) and LongMemEval (MIT); see [DATA_LICENSES.md](DATA_LICENSES.md).
+  Please credit both datasets when you reuse them.
 - Model outputs come from Gemma 4, Qwen3.5 and Llama 3.1 (judge); see each model's license.
 - Thesis text and figures: © 2026 Ioannis Bouzas.
 
