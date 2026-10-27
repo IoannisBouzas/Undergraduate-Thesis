@@ -1,0 +1,107 @@
+{
+  "run_id": "lap_locomo20_e4b_fc8k",
+  "dataset": "locomo",
+  "mode": "fullcontext",
+  "model": "gemma4:e4b",
+  "n": 20,
+  "f1_mean": 0.02683473389355743,
+  "em_mean": 0.0,
+  "contains_mean": 0.0,
+  "ingest_seconds_mean": 5e-05,
+  "generate_seconds_mean": 1.6689,
+  "prompt_tokens_mean": 8192.0,
+  "completion_tokens_mean": 12.7,
+  "total_tokens_mean": 8204.7,
+  "by_category": {
+    "1": {
+      "n": 5,
+      "f1_mean": 0.026666666666666665,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "2": {
+      "n": 5,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "3": {
+      "n": 5,
+      "f1_mean": 0.05714285714285715,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "4": {
+      "n": 5,
+      "f1_mean": 0.023529411764705882,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    }
+  },
+  "by_conversation": {
+    "conv-26": {
+      "n": 4,
+      "f1_mean": 0.07142857142857144,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "conv-30": {
+      "n": 3,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "conv-41": {
+      "n": 4,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "conv-42": {
+      "n": 4,
+      "f1_mean": 0.029411764705882353,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "conv-43": {
+      "n": 4,
+      "f1_mean": 0.03333333333333333,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "conv-44": {
+      "n": 1,
+      "f1_mean": 0.0,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    }
+  },
+  "config": {
+    "run_id": "lap_locomo20_e4b_fc8k",
+    "output_dir": "results\\lap_locomo20_e4b_fc8k",
+    "backend": "ollama",
+    "model": "gemma4:e4b",
+    "extraction_model": "gemma4:e4b",
+    "embed_model": "nomic-embed-text",
+    "host": "http://localhost:18080/api",
+    "num_ctx": 8192,
+    "temperature": 0.0,
+    "max_answer_tokens": 64,
+    "thinking": false,
+    "mode": "fullcontext",
+    "prompt_version": "qa_short_answer_v3",
+    "graph_extraction_prompt_version": "triple_json_v2",
+    "decay_rate": 1.0,
+    "prune_threshold": 0.15,
+    "max_triples": 12,
+    "query_ner": "heuristic",
+    "top_k": 10,
+    "graphrag_batch_size": 5,
+    "limit": 20,
+    "cache_policy": "enabled",
+    "examples_hash": "231afbb0f95fac1b16816f87a07c0c618e3f8212e11a2e46ee64bab5c6d703cd",
+    "excluded_locomo_categories": [
+      "5"
+    ]
+  }
+}

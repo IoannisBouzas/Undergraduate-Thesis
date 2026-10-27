@@ -1,0 +1,116 @@
+{
+  "provenance": {
+    "model": "gemma4:e4b",
+    "host": "http://localhost:18080/api",
+    "num_ctx": 4096,
+    "temperature": 0.0,
+    "batch_size": 5,
+    "extraction_max_tokens": 512,
+    "prompt_version": "triple_json_v2 (text replicated from run_flat_baseline.flush)",
+    "conversations": [
+      "conv-26",
+      "conv-30",
+      "conv-41",
+      "conv-42",
+      "conv-43",
+      "conv-44",
+      "conv-47",
+      "conv-48",
+      "conv-49",
+      "conv-50"
+    ],
+    "note": "replay of graph extraction only; no judging, no graph cache written"
+  },
+  "totals": {
+    "batches": 1179,
+    "parse_fail": 11,
+    "empty_model": 96,
+    "empty_after_norm": 0,
+    "ok": 1072,
+    "triples_returned": 6231,
+    "triples_kept": 6228,
+    "triples_dropped": 3
+  },
+  "per_conversation": {
+    "conv-26": {
+      "batches": 84,
+      "parse_fail": 2,
+      "empty_model": 3,
+      "empty_after_norm": 0,
+      "triples_returned": 499,
+      "triples_dropped": 0
+    },
+    "conv-30": {
+      "batches": 74,
+      "parse_fail": 0,
+      "empty_model": 10,
+      "empty_after_norm": 0,
+      "triples_returned": 389,
+      "triples_dropped": 0
+    },
+    "conv-41": {
+      "batches": 133,
+      "parse_fail": 2,
+      "empty_model": 14,
+      "empty_after_norm": 0,
+      "triples_returned": 660,
+      "triples_dropped": 0
+    },
+    "conv-42": {
+      "batches": 126,
+      "parse_fail": 0,
+      "empty_model": 9,
+      "empty_after_norm": 0,
+      "triples_returned": 608,
+      "triples_dropped": 1
+    },
+    "conv-43": {
+      "batches": 136,
+      "parse_fail": 1,
+      "empty_model": 11,
+      "empty_after_norm": 0,
+      "triples_returned": 715,
+      "triples_dropped": 0
+    },
+    "conv-44": {
+      "batches": 135,
+      "parse_fail": 1,
+      "empty_model": 11,
+      "empty_after_norm": 0,
+      "triples_returned": 751,
+      "triples_dropped": 0
+    },
+    "conv-47": {
+      "batches": 138,
+      "parse_fail": 1,
+      "empty_model": 8,
+      "empty_after_norm": 0,
+      "triples_returned": 734,
+      "triples_dropped": 0
+    },
+    "conv-48": {
+      "batches": 137,
+      "parse_fail": 2,
+      "empty_model": 8,
+      "empty_after_norm": 0,
+      "triples_returned": 726,
+      "triples_dropped": 1
+    },
+    "conv-49": {
+      "batches": 102,
+      "parse_fail": 1,
+      "empty_model": 12,
+      "empty_after_norm": 0,
+      "triples_returned": 532,
+      "triples_dropped": 0
+    },
+    "conv-50": {
+      "batches": 114,
+      "parse_fail": 1,
+      "empty_model": 10,
+      "empty_after_norm": 0,
+      "triples_returned": 617,
+      "triples_dropped": 1
+    }
+  }
+}

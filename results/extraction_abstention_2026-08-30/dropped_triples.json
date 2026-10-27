@@ -1,0 +1,32 @@
+[
+  {
+    "raw": [
+      "Joanna",
+      "recollects story from age",
+      "10"
+    ],
+    "emptied_fields": [
+      "object"
+    ]
+  },
+  {
+    "raw": [
+      "Jolene",
+      "age when receiving item",
+      "10"
+    ],
+    "emptied_fields": [
+      "object"
+    ]
+  },
+  {
+    "raw": [
+      "Dave",
+      "was age when first car show",
+      "10"
+    ],
+    "emptied_fields": [
+      "object"
+    ]
+  }
+]

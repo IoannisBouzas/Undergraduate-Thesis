@@ -1,0 +1,32 @@
+{
+  "run_dir": "results\\lap_locomo20_e2b_fc",
+  "run_summary": {
+    "n_rows": 20,
+    "n_resource_samples": 0,
+    "energy_captured": false,
+    "battery_source": null,
+    "plugged_any": false,
+    "temp_idle_to_peak_c": null,
+    "cpu_freq_peak_to_min_mhz": null,
+    "throttled": null,
+    "run_charge_mah": null,
+    "run_energy_kj": null
+  },
+  "by_mode": {
+    "fullcontext": {
+      "n": 20,
+      "n_scored": 20,
+      "n_unscored": 0,
+      "accuracy": 0.1,
+      "f1_mean": 0.1,
+      "tokens_per_answer": 4114.3,
+      "retrieved_tokens_per_answer": 3870.35,
+      "latency_s_mean": 0.7459,
+      "ttft_s_mean": 0.2272,
+      "energy_j_per_answer": null,
+      "correct_per_joule": null,
+      "correct_per_1k_tokens": 0.0243,
+      "peak_temp_c": null
+    }
+  }
+}
