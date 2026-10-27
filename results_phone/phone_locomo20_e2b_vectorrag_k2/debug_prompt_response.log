@@ -1,0 +1,480 @@
+=== Q: What did Caroline research? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[4:33 pm on 12 July, 2023] Caroline: It taught me self-acceptance and how to find support. It also showed me that tough times don't last - hope and love exist. Pets bring so much joy too, though.
+[10:31 am on 13 October, 2023] Melanie: Thanks for the tip, Caroline. Doing research and readying myself emotionally makes sense. I'll do that. BTW, recently I had a setback. Last month I got hurt and had to take a break from pottery, which I use for self-expression and peace.
+
+Question: What did Caroline research?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>Doing research</answer>
+--- PARSED PREDICTION (answer_tag) ---
+Doing research
+====================
+
+=== Q: What do Jon and Gina both have in common? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[10:43 am on 4 February, 2023] Gina: No doubt, Jon you've got this. Your passion and commitment are awesome! Keep it up!
+[6:46 pm on 23 July, 2023] Gina: Remember Jon, Just do it!
+
+Question: What do Jon and Gina both have in common?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>Passion and commitment</answer>
+--- PARSED PREDICTION (answer_tag) ---
+Passion and commitment
+====================
+
+=== Q: What martial arts has John done? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[11:01 am on 17 December, 2022] John: Woah, Maria, that sounds cool! I'm doing kickboxing and it's giving me so much energy.
+[6:10 pm on 22 December, 2022] John:  Yep, let's keep making great memories with our loved ones and cherishing the time we have. I'm off to do some taekwondo!
+
+Question: What martial arts has John done?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>kickboxing and taekwondo</answer>
+--- PARSED PREDICTION (answer_tag) ---
+kickboxing and taekwondo
+====================
+
+=== Q: What kind of interests do Joanna and Nate share? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[7:31 pm on 21 January, 2022] Joanna: Yeah! Besides writing, I also enjoy reading, watching movies, and exploring nature. Anything else you enjoy doing, Nate?
+[5:54 pm on 9 November, 2022] Nate: Hey Joanna, I'm a big fan of them and thought it would be a fun idea to start making them myself. I'm hoping to share my love of gaming and connect with others who enjoy it too.
+
+Question: What kind of interests do Joanna and Nate share?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>Reading, watching movies, and exploring nature.</answer>
+--- PARSED PREDICTION (answer_tag) ---
+Reading, watching movies, and exploring nature.
+====================
+
+=== Q: what are John's goals with regards to his basketball career? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[1:08 pm on 11 August, 2023] John: Yeah! Winning a championship is my number one goal. But I also want to make a difference away from the court, like through charity or inspiring people. Basketball has been great to me, so I want to give something back.
+[8:17 pm on 21 September, 2023] John: Definitely! I'm focusing on better shooting and making more of an impact on the court. I want to be known as a consistent performer and help my team. Off the court, I'm also looking into more endorsements and building my brand. It's important for me to think about life after basketball.
+
+Question: what are John's goals with regards to his basketball career?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>Winning a championship and being a consistent performer.</answer>
+--- PARSED PREDICTION (answer_tag) ---
+Winning a championship and being a consistent performer.
+====================
+
+=== Q: When did Caroline go to the LGBTQ support group? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[1:56 pm on 8 May, 2023] Caroline: I went to a LGBTQ support group yesterday and it was so powerful.
+[8:56 pm on 20 July, 2023] Caroline: Hey Mel! A lot's happened since we last chatted - I just joined a new LGBTQ activist group last Tues. I'm meeting so many cool people who are as passionate as I am about rights and community support. I'm giving my voice and making a real difference, plus it's fulfilling in so many ways. It's just great, you know?
+
+Question: When did Caroline go to the LGBTQ support group?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>8 May</answer>
+--- PARSED PREDICTION (answer_tag) ---
+8 May
+====================
+
+=== Q: When Jon has lost his job as a banker? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[4:04 pm on 20 January, 2023] Jon: Hey Gina! Good to see you too. Lost my job as a banker yesterday, so I'm gonna take a shot at starting my own business.
+[2:15 pm on 21 June, 2023] Jon: Thanks! It's been tough going since I lost my job, but I'm sure investing my time in my business will pay off eventually. I really appreciate your help.
+
+Question: When Jon has lost his job as a banker?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>20 January</answer>
+--- PARSED PREDICTION (answer_tag) ---
+20 January
+====================
+
+=== Q: Who did Maria have dinner with on May 3, 2023? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[6:10 pm on 22 December, 2022] Maria: Woah, that's a nice pic, John! You all obviously had a blast at dinner. Nothing beats getting together with loved ones for a good meal - it makes some awesome memories!
+[6:29 pm on 7 July, 2023] Maria: For sure! We can keep doing great stuff and making a difference. Well, I'm off to have dinner with some friends from the gym. Talk to you later!
+
+Question: Who did Maria have dinner with on May 3, 2023?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>friends from the gym</answer>
+--- PARSED PREDICTION (answer_tag) ---
+friends from the gym
+====================
+
+=== Q: When did Joanna first watch "Eternal Sunshine of the Spotless Mind? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[7:31 pm on 21 January, 2022] Joanna: Yep, that movie is awesome. I first watched it around 3 years ago. I even went out and got a physical copy! [shared photo: a photo of a dvd on a table with a blurry background]
+[12:06 am on 11 November, 2022] Joanna: Woohoo, thanks Nate! It's pretty wild to see it come alive. Every day on set is awesome and full of potential. Being able to show my vision is awesome.
+
+Question: When did Joanna first watch "Eternal Sunshine of the Spotless Mind?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>3 years ago</answer>
+--- PARSED PREDICTION (answer_tag) ---
+3 years ago
+====================
+
+=== Q: In which month's game did John achieve a career-high score in points? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[4:21 pm on 16 July, 2023] John: Hey Tim! Good to see you again. So much has happened in the last month - on and off the court. Last week I scored 40 points, my highest ever, and it feels like all my hard work's paying off. [shared photo: a photography of a score board with a clock and a phone]
+[3:00 pm on 2 October, 2023] John: It was so amazing! The energy was crazy and everyone was so hyped. Seeing the top players was so motivating - it made me want to work even harder. Check out this pic from the game! [shared photo: a photo of a basketball game with a crowd of people watching]
+
+Question: In which month's game did John achieve a career-high score in points?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>July</answer>
+--- PARSED PREDICTION (answer_tag) ---
+July
+====================
+
+=== Q: What fields would Caroline be likely to pursue in her educaton? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[1:56 pm on 8 May, 2023] Caroline: Gonna continue my edu and check out career options, which is pretty exciting!
+[1:56 pm on 8 May, 2023] Caroline: I'm keen on counseling or working in mental health - I'd love to support those with similar issues.
+
+Question: What fields would Caroline be likely to pursue in her educaton?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>Counseling or mental health</answer>
+--- PARSED PREDICTION (answer_tag) ---
+Counseling or mental health
+====================
+
+=== Q: What might John's financial status be? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[7:38 pm on 20 May, 2023] John: Yeah, I hope so. They've given so much and deserve our backing. I want to help make their lives better.
+[8:43 pm on 3 July, 2023] John: Definitely, it's essential for wellbeing. It's great that you're supporting her. Is there anything specific she needs help with? Maybe I can assist as well.
+
+Question: What might John's financial status be?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>Not specified</answer>
+--- PARSED PREDICTION (answer_tag) ---
+Not specified
+====================
+
+=== Q: Is it likely that Nate has friends besides Joanna? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[10:57 am on 22 August, 2022] Joanna: Wow Nate, they're adorable! I can see why you enjoy spending time with them. It looks like they have so much more room to swim now!
+[8:16 pm on 25 October, 2022] Nate: Yeah, they each do. One is more adventurous while the other is more reserved, which I find cute. Having them around brings me joy and they make great companions.
+
+Question: Is it likely that Nate has friends besides Joanna?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>No</answer>
+--- PARSED PREDICTION (answer_tag) ---
+No
+====================
+
+=== Q: Would Tim enjoy reading books by C. S. Lewis or John Greene? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[10:22 am on 21 November, 2023] Tim: Yep, John! I love getting lost in fantasy stories, but also discovering new ways to better myself through books on growth, psychology, and improving myself. It's wild how much you can learn from them, right?
+[10:22 am on 21 November, 2023] Tim: Yeah, John! I recently read a book that really made a big impact on me. It's all about how small changes can make big differences. It really changed the way I do things. Have you read any good books lately?
+
+Question: Would Tim enjoy reading books by C. S. Lewis or John Greene?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>Yes</answer>
+--- PARSED PREDICTION (answer_tag) ---
+Yes
+====================
+
+=== Q: What is an indoor activity that Andrew would enjoy doing while make his dog happy? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[9:58 pm on 16 August, 2023] Andrew: That sounds adorable! Pets always find their own little spots and it brings so much joy and comfort. Here's Toby at his favorite spot. [shared photo: a photo of a dog laying on a fluffy blanket on the floor]
+[9:41 pm on 6 October, 2023] Andrew: Yeah, dogs sure know how to find the simple joys of life! Appreciating the little things is so important. Well speaking of interesting hobbies, I rememver you mentionoed about that jewelry earlier? I remember you saying you make them with recycled objects. That sounds cool - tell me more!
+
+Question: What is an indoor activity that Andrew would enjoy doing while make his dog happy?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>Playing with Toby</answer>
+--- PARSED PREDICTION (answer_tag) ---
+Playing with Toby
+====================
+
+=== Q: What did the charity race raise awareness for? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[1:14 pm on 25 May, 2023] Melanie: Hey Caroline, since we last chatted, I've had a lot of things happening to me. I ran a charity race for mental health last Saturday – it was really rewarding. Really made me think about taking care of our minds.
+[1:14 pm on 25 May, 2023] Caroline: That charity race sounds great, Mel! Making a difference & raising awareness for mental health is super rewarding - I'm really proud of you for taking part!
+
+Question: What did the charity race raise awareness for?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>mental health</answer>
+--- PARSED PREDICTION (answer_tag) ---
+mental health
+====================
+
+=== Q: How do Jon and Gina both like to destress? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[2:32 pm on 29 January, 2023] Gina: Believe in yourself, Jon! The process may be tough, but you got this. Push through and it'll be worth it. Don't forget to take breaks and dance it out when you need to destress!
+[3:14 pm on 11 May, 2023] Jon: Yeah, Gina! Dancing helps me de-stress. It's where I'm most alive. It's a must-have in my life.
+
+Question: How do Jon and Gina both like to destress?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>Dancing</answer>
+--- PARSED PREDICTION (answer_tag) ---
+Dancing
+====================
+
+=== Q: What is John's main focus in local politics? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[11:01 am on 17 December, 2022] John: Yeah Maria, I'm really hoping to get into local politics. I love helping the community and making it a better place.
+[7:06 pm on 9 January, 2023] John: I've been keeping busy since we last talked! I've been looking into local politics, talking to community leaders, and getting to know the needs and hopes of our neighborhood. It's been super informative, and I'm feeling optimistic about it all.
+
+Question: What is John's main focus in local politics?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>Helping the community and making it better</answer>
+--- PARSED PREDICTION (answer_tag) ---
+Helping the community and making it better
+====================
+
+=== Q: What is one of Joanna's favorite movies? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[7:31 pm on 21 January, 2022] Joanna: A few times. It's one of my favorites! I really like the idea and the acting.
+[9:27 am on 7 February, 2022] Joanna: I just watched "Little Women" and it was amazing! It's a great story about sisterhood, love, and reaching for your dreams. Definitely a must-see!
+
+Question: What is one of Joanna's favorite movies?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>"Little Women"</answer>
+--- PARSED PREDICTION (answer_tag) ---
+Little Women
+====================
+
+=== Q: Which team did John sign with on 21 May, 2023? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[7:48 pm on 21 May, 2023] John: That's great! I just signed with a new team - excited for the season!
+[10:29 am on 9 August, 2023] John: Our team bond is awesome and it makes all the hard work worth it.
+
+Question: Which team did John sign with on 21 May, 2023?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>new team</answer>
+--- PARSED PREDICTION (answer_tag) ---
+new team
+====================
+

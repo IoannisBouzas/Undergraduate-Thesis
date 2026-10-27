@@ -1,0 +1,38 @@
+{
+  "run_dir": "results_phone\\phone_locomo20_e2b_vectorrag_rep2",
+  "run_summary": {
+    "n_rows": 20,
+    "n_resource_samples": 1336,
+    "energy_captured": true,
+    "battery_source": "termux-api",
+    "plugged_any": false,
+    "temp_idle_to_peak_c": [
+      47.1,
+      97.4
+    ],
+    "cpu_freq_peak_to_min_mhz": [
+      2577.6,
+      667.2
+    ],
+    "throttled": true,
+    "run_charge_mah": 621.857,
+    "run_energy_kj": 9.468
+  },
+  "by_mode": {
+    "vectorrag": {
+      "n": 20,
+      "n_scored": 20,
+      "n_unscored": 0,
+      "accuracy": 0.5,
+      "f1_mean": 0.4462,
+      "tokens_per_answer": 709.25,
+      "retrieved_tokens_per_answer": 427.6,
+      "latency_s_mean": 51.1715,
+      "ttft_s_mean": null,
+      "energy_j_per_answer": 473.399,
+      "correct_per_joule": 0.0011,
+      "correct_per_1k_tokens": 0.705,
+      "peak_temp_c": 95.8
+    }
+  }
+}

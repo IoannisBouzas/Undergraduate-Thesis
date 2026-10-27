@@ -1,0 +1,640 @@
+=== Q: What did Caroline research? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[1:56 pm on 8 May, 2023] Caroline: Gonna continue my edu and check out career options, which is pretty exciting!
+[1:56 pm on 8 May, 2023] Caroline: Totally agree, Mel. Relaxing and expressing ourselves is key. Well, I'm off to go do some research.
+[1:14 pm on 25 May, 2023] Caroline: Researching adoption agencies — it's been a dream to have a family and give a loving home to kids who need it.
+[10:37 am on 27 June, 2023] Melanie: Congrats Caroline! Good on you for going after what you really care about. [shared photo: a photo of a book shelf filled with books in a room]
+[4:33 pm on 12 July, 2023] Caroline: Wow! What got you into running?
+[4:33 pm on 12 July, 2023] Caroline: Glad it helped ya, Melanie!
+[8:56 pm on 20 July, 2023] Caroline: Cool! What did it look like?
+[3:19 pm on 28 August, 2023] Caroline: Wow! Did you see that band?
+[10:31 am on 13 October, 2023] Caroline: The room was electric with energy and support! The posters were amazing, so much pride and strength! It inspired me to make some art. [shared photo: a photo of a drawing of a woman in a dress]
+[9:55 am on 22 October, 2023] Caroline: Glad you agree, Caroline. Appreciate the support of those close to me. Their encouragement made me who I am.
+
+Question: What did Caroline research?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>adoption agencies</answer>
+--- PARSED PREDICTION (answer_tag) ---
+adoption agencies
+====================
+
+=== Q: What do Jon and Gina both have in common? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[4:04 pm on 20 January, 2023] Gina: That's cool, Jon! What got you into this biz?
+[10:43 am on 4 February, 2023] Gina: Wow, Jon! You're so talented! What show ya got planned?
+[10:43 am on 4 February, 2023] Gina: No doubt, Jon you've got this. Your passion and commitment are awesome! Keep it up!
+[10:43 am on 4 February, 2023] Jon: Thanks, Gina! Your kind words mean a lot. I won't give up!
+[7:28 pm on 23 March, 2023] Jon: Hey Gina, how's it going?
+[8:29 pm on 13 June, 2023] Jon: Thanks, Gina! Your support's really been awesome.
+[9:38 pm on 16 June, 2023] Gina: Go, Jon! I'm here for you. Keep going!
+[1:25 pm on 9 July, 2023] Gina: Go get 'em, Jon!
+[6:46 pm on 23 July, 2023] Jon: Ha, ha! Thanks, Gina. Sounds familiar, who do those words belong to?
+[6:46 pm on 23 July, 2023] Gina: Remember Jon, Just do it!
+
+Question: What do Jon and Gina both have in common?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>Support</answer>
+--- PARSED PREDICTION (answer_tag) ---
+Support
+====================
+
+=== Q: What martial arts has John done? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[11:01 am on 17 December, 2022] John: Woah, Maria, that sounds cool! I'm doing kickboxing and it's giving me so much energy.
+[6:10 pm on 22 December, 2022] John:  Yep, let's keep making great memories with our loved ones and cherishing the time we have. I'm off to do some taekwondo!
+[12:24 am on 7 April, 2023] John: They're awesome - they make sure we do the poses properly and encourage us to listen to our bodies. They create a great, relaxed environment that makes everyone feel welcome. Here's a photo from our last class. [shared photo: a photography of a man doing yoga outside on a blue mat]
+[12:24 am on 7 April, 2023] John: It's a beginner yoga class, focusing on fundamentals like poses and breathing. I find it helps me relax and increase my flexibility.
+[3:18 pm on 4 May, 2023] John: I just started going to boot camps with my fam last month. It's good for bonding and getting fit.
+[3:18 pm on 4 May, 2023] John: We've all been helping and supporting each other during boot camp - cheering each other on during workouts and providing emotional support outside them. It's been amazing witnessing us come together and be there for each other.
+[6:59 pm on 5 July, 2023] John: My family, exercise, and spending time with friends, for sure.
+[6:21 pm on 22 July, 2023] John: Yeah, they offer a a bunch, like yoga, kickboxing, and circuit training. It keeps things interesting!
+[6:21 pm on 22 July, 2023] John: I've done weight training so far too. It was challenging but peaceful, kinda like yoga.
+[11:08 am on 16 August, 2023] John:  I was impressed with their dedication and how well they worked together. Just being around them was so inspiring!
+
+Question: What martial arts has John done?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>kickboxing, taekwondo</answer>
+--- PARSED PREDICTION (answer_tag) ---
+kickboxing, taekwondo
+====================
+
+=== Q: What kind of interests do Joanna and Nate share? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[7:31 pm on 21 January, 2022] Joanna: Hey Nate! Long time no see! I've been working on a project lately - it's been pretty cool. What about you - any fun projects or hobbies?
+[7:31 pm on 21 January, 2022] Joanna: Yeah! Besides writing, I also enjoy reading, watching movies, and exploring nature. Anything else you enjoy doing, Nate?
+[7:31 pm on 21 January, 2022] Joanna: Cool, Nate! So we both have similar interests. What type of movies do you like best?
+[2:01 pm on 23 January, 2022] Joanna: Thanks, Nate! It's a mix of drama and romance!
+[7:49 pm on 20 May, 2022] Nate: No worries, Joanna! Keep going and reach for your dreams. You've got tons of talent and potential!
+[11:15 am on 6 October, 2022] Joanna: Wow, Nate, that looks awesome! What inspired you?
+[11:15 am on 6 October, 2022] Joanna: Thanks Nate! I absolutley love DIYs, and I know she does too.
+[8:16 pm on 25 October, 2022] Nate: Wow Joanna, that's so cool! It's amazing how our imaginations can bring ideas to life. Can you tell me more about the character on the left in the photo?
+[8:10 pm on 7 November, 2022] Nate: Great actually! These little guys sure bring joy to my life! Watching them is so calming and fascinating. I've really grown fond of them. So, what about you, Joanna? What brings you happiness?
+[12:06 am on 11 November, 2022] Nate: No worries, Joanna. Hope you enjoy it!
+
+Question: What kind of interests do Joanna and Nate share?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>Similar interests</answer>
+--- PARSED PREDICTION (answer_tag) ---
+Similar interests
+====================
+
+=== Q: what are John's goals with regards to his basketball career? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[7:48 pm on 21 May, 2023] John: Yeah, my goal is to improve my shooting percentage. Been practicing hard and gonna make it happen. [shared photo: a photo of two men standing next to a basketball machine]
+[4:17 pm on 2 August, 2023] John: Thanks! They really do. I want to keep reaching for new goals.
+[1:08 pm on 11 August, 2023] John: Thanks! Basketball has been a part of my life ever since I was a kid. I'd watch NBA games with my dad and dream of playing on those big courts. When I turned ten, dad signed me up for a local league, and I've been playing ever since. I kept playing through middle and high school before earning a college scholarship. And after college, I was drafted by a team – my dream come true!
+[1:08 pm on 11 August, 2023] John: Yeah! Winning a championship is my number one goal. But I also want to make a difference away from the court, like through charity or inspiring people. Basketball has been great to me, so I want to give something back.
+[8:17 pm on 21 September, 2023] John: Definitely! I'm focusing on better shooting and making more of an impact on the court. I want to be known as a consistent performer and help my team. Off the court, I'm also looking into more endorsements and building my brand. It's important for me to think about life after basketball.
+[10:22 am on 21 November, 2023] John: Thanks! That means a lot. Difficult times are part of life – what's important is how we handle them. When things get tough, I try to remember why I'm so passionate about basketball. That love and enthusiasm keeps me motivated, no matter what.
+[10:22 am on 21 November, 2023] John: Thanks! I appreciate your support. It's all about growing and getting better, both on and off the court. Let's keep working hard!
+[10:04 am on 19 December, 2023] John: Things have been going great on the court. We've been putting in a lot of work and achieving our goals, which is awesome.
+[5:26 pm on 2 January, 2024] John: Yeah, basketball is still really important to me - I practice and train every day to stay in shape and improve. Can't imagine my life without it, it's my passion. [shared photo: a photo of a basketball ball on the ground with a basketball hoop in the background]
+[5:24 pm on 7 January, 2024] John: Thanks! It's amazing how basketball brings people together and creates a positive impact!
+
+Question: what are John's goals with regards to his basketball career?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>Improve shooting percentage, win a championship, make a difference through charity/inspiring people, be a consistent performer, and build a brand for life after basketball.</answer>
+--- PARSED PREDICTION (answer_tag) ---
+Improve shooting percentage, win a championship, make a difference through charity/inspiring people, be a consistent performer, and build a brand for life after basketball.
+====================
+
+=== Q: When did Caroline go to the LGBTQ support group? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[1:56 pm on 8 May, 2023] Caroline: I went to a LGBTQ support group yesterday and it was so powerful.
+[1:56 pm on 8 May, 2023] Caroline: The support group has made me feel accepted and given me courage to embrace myself.
+[1:14 pm on 25 May, 2023] Caroline: I chose them 'cause they help LGBTQ+ folks with adoption. Their inclusivity and support really spoke to me.
+[7:55 pm on 9 June, 2023] Melanie: Hey Caroline! Great to hear from you. Sounds like your event was amazing! I'm so proud of you for spreading awareness and getting others involved in the LGBTQ community. You've come a long way since your transition - keep on inspiring people with your strength and courage!
+[10:37 am on 27 June, 2023] Caroline: I'm still figuring out the details, but I'm thinking of working with trans people, helping them accept themselves and supporting their mental health. Last Friday, I went to an LGBTQ+ counseling workshop and it was really enlightening. They talked about different therapeutic methods and how to best work with trans people. Seeing how passionate these pros were about making a safe space for people like me was amazing.
+[1:36 pm on 3 July, 2023] Caroline: Since we last spoke, some big things have happened. Last week I went to an LGBTQ+ pride parade. Everyone was so happy and it made me feel like I belonged. It showed me how much our community has grown, it was amazing!
+[4:33 pm on 12 July, 2023] Caroline: Yeah, it's true! Having people who back you makes such a huge difference. It's great to see how far LGBTQ rights have come, but there's still plenty of progress to be made. I wanna help make a difference.
+[2:31 pm on 17 July, 2023] Caroline: Hey Melanie! That sounds great! Last weekend I joined a mentorship program for LGBTQ youth - it's really rewarding to help the community.
+[8:56 pm on 20 July, 2023] Caroline: Hey Mel! A lot's happened since we last chatted - I just joined a new LGBTQ activist group last Tues. I'm meeting so many cool people who are as passionate as I am about rights and community support. I'm giving my voice and making a real difference, plus it's fulfilling in so many ways. It's just great, you know?
+[8:56 pm on 20 July, 2023] Caroline: Thanks, Melanie! It's awesome to have our own platform to be ourselves and support others' rights. Our group, 'Connected LGBTQ Activists', is made of all kinds of people investing in positive changes. We have regular meetings, plan events and campaigns, to get together and support each other.
+
+Question: When did Caroline go to the LGBTQ support group?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>8 May 2023</answer>
+--- PARSED PREDICTION (answer_tag) ---
+8 May 2023
+====================
+
+=== Q: When Jon has lost his job as a banker? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[4:04 pm on 20 January, 2023] Jon: Hey Gina! Good to see you too. Lost my job as a banker yesterday, so I'm gonna take a shot at starting my own business.
+[10:43 am on 4 February, 2023] Jon: Thanks! Setbacks can be tough, but with your support, I can handle anything. Appreciate you having my back!
+[2:35 pm on 16 March, 2023] Jon: Oof, sorry to hear that. What's up? Is there anything I can do to help?
+[2:35 pm on 16 March, 2023] Jon: Thanks for askin', Gina! Losing my job was hard, but I'm livin' my dreams now. Startin' my biz has been tough but I'm gonna make it! I keep facing new challenges, but I'm sure it'll be worth it in the end. [shared photo: a photo of a laptop computer sitting on top of a table]
+[1:26 pm on 3 April, 2023] Jon: Hey Gina, I had to shut down my bank account. It was tough, but I needed to do it for my biz.
+[10:33 am on 9 April, 2023] Jon: Thanks, Gina! I'm determined to make this studio work. Losing my job was tough but it gave me the push I needed to do what I love.
+[3:14 pm on 11 May, 2023] Jon: Thanks! Losing my job gave me the push to finally start my dream business: my own dance studio! Now I'm stepping into the unknown and hoping for the best.
+[2:15 pm on 21 June, 2023] Jon: Thanks! It's been tough going since I lost my job, but I'm sure investing my time in my business will pay off eventually. I really appreciate your help.
+[1:25 pm on 9 July, 2023] Jon: Bye!
+[5:44 pm on 21 July, 2023] Jon: Thanks for having my back.
+
+Question: When Jon has lost his job as a banker?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>20 January 2023</answer>
+--- PARSED PREDICTION (answer_tag) ---
+20 January 2023
+====================
+
+=== Q: Who did Maria have dinner with on May 3, 2023? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[6:10 pm on 22 December, 2022] Maria: Woah, that's a nice pic, John! You all obviously had a blast at dinner. Nothing beats getting together with loved ones for a good meal - it makes some awesome memories!
+[6:10 pm on 22 December, 2022] Maria: Yeah, John! It definitely builds a strong bond. Those shared meals really make life enjoyable and meaningful. What did you make? [shared photo: a photo of a table with pizzas and salads on it]
+[6:10 pm on 22 December, 2022] Maria: I can picture you all laughing and having a blast making your own pizzas - a great way to bond! I made some peach cobbler recently, it was great.
+[6:03 pm on 6 March, 2023] Maria: Wow, that's really cool! Have you discussed it with anyone yet?
+[6:13 pm on 10 April, 2023] Maria: We organized a meal for the shelter residents and I helped with getting everything ready. It was cool to see everyone together, eating and supporting each other.
+[3:18 pm on 4 May, 2023] Maria: Hey John! Nice to hear from you. What's new with you?
+[3:18 pm on 4 May, 2023] Maria: Wow, John! It's great when you have that kind of support. My mom and I made some dinner together last night! [shared photo: a photo of a table with a variety of food on it]
+[6:29 pm on 7 July, 2023] Maria: For sure! We can keep doing great stuff and making a difference. Well, I'm off to have dinner with some friends from the gym. Talk to you later!
+[3:34 pm on 17 July, 2023] Maria: Some fun ones like charades and a scavenger hunt. We all had a good laugh!
+[6:21 pm on 22 July, 2023] Maria: I wanted to make connections, laugh together and take in nature's beauty. Uplifting!
+
+Question: Who did Maria have dinner with on May 3, 2023?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>No information</answer>
+--- PARSED PREDICTION (answer_tag) ---
+No information
+====================
+
+=== Q: When did Joanna first watch "Eternal Sunshine of the Spotless Mind? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[7:31 pm on 21 January, 2022] Joanna: Wow, great job! What was is called?
+[7:31 pm on 21 January, 2022] Joanna: Yep, that movie is awesome. I first watched it around 3 years ago. I even went out and got a physical copy! [shared photo: a photo of a dvd on a table with a blurry background]
+[7:31 pm on 21 January, 2022] Joanna: A few times. It's one of my favorites! I really like the idea and the acting.
+[9:27 am on 7 February, 2022] Joanna: I just watched "Little Women" and it was amazing! It's a great story about sisterhood, love, and reaching for your dreams. Definitely a must-see!
+[6:44 pm on 17 April, 2022] Joanna: Nature's always been my haven. Walking in it, feeling it, hearing the sounds - it's so calming. Worries and stress seem to vanish, and it's just me and the beauty around me.
+[7:44 pm on 21 April, 2022] Joanna: Heard of that series! It's been on my list forever. Thanks for the recommendation, Nate. I'm definitely going to check it out!
+[3:35 pm on 12 May, 2022] Joanna: It was awesome, Nate. The sound of that place and the beauty of nature made me so calm and peaceful. Everything else faded away and all that mattered was the present.
+[10:57 am on 22 August, 2022] Joanna: Wow, that series looks awesome! I'll have to check it out sometime!
+[11:15 am on 6 October, 2022] Joanna: Taking breaks and reducing stress is pretty nice! Have you watched any good movies recently? I could use some recommendations!
+[5:54 pm on 9 November, 2022] Joanna: Wow, that's a cool idea! What inspired you to start making gaming videos?
+
+Question: When did Joanna first watch "Eternal Sunshine of the Spotless Mind?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>3 years ago</answer>
+--- PARSED PREDICTION (answer_tag) ---
+3 years ago
+====================
+
+=== Q: In which month's game did John achieve a career-high score in points? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[4:21 pm on 16 July, 2023] John: Hey Tim! Good to see you again. So much has happened in the last month - on and off the court. Last week I scored 40 points, my highest ever, and it feels like all my hard work's paying off. [shared photo: a photography of a score board with a clock and a phone]
+[4:21 pm on 16 July, 2023] John: Thank you! Scoring those points was an incredible experience. The atmosphere was electric, and my teammates and I were thrilled. We pulled off a tough win! [shared photo: a photo of a group of men sitting on top of a basketball court]
+[3:00 pm on 2 October, 2023] John: It was so amazing! The energy was crazy and everyone was so hyped. Seeing the top players was so motivating - it made me want to work even harder. Check out this pic from the game! [shared photo: a photo of a basketball game with a crowd of people watching]
+[1:50 pm on 13 October, 2023] John: It was an intense season with both tough losses and great wins. Overall, I'd say we did pretty well.
+[11:41 am on 6 November, 2023] John: Yeah, last year I had a basketball game where we were trailing big time in the 4th quarter. We had to dig deep and keep on pushing to overturn the deficit and it was amazing when that final buzzer sounded. Unforgettable feeling.
+[5:34 pm on 6 December, 2023] John: I've been playing professionally for just under a year now. It's been a wild ride.
+[8:28 pm on 11 December, 2023] John: Thanks! It's a bummer about your English lit class, but you did your best. By the way, I had a career-high in assists last Friday in our big game against our rival. Yay! [shared photo: a photo of a basketball game being played in a large arena]
+[8:28 pm on 11 December, 2023] John: I've had some thrilling games in my career. My favorite was when we were down 10 in the 4th and I hit the buzzer-beater shot to win. The atmosphere was incredible and it was such a thrilling experience. Those moments make me love basketball so much.
+[3:37 pm on 16 December, 2023] John: Winning was such a thrill, and it was an awesome moment. These experiences really make me love the game.
+[5:24 pm on 7 January, 2024] John: The game turned out to be a total success! Lots of people showed up and had a great time, plus we were able to raise some money for charity.
+
+Question: In which month's game did John achieve a career-high score in points?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>July 2023</answer>
+--- PARSED PREDICTION (answer_tag) ---
+July 2023
+====================
+
+=== Q: What fields would Caroline be likely to pursue in her educaton? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[1:56 pm on 8 May, 2023] Caroline: Gonna continue my edu and check out career options, which is pretty exciting!
+[1:56 pm on 8 May, 2023] Melanie: Wow, Caroline! What kinda jobs are you thinkin' of? Anything that stands out?
+[1:56 pm on 8 May, 2023] Caroline: I'm keen on counseling or working in mental health - I'd love to support those with similar issues.
+[10:37 am on 27 June, 2023] Caroline: Lately, I've been looking into counseling and mental health as a career. I want to help people who have gone through the same things as me. [shared photo: a photo of a book shelf with many books on it]
+[10:37 am on 27 June, 2023] Melanie: Wow, Caroline! You've gained so much from your own experience. Your passion and hard work to help others is awesome. Keep it up, you're making a big impact!
+[10:37 am on 27 June, 2023] Melanie: Congrats Caroline! Good on you for going after what you really care about. [shared photo: a photo of a book shelf filled with books in a room]
+[4:33 pm on 12 July, 2023] Caroline: Thanks, Mell! I'm still looking into counseling and mental health jobs. It's important to me that people have someone to talk to, and I want to help make that happen.
+[1:50 pm on 17 August, 2023] Melanie: Yeah, Caroline! I'll start thinking about what we can do.
+[3:19 pm on 28 August, 2023] Caroline: I'm definitely carrying on volunteering at the youth center. It's an important part of my life and I've made strong connections with people there. I really believe in community and supporting each other. So I wanna keep making a difference.
+[12:09 am on 13 September, 2023] Caroline: I haven't done pottery yet, but I'm game for trying new art. I might try it sometime! Check out this piece I made! [shared photo: a photo of a painting on a easel with a red and blue background]
+
+Question: What fields would Caroline be likely to pursue in her educaton?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>Counseling or mental health</answer>
+--- PARSED PREDICTION (answer_tag) ---
+Counseling or mental health
+====================
+
+=== Q: What might John's financial status be? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[8:55 pm on 25 February, 2023] John: It's really inspiring to see someone staying optimistic even when things get tough.
+[3:18 pm on 4 May, 2023] John: That looks interesting. What's the story behind the picture?
+[5:04 pm on 6 May, 2023] John: Thanks, Maria. Got it. It's easy to get lost and forget that. Appreciate your support. How's that going for you?
+[7:38 pm on 20 May, 2023] John: Yeah, I hope so. They've given so much and deserve our backing. I want to help make their lives better.
+[12:21 am on 27 June, 2023] John: It's great knowing that our actions can brighten someone else's life. Keep it up!
+[8:43 pm on 3 July, 2023] John: That's really nice of you. It's important to help family during hard times. How is she doing now?
+[8:43 pm on 3 July, 2023] John: Definitely, it's essential for wellbeing. It's great that you're supporting her. Is there anything specific she needs help with? Maybe I can assist as well.
+[6:59 pm on 5 July, 2023] John: My family, exercise, and spending time with friends, for sure.
+[12:10 am on 11 August, 2023] John: Lately, I've been stumped about something. Don't feel like I'm making much of an impact here, which has me questioning my decisions and goals.
+[12:10 am on 11 August, 2023] John: Lately I've been exploring options. One idea I had was to join local organizations or volunteering programs. Maybe that's an option.
+
+Question: What might John's financial status be?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>Not specified</answer>
+--- PARSED PREDICTION (answer_tag) ---
+Not specified
+====================
+
+=== Q: Is it likely that Nate has friends besides Joanna? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[6:44 pm on 17 April, 2022] Nate: Hey Joanna! Haven't talked with you in a while - how's it going?
+[7:49 pm on 20 May, 2022] Nate: Hey Joanna! How've you been? Been a busy week since we talked.
+[7:49 pm on 20 May, 2022] Nate: Wow, that looks great Joanna! Is that your third one?
+[3:00 pm on 25 May, 2022] Nate: They actually didn't share a whole lot in common with me besides the love of animals, but I think that was all we needed to share in common to be good friends!
+[3:00 pm on 25 May, 2022] Joanna: That's really cool that you can just go out and meet people like that, keep it up Nate!
+[3:00 pm on 25 May, 2022] Joanna: Awww! It's so cute! I love the thought Nate!
+[2:12 pm on 5 June, 2022] Nate: Of course! Well see you later Joanna!
+[8:16 pm on 25 October, 2022] Nate: Wow Joanna, that's so cool! It's amazing how our imaginations can bring ideas to life. Can you tell me more about the character on the left in the photo?
+[8:16 pm on 25 October, 2022] Nate: Yeah, they each do. One is more adventurous while the other is more reserved, which I find cute. Having them around brings me joy and they make great companions.
+[5:54 pm on 9 November, 2022] Nate: Bye Joanna!
+
+Question: Is it likely that Nate has friends besides Joanna?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>Yes</answer>
+--- PARSED PREDICTION (answer_tag) ---
+Yes
+====================
+
+=== Q: Would Tim enjoy reading books by C. S. Lewis or John Greene? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[4:21 pm on 16 July, 2023] Tim: That's awesome! I don't surf, but reading a great fantasy book helps me escape and feel free. [shared photo: a photo of a book with a harry potter cover]
+[10:29 am on 9 August, 2023] Tim: Thanks for asking! I'm reading a fantasy book that really captivates me. It takes me to another world where I'm on the edge of my seat and my imagination soars. It's amazing how books can transport us like that.
+[10:22 am on 21 November, 2023] Tim: Yes, they are still my favorites - I love how they take me to other places. What other books do you like?
+[10:22 am on 21 November, 2023] John: I love non-fiction books about personal development and mindset. They help me know myself better. Do you enjoy reading other types of books as well?
+[10:22 am on 21 November, 2023] Tim: Yep, John! I love getting lost in fantasy stories, but also discovering new ways to better myself through books on growth, psychology, and improving myself. It's wild how much you can learn from them, right?
+[10:22 am on 21 November, 2023] John: Yeah, Tim! Books really can shift how we think and help us learn totally new things. Have you come across any that made a big impact on you recently?
+[10:22 am on 21 November, 2023] Tim: Yeah, John! I recently read a book that really made a big impact on me. It's all about how small changes can make big differences. It really changed the way I do things. Have you read any good books lately?
+[10:22 am on 21 November, 2023] Tim: Definitely! Books have a way of opening up new worlds, inspiring us, and making us think. They have the power to make us feel better and help us grow, which is amazing. It's great that we share a love for reading. Let's keep exploring books and motivating each other! Talk to you later!
+[7:42 pm on 8 December, 2023] Tim: I haven't read that yet but I've heard great things! Just finished "A Dance with Dragons" and it's a really good story. Highly recommend it! [shared photo: a photography of a book shelf with a book and a book cover]
+[5:26 pm on 2 January, 2024] Tim: Wow! Love the way you go for it. Don't ever quit on what you love. I will always love reading, personally. [shared photo: a photo of a collection of harry potter books on a desk]
+
+Question: Would Tim enjoy reading books by C. S. Lewis or John Greene?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>Yes</answer>
+--- PARSED PREDICTION (answer_tag) ---
+Yes
+====================
+
+=== Q: What is an indoor activity that Andrew would enjoy doing while make his dog happy? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[10:47 am on 6 May, 2023] Andrew: I'm looking for a place near a park or woods, so I can stay close to nature and give the dog a large open space to run around
+[2:03 pm on 11 May, 2023] Andrew: That's awesome! Glad have the opportunity to bond with your pets. That workshop sounds cool. Where did you hear about it? And the one in the picture is adorable!
+[1:51 pm on 26 June, 2023] Andrew: Awesome! They must love it. Makes me happy seeing them have fun. Any plans on making it even more pup-friendly?
+[1:51 pm on 26 June, 2023] Andrew: Wow you really went in huh!?  Now they have a great place to play and explore, that's awesome! Take a look at this place I'm at. [shared photo: a photo of a group of dogs playing with a ball in a large indoor area]
+[1:51 pm on 26 June, 2023] Andrew: This is the doggy daycare near me, it has a big indoor space for dogs to play.
+[9:48 am on 8 July, 2023] Andrew: Oh I'm sure, dogs definitely add lots of fun to our daily life.
+[9:58 pm on 16 August, 2023] Andrew: That sounds adorable! Pets always find their own little spots and it brings so much joy and comfort. Here's Toby at his favorite spot. [shared photo: a photo of a dog laying on a fluffy blanket on the floor]
+[9:41 pm on 6 October, 2023] Andrew: Yeah, dogs sure know how to find the simple joys of life! Appreciating the little things is so important. Well speaking of interesting hobbies, I rememver you mentionoed about that jewelry earlier? I remember you saying you make them with recycled objects. That sounds cool - tell me more!
+[7:59 pm on 4 November, 2023] Audrey: We give them lots of activities to keep them busy - puzzles, training, hide-and-seek - they love it all! [shared photo: a photography of a dog playing with a frisbee in a room]
+[7:59 pm on 4 November, 2023] Andrew: Cool ideas! I think I'll give those activities a try with my pups. Thanks!
+
+Question: What is an indoor activity that Andrew would enjoy doing while make his dog happy?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>Puzzles, training, hide-and-seek</answer>
+--- PARSED PREDICTION (answer_tag) ---
+Puzzles, training, hide-and-seek
+====================
+
+=== Q: What did the charity race raise awareness for? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[1:14 pm on 25 May, 2023] Melanie: Hey Caroline, since we last chatted, I've had a lot of things happening to me. I ran a charity race for mental health last Saturday – it was really rewarding. Really made me think about taking care of our minds.
+[1:14 pm on 25 May, 2023] Caroline: That charity race sounds great, Mel! Making a difference & raising awareness for mental health is super rewarding - I'm really proud of you for taking part!
+[10:37 am on 27 June, 2023] Melanie: Woah, Caroline, it sounds like you're doing some impressive work. It's inspiring to see your dedication to helping others. What motivated you to pursue counseling?
+[1:36 pm on 3 July, 2023] Caroline: Thanks, Mel! It really motivated me for sure. Talking to the community made me want to use my story to help others too - I'm still thinking that counseling and mental health is the way to go. I'm super excited to give back. 
+[4:33 pm on 12 July, 2023] Caroline: It taught me self-acceptance and how to find support. It also showed me that tough times don't last - hope and love exist. Pets bring so much joy too, though.
+[4:33 pm on 12 July, 2023] Caroline: Wow! What got you into running?
+[1:51 pm on 15 July, 2023] Caroline: Yes, I did. It was amazing! I felt so accepted and happy, just being around people who accepted and celebrated me. It's definitely a top memory. [shared photo: a photo of a group of people holding up signs and smiling]
+[2:31 pm on 17 July, 2023] Caroline: The pride event was awesome! It was so encouraging to be surrounded by so much love and acceptance. [shared photo: a photo of a woman holding a rainbow umbrella in the air]
+[8:56 pm on 20 July, 2023] Melanie: Wow, Caroline, your group sounds awesome! Supporting each other and making good things happen - that's so inspiring! Have you been part of any events or campaigns lately?
+[2:24 pm on 14 August, 2023] Caroline: It was so inspiring, Mel! Check out the crowd. People of all kinds celebrating love and acceptance - it really pushed me to keep fighting for LGBTQ rights. [shared photo: a photo of a group of people walking down a street with balloons]
+
+Question: What did the charity race raise awareness for?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>mental health</answer>
+--- PARSED PREDICTION (answer_tag) ---
+mental health
+====================
+
+=== Q: How do Jon and Gina both like to destress? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[4:04 pm on 20 January, 2023] Gina: Wow Jon, same here! Dance is pretty much my go-to for stress relief. Got any fave styles?
+[2:32 pm on 29 January, 2023] Gina: Believe in yourself, Jon! The process may be tough, but you got this. Push through and it'll be worth it. Don't forget to take breaks and dance it out when you need to destress!
+[12:48 am on 1 February, 2023] Jon: Hey Gina, hope you're doing ok! Still following my passion for dance. It's been bumpy, but I'm determined to make it work. I'm still searching for a place to open my dance studio.
+[9:32 am on 8 February, 2023] Gina: Totally agree, Jon. Dancing lets us be ourselves and ain't nothing like the feeling it gives us. You're so dedicated to your studio, it's inspiring. Chase those dreams, buddy!
+[1:26 pm on 3 April, 2023] Gina: Thanks Jon! Dance is my stress relief and fashion fuels my creativity. I love finding new trends for my store. It keeps me motivated to keep growing. Check out this pic of my fave dance session! [shared photo: a photo of a man and woman doing a yoga pose]
+[10:33 am on 9 April, 2023] Gina: Wow Jon, you look so happy when you dance! Show the world your true self and keep dancing!
+[10:33 am on 9 April, 2023] Jon: Thanks a bunch, Gina! You seriously rock. Dancing for me is like a way to express myself and find my happy place. I used to be scared to death of what people would think, but I learnt that my own happiness is the most important thing. It's been tough but also the best thing ever!
+[3:14 pm on 11 May, 2023] Gina: Gotcha, Jon! Dance is my stress fix too. As soon as I start, all my worries vanish. It's amazing what we can do for our own mental health with something we enjoy.
+[3:14 pm on 11 May, 2023] Jon: Yeah, Gina! Dancing helps me de-stress. It's where I'm most alive. It's a must-have in my life.
+[3:14 pm on 11 May, 2023] Gina: I get it, Jon. Dance is just me -- I can't picture life without it. It's like air.
+
+Question: How do Jon and Gina both like to destress?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>Dance</answer>
+--- PARSED PREDICTION (answer_tag) ---
+Dance
+====================
+
+=== Q: What is John's main focus in local politics? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[11:01 am on 17 December, 2022] John: Yeah Maria, I'm really hoping to get into local politics. I love helping the community and making it a better place.
+[11:01 am on 17 December, 2022] John: I'm passionate about improving education and infrastructure in our community. Those are my main focuses.
+[11:01 am on 17 December, 2022] John: I'm gonna chat with local leaders and organizations, get support and gather ideas for my next move.
+[7:06 pm on 9 January, 2023] John: I've been keeping busy since we last talked! I've been looking into local politics, talking to community leaders, and getting to know the needs and hopes of our neighborhood. It's been super informative, and I'm feeling optimistic about it all.
+[2:33 pm on 5 February, 2023] John: I feel a strong urge to serve my country and community. Running for office was my chance to make an impact. But anyway, tell me more about your charity event. Did something special happen that made it meaningful for you?
+[9:36 am on 2 April, 2023] John: Thanks! I'm considering going into policymaking because of my degree and my passion for making a positive impact. There are many opportunities to make improvements.
+[9:36 am on 2 April, 2023] John: Going to community meetings and getting involved in my community has given me a better understanding of the challenges our education and infrastructure systems face. It has also shown me the impact these issues have on our neighbors, highlighting the need for us to work towards finding solutions.
+[7:34 pm on 18 April, 2023] John: Recently, education reform and infrastructure development. Good access to quality education and updated infrastructure are key to a thriving and successful community. My goal is to get conversations going and get people involved by sharing ideas and taking action. It's really empowering to know I can help make a difference in people's lives.
+[12:10 am on 11 August, 2023] John: Lately, I've been stumped about something. Don't feel like I'm making much of an impact here, which has me questioning my decisions and goals.
+[12:10 am on 11 August, 2023] John: Lately I've been exploring options. One idea I had was to join local organizations or volunteering programs. Maybe that's an option.
+
+Question: What is John's main focus in local politics?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>Education and infrastructure</answer>
+--- PARSED PREDICTION (answer_tag) ---
+Education and infrastructure
+====================
+
+=== Q: What is one of Joanna's favorite movies? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[7:31 pm on 21 January, 2022] Joanna: Cool, Nate! So we both have similar interests. What type of movies do you like best?
+[7:31 pm on 21 January, 2022] Joanna: Yep, that movie is awesome. I first watched it around 3 years ago. I even went out and got a physical copy! [shared photo: a photo of a dvd on a table with a blurry background]
+[7:31 pm on 21 January, 2022] Joanna: A few times. It's one of my favorites! I really like the idea and the acting.
+[9:27 am on 7 February, 2022] Joanna: I can tell! Your cooking skills are awesome. Seen any good movies lately?
+[9:27 am on 7 February, 2022] Joanna: I just watched "Little Women" and it was amazing! It's a great story about sisterhood, love, and reaching for your dreams. Definitely a must-see!
+[9:27 am on 7 February, 2022] Joanna: Anytime! I'm always down to give movie reccomendations.
+[7:44 pm on 21 April, 2022] Joanna: That's awesome! I love how video games can really spark your imagination. Do you have a favorite fantasy or sci-fi movie?
+[10:58 am on 9 October, 2022] Joanna: That sounds great! What's your favorite game or movie that you've seen recently?
+[10:58 am on 9 October, 2022] Joanna: I watched a classic movie the other day that was awesome - the story was so gripping and the actors were great! It really stuck with me. [shared photo: a photo of a framed movie poster with a signed picture]
+[10:58 am on 9 October, 2022] Joanna: Well, it was amazing, so probably 9 or 10 out of 10! Movies can take us to different places and make us feel lots of emotions. What do you love about watching them?
+
+Question: What is one of Joanna's favorite movies?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>The movie she watched around 3 years ago</answer>
+--- PARSED PREDICTION (answer_tag) ---
+The movie she watched around 3 years ago
+====================
+
+=== Q: Which team did John sign with on 21 May, 2023? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[7:48 pm on 21 May, 2023] John: That's great! I just signed with a new team - excited for the season!
+[7:48 pm on 21 May, 2023] Tim: Woohoo! Congrats on the new team. Which team did you sign with?
+[7:48 pm on 21 May, 2023] John: The Minnesota Wolves! I can't wait to play with them!
+[7:48 pm on 21 May, 2023] John: Fitting into the new team's style of play was a challenge during pre-season.
+[10:29 am on 9 August, 2023] John: Our team bond is awesome and it makes all the hard work worth it.
+[7:54 pm on 17 August, 2023] John: Thanks! They signed it to show our friendship and appreciation. It's a great reminder of our bond.
+[8:17 pm on 21 September, 2023] John: We're planning to take a team trip next month to explore a new city and have some fun. Can't wait!
+[10:22 am on 21 November, 2023] John: Thanks! I appreciate your support. It's all about growing and getting better, both on and off the court. Let's keep working hard!
+[5:34 pm on 6 December, 2023] John: I've been playing professionally for just under a year now. It's been a wild ride.
+[10:04 am on 19 December, 2023] John: Things have been going great on the court. We've been putting in a lot of work and achieving our goals, which is awesome.
+
+Question: Which team did John sign with on 21 May, 2023?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>Minnesota Wolves</answer>
+--- PARSED PREDICTION (answer_tag) ---
+Minnesota Wolves
+====================
+
