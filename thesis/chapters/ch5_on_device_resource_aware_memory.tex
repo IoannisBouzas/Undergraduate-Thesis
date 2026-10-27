@@ -1,0 +1,604 @@
+
+\chapter{Resource-aware long-term memory on a smartphone}
+\label{ch:on_device_memory}
+
+On the tested Galaxy S23 Ultra, Vector RAG had higher accuracy point estimates and lower measured
+energy per query than truncated full context in all five reader pairs. These separate measurements
+describe answer quality and device cost. Correct answers per kilojoule summarizes their joint
+effect: the observed Vector-RAG advantage was 5.8$\times$ to 26.9$\times$ for the four reader pairs
+with a non-zero full-context denominator, and these multipliers are uncertain with 20 questions
+per cell (Section~\ref{sec:ch5_charge}). On this slice, Vector RAG answered every question that full
+context answered correctly, as well as additional questions. Across the five readers, it produced
+40.8 to 68.8 correct answers per full-charge equivalent, against 0 to 8.9 for full context. Query
+service was also 6.8$\times$ to 8.2$\times$ faster. These values describe the tested phone
+workloads, not every mobile agent or question mix.
+
+\paragraph{Contribution of this chapter.} Among the studies reviewed in
+Section~\ref{sec:ch2_device}, MobileRAG reports per-query phone energy for document retrieval and
+SmartRAG reports average phone power for one graph system whose baselines ran off the phone. None
+compares memory representations of a conversation history by accuracy and energy both measured on
+one handset. This chapter makes that comparison for vector retrieval and truncated full context
+with five readers, using accuracy judged from the phone's own answers. It also measures, on the same
+handset and with the same energy method, what it costs to build a vector memory and an
+SLM-extracted graph memory for a conversation.
+
+The result continues the strategy comparison in Chapter~\ref{ch:memory_evaluation} but
+changes the unit of analysis. Chapter~\ref{ch:memory_evaluation} asks which memory
+representation produces correct answers under controlled workstation conditions. This
+chapter asks what happens when the same broad choice must fit a phone's battery, memory
+and thermal limits. Chapter~\ref{ch:spe} later returns to graph-memory repair. Here,
+GraphRAG is limited to the direct phone construction evidence that actually exists.
+
+The chapter addresses the following research question:
+
+\begin{quote}
+\textbf{RQ2.} What trade-offs between answer quality and resource consumption arise when
+deploying long-term memory strategies on smartphones?
+\end{quote}
+
+\section{A resource-aware objective}
+\label{sec:ch5_objective}
+
+A continuing mobile agent does more than issue isolated language-model calls. It stores
+observations, updates its memory and retrieves evidence while sharing a finite battery
+and thermal envelope with the rest of the phone. A memory design that is accurate but
+repeatedly fills the context window can be too slow or expensive to use. Low energy is
+not sufficient either if the reader returns no correct answers.
+
+Accuracy and energy per query are reported first as separate measures of answer quality and device
+cost. Correct answers per unit of energy, $G_E$ in Equation~\ref{eq:golden_metric}, adds a combined
+measure: how many correct answers the measured energy buys. It is reported per kilojoule as the
+number of judge-scored correct phone answers divided by the voltage-weighted battery energy of the
+recorded workload, including energy spent on incorrect answers. The combined measure complements
+the separate results; a high value alone does not establish adequate accuracy or low query cost.
+Correct answers per full-charge equivalent, $G_Q$, are computed separately from the direct
+charge-counter delta.
+
+This avoids mixing a voltage-weighted joule numerator with a nominal-voltage battery
+denominator. Neither measure predicts daily battery life because the screen, radios,
+background applications and the rest of the agent loop sit outside the measured span.
+
+Section~\ref{sec:ch2_device} explains why these costs must be measured for the tested
+configuration rather than inferred from token counts or from other
+devices~\citep{slm_edge_deployment,ondevice_lm_review}.
+
+\section{Experimental boundary}
+\label{sec:ch5_boundary}
+
+Chapter~\ref{ch:methodology} defines the phone protocol, voltage-weighted Coulomb
+counting, question selection and judging procedure. Inference ran on the CPU of the Galaxy
+S23 Ultra described there, with 12~GB of RAM and a 5,000~mAh battery. The local inference server used one slot, an
+8,192-token slot context and five model threads. Workloads ran unplugged with the screen
+off.
+
+Five standard Q4\_K\_M readers were evaluated: Qwen3.5 0.8B, 2B and 4B, and Gemma 4 E2B
+and E4B. Vector retrieval used the Q4\_K\_M Nomic Embed Text v1.5 artifact. Revisions, filenames, byte sizes and
+SHA-256 digests reconstructed during the evidence audit are
+recorded in \texttt{docs/runbooks/MODEL\_PROVENANCE.md}. The surviving run directories
+did not embed immutable model hashes, so this reconstruction combines server logs with
+the surviving model cache.
+
+The primary comparison uses the same balanced 20-question LoCoMo slice under Vector RAG
+and truncated full context~\citep{locomo}. It contains five questions from each of the
+four evaluated question families. Decoding was deterministic, and every accuracy in the
+phone tables was judged from a phone output. The energy unit is a complete sitting
+divided by its number of scored answers. Vector RAG has three complete energy sittings
+for every reader. Gemma E2B full context also has three, one of which completed 19
+answers. The other full-context cells have one complete sitting. Appendix~\ref{app:on_device_statistics} gives the replicate values and uncertainty details.
+
+The device audit searched the experiment locations accessible through ADB and Termux:
+shared storage, Termux's private results directory and the local mirror of pulled
+results. Protected Android sandboxes and restricted kernel interfaces were not readable
+without root. The evidence claim is therefore limited to accessible experimental
+storage.
+
+\section{The two statistical results used in this chapter}
+\label{sec:ch5_statistical_story}
+
+\subsection{Workstation accuracy cannot substitute for phone accuracy}
+\label{sec:ch5_parity}
+
+The phrase ``the workstation result does not transfer to the phone'' has a precise
+meaning in this thesis. It does not mean that the phone was proved less accurate. It
+means that the predefined agreement rule did not license the two environments as
+interchangeable.
+
+The parity run used the same 100 question identifiers and the same E2B Vector-RAG
+configuration on the workstation and phone. Each answer was reduced to a paired binary
+correctness label. The two devices agreed on 83 of 100 labels, below the required 90\%
+agreement. Cohen's $\kappa$ was 0.621. Of the 17 disagreements, five questions were
+correct only on the workstation and 12 only on the phone. An exact McNemar test on those
+discordant pairs gave $p=0.1435$.
+
+These numbers answer different questions. Agreement measures whether the same questions
+receive the same labels. McNemar's test asks whether the disagreements consistently
+favor one device; this run did not establish a directional accuracy shift. The agreement
+criterion still failed. Workstation accuracy is therefore not joined to phone energy anywhere in
+the main result.
+
+\subsection{Question family changes the observed difficulty}
+\label{sec:ch5_question_families}
+
+The second result concerns the benchmark, not the device. The agreement rule
+forbids substituting workstation \emph{accuracy} for phone accuracy; it does not prevent
+using the workstation record to characterize the \emph{questions} both environments
+answer. That use assumes only that the relative difficulty of LoCoMo's question families
+carries across environments, which is weaker than the per-question label agreement the
+parity gate tested and failed. On the workstation sample, question family (the LoCoMo
+category) remained associated with correctness in all eight primary Gemma reader-memory
+cells after Holm correction (Section~\ref{sec:ch4_locomo_categories}). Phone accuracy
+must therefore be tied to its sampled question composition. The balanced phone slice
+gives each family equal weight and should not be read as an estimate under LoCoMo's
+natural family frequencies.
+
+\section{Measured phone comparison}
+\label{sec:ch5_phone_comparison}
+
+Table~\ref{tab:ch5_phone_cells} presents the direct phone measurements.\footnote{All
+20-question phone Vector RAG runs in this chapter, including
+Figures~\ref{fig:ch5_phone_efficiency} and~\ref{fig:ch5_resource_dashboard}, use the
+unprefixed embedding path. On the same 20 questions, the prefixed 100-question runs answered 8
+(E2B) and 10 (E4B) correctly, against 10 and 8 here (Section~\ref{sec:retrieval}).} Repeated cells
+use the mean across complete sittings. Single-sitting values are point estimates without
+a replication claim.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \setlength{\tabcolsep}{4.2pt}
+  \begin{tabular}{llrrrr}
+    \toprule
+    Reader & Memory & Accuracy & J/answer & Query time (s) & Sittings \\
+    \midrule
+    Qwen3.5 0.8B & Vector RAG   & 20\% & 306  & 15.0  & 3 \\
+    Qwen3.5 0.8B & Full context &  0\% & 330  & 114.5 & 1 \\
+    Qwen3.5 2B   & Vector RAG   & 30\% & 433  & 34.8  & 3 \\
+    Qwen3.5 2B   & Full context & 10\% & 850  & 262.0 & 1 \\
+    Qwen3.5 4B   & Vector RAG   & 35\% & 569  & 94.0  & 3 \\
+    Qwen3.5 4B   & Full context & 10\% & 2166 & 641.9 & 1 \\
+    Gemma 4 E2B  & Vector RAG   & 50\% & 551  & 54.5  & 3 \\
+    Gemma 4 E2B  & Full context &  5\% & 1395 & 420.7 & 3$^{a}$ \\
+    Gemma 4 E4B  & Vector RAG   & 40\% & 737  & 93.0  & 3 \\
+    Gemma 4 E4B  & Full context &  5\% & 2589 & 759.7 & 1 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Phone-measured accuracy, voltage-weighted energy and query latency on the
+  balanced 20-question LoCoMo slice. Energy is the mean joules per answer across complete
+  sittings where repeated measurements exist. Latency is the mean of the per-sitting
+  medians. $^{a}$One Gemma E2B full-context sitting completed 19 answers.}
+  \label{tab:ch5_phone_cells}
+\end{table}
+
+Vector RAG had a higher accuracy point estimate, lower energy per answer and shorter
+query time in every reader pair. For Qwen3.5 0.8B the energy difference is small, 306 against
+330~J, and lies within the spread of that reader's three vector sittings (248 to 345~J); for the
+other four readers full context used 2 to 4 times more energy per answer. Reader size alone did not order the systems. Qwen3.5
+0.8B used the least energy for a Vector-RAG answer but reached only 20\% accuracy. Gemma
+E2B reached the highest measured accuracy and correct answers per unit of energy, while the larger Gemma
+E4B used more energy and scored ten percentage points lower on this slice. The small
+sample does not support a general ranking of the readers. It does show why a phone
+policy cannot use parameter count as its only decision variable.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{results/thesis_visuals/fig05_phone_efficiency.pdf}
+  \caption{Correct answers per unit of energy and energy per answer across the five phone
+  readers. The left panel divides
+  phone-measured accuracy by replicate-mean energy; the right panel shows mean joules per
+  answer, with each cell's individual sittings as grey dots above its marker. The Qwen3.5 0.8B full-context
+  cell produced zero correct answers, so no finite Vector/full-context efficiency ratio
+  is assigned to that pair.}
+  \label{fig:ch5_phone_efficiency}
+\end{figure}
+
+\section{Correct answers per charge}
+\label{sec:ch5_charge}
+
+Table~\ref{tab:ch5_charge} converts the Vector-RAG charge-counter measurements into
+correct answers per 5,000 mAh full-charge equivalent. It also reports the observed
+within-sitting advantage over full context.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \begin{tabular}{lrr}
+    \toprule
+    Reader & Vector correct/full charge & Paired Vector/FC efficiency \\
+    \midrule
+    Qwen3.5 0.8B & 50.2 & Undefined$^{a}$ \\
+    Qwen3.5 2B   & 52.8 & 5.8$\times$ \\
+    Qwen3.5 4B   & 46.7 & 13.4$\times$ \\
+    Gemma 4 E2B  & 68.8 & 25.1$\times$ \\
+    Gemma 4 E4B  & 40.8 & 26.9$\times$ \\
+    \bottomrule
+  \end{tabular}
+  \caption{Correct answers per full-charge equivalent for Vector RAG and its observed advantage over
+  full context. Vector values use mean charge per answer across complete sittings. The
+  efficiency ratios are computed within matched sittings and are therefore not obtained
+  by dividing the rounded means in Table~\ref{tab:ch5_phone_cells}. $^{a}$Full context
+  produced zero correct answers, so the ratio is undefined.}
+  \label{tab:ch5_charge}
+\end{table}
+
+The range in the opening paragraph is now visible directly in Table~\ref{tab:ch5_charge}: Gemma E4B is the 40.8 floor and Gemma E2B is the 68.8 ceiling.
+The smallest reader does not maximize correct answers per charge because its lower accuracy offsets
+part of its energy saving. The largest Gemma reader also does not maximize it because
+its extra energy did not buy a higher score on this slice.
+
+The complete full-context sittings produced 8.9 correct answers per charge for Qwen3.5
+2B, 3.3 for Qwen3.5 4B, 2.4 in the primary Gemma E2B sitting, 1.4 for Gemma E4B and zero
+for Qwen3.5 0.8B. These are workload-normalized comparisons, not a recommendation to
+drain a handset or a forecast of daily use.
+
+\paragraph{Sensitivity of the efficiency ratio to small-sample denominators.}
+The $25.1\times$ and $26.9\times$ ratios rest on very small denominators. On a 20-question slice, a
+5.0\% full-context accuracy is one correct answer ($1/20$), with a Wilson 95\% confidence interval of
+$[0.9\%, 23.6\%]$. One more correct full-context answer ($2/20=10.0\%$) would have cut the E2B ratio from
+$25.1\times$ to about $12.5\times$, and zero correct answers, as observed for Qwen 0.8B, leave the ratio
+undefined. Resampling the 20 observed question pairs with mean energy held fixed gives
+2.5th-percentile ratios ranging from 2.6$\times$ to 8.8$\times$ across the four readers with defined
+ratios (Appendix~\ref{app:ch5_energy_replication}). These are conditional sensitivity results:
+they do not include between-sitting energy variation or charge-counter bias, and resampling cannot
+introduce full-context-only successes absent from the original sample. The observed efficiency
+ordering holds in all five reader pairs, but the multipliers describe this slice and should not
+be read as general constants.
+
+\section{Latency, RAM and thermal headroom}
+\label{sec:ch5_resources}
+
+Figure~\ref{fig:ch5_resource_dashboard} places accuracy and energy beside query latency,
+the peak temperature of the hottest thermal zone and peak system RAM.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{results/thesis_visuals/fig12_phone_workload_dashboard.pdf}
+  \caption{Phone workload comparison across five readers. Accuracy uses 20 balanced LoCoMo questions with
+  Wilson 95\% intervals. Resource whiskers show between-sitting standard deviations; grey dots
+  are individual sittings. Vector retrieval has three sittings per reader; full context has
+  three for E2B and one otherwise. Energy and latency axes are logarithmic; thermal and RAM axes
+  do not start at zero. Resources summarize complete run spans. Temperature is the maximum
+  across readable thermal zones, not battery temperature; RAM is system-wide. Neither peak
+  isolates a model component.}
+  \label{fig:ch5_resource_dashboard}
+\end{figure}
+
+Vector retrieval shortened the mean of the per-sitting median query times from 114.5 to
+15.0 seconds for Qwen3.5 0.8B, from 262.0 to 34.8 seconds for Qwen3.5 2B, from 641.9 to
+94.0 seconds for Qwen3.5 4B, from 420.7 to 54.5 seconds for Gemma E2B and from 759.7 to
+93.0 seconds for Gemma E4B. Retrieval adds ingestion, but repeated queries avoid paying
+full-context prefill on every request.
+
+Peak RAM did not follow the same ordering. Measured as system-wide memory in use (total minus
+available), the cell means lay between about 5.5 and 6.7 GB, with
+retrieval lower for some readers and higher for others. Model weights and the resident
+runtime occupy much of this footprint at the tested context size. The evidence supports
+reduced repeated context processing, not a claim that retrieval always reduces peak
+resident memory.
+
+The displayed mean of per-sitting hottest-zone peaks was higher for Vector RAG in all five reader
+pairs, by 0.5 to 3.7 degrees Celsius, despite much shorter query times. Four comparisons
+combine a three-sitting Vector-RAG mean with one full-context sitting, so this 5-of-5
+pattern is descriptive. It does not establish that retrieval inherently runs hotter, and the recorded traces do not
+explain it. Vector-RAG queries were short, with medians of 15 to 94 seconds, against about 2 to
+13 minutes for full context, so a peak reading may reflect a short burst rather than cumulative
+thermal load. However, prefill and decode were not timed separately, governor decisions were not
+recorded, and the core-frequency medians discussed below show no consistent pattern between the
+strategies. Testing the burst account would require a controlled experiment with matched starting
+temperature and frequency-residency logging.
+
+Mean power over a sitting separates the two strategies as well, and in the opposite direction to
+duration. Table~\ref{tab:ch5_power} gives the whole-device average over each measured span. Vector
+retrieval drew more average power than full context in four of the five reader pairs, by 0.13 to
+1.22~W, and the same power to within 0.01~W in the fifth, while its median query took about one
+seventh as long.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \begin{tabular}{lrr}
+    \toprule
+    Reader & Vector RAG (W) & Full context (W) \\
+    \midrule
+    Qwen3.5 0.8B & 2.88 & 2.89 \\
+    Qwen3.5 2B   & 3.97 & 3.27 \\
+    Qwen3.5 4B   & 3.44 & 3.31 \\
+    Gemma 4 E2B  & 4.11 & 3.59 \\
+    Gemma 4 E4B  & 4.71 & 3.49 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Mean whole-device power over each sitting's measured span, from the same charge-counter
+  energy and span as the energy column of Table~\ref{tab:ch5_phone_cells}
+  (\texttt{results/golden\_metric.json}). One sitting per cell, not a replicate mean. The
+  construction pilot of Section~\ref{sec:ch5_graph_boundary} averaged 3.96~W over its span.}
+  \label{tab:ch5_power}
+\end{table}
+
+Two explanations were considered for that difference (\texttt{results/phone\_power\_phases.json}).
+The first is the work of building the vector memory. Each vector sitting embeds six conversation
+histories, one before each history's questions, and these embedding windows took 22.8 to 31.7 minutes
+of a 29 to 55-minute sitting. They drew 3.4 to 5.1~W, more than the question stretches of the same
+sitting in four of the five readers (by 0.4 to 0.9~W; Qwen3.5 4B was level), so building the memory
+accounts for part of the difference. The question stretches alone drew 3.1 to 4.4~W, against 2.9 to
+3.6~W over the whole full-context sittings: a gap of 0.9~W for Gemma E4B and 0.3~W or less for the
+other readers. Four of those full-context sittings started at the highest possible charge (100\%),
+and in three of them the charge counter paused, which makes their power read low, so only the E4B
+gap is clearly larger than that effect. The second explanation is the duty cycle. The median of the maximum core frequency
+during the question stretches was 1,594 to 1,978~MHz in the vector sittings, against 1,843~MHz in
+every full-context sitting, so the clock data show no consistent pattern that would support it. The
+traces do not record governor decisions, so the remaining difference is not explained here. Vector
+stretches that began while the charge counter was paused at full charge are left out of these phase
+figures.
+
+The recovered second Gemma E4B full-context sitting illustrates another device outcome:
+failure to complete. It produced 8 of 20 output records and no final summary during
+approximately 113 minutes. The battery level fell from 96\% to 65\% over the surviving
+trace. Because the boundary cannot be matched to the sealed cells, this run is excluded
+from the result tables. Its value is operational: checkpointing and recoverability are
+part of a phone memory system, not merely conveniences for the experimenter.
+
+\subsection{Prefill dominance and KV-cache size}
+\label{sec:ch5_prefill_decode_memory}
+
+The latency and memory measurements in the dashboard reflect the prefill--decode difference and the
+growth of the KV cache with context length, both introduced in Section~\ref{sec:ch2_slms}.
+Figure~\ref{fig:ch5_prefill_decode_memory} shows the measured query times of the Gemma~4 E2B phone runs
+(llama.cpp on the Snapdragon 8 Gen 2 CPU cluster, 5 pinned threads, CPU mask \texttt{0xf8}).
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{results/thesis_visuals/fig20_phone_prefill_decode_memory.pdf}
+  \caption{Measured query time (retrieval plus generation) of every answered Gemma-4 E2B question on the
+  Samsung Galaxy S23 Ultra against its prompt length: three full-context sittings, four vector-retrieval
+  sittings with ten retrieved turns (one of them 100 questions long), one sitting with two retrieved turns, and
+  the four questions of the early graph pilot. Large markers are medians. The phone records only the total
+  generation time of each question, so prefill and decode time are not separated.}
+  \label{fig:ch5_prefill_decode_memory}
+\end{figure}
+
+Figure~\ref{fig:ch5_prefill_decode_memory} plots every answered E2B phone question against its prompt length.
+Full-context prompts of about 4,900 tokens took a median of 411 to 431 seconds per sitting. Ten retrieved
+turns (about 680 tokens) took 46 to 65 seconds, two retrieved turns (about 290 tokens) about 21 seconds, and
+the four graph-pilot questions (about 510 tokens) about 34 seconds. Query time follows prompt length: the
+median full-context prompt is 17 times as long as the median two-turn prompt (4,905 against 294 tokens) and
+took 20 times as long (418.5 against 20.8 seconds). The answers are short, a median of 10 tokens (8 to 21)
+across the 243 answers. The phone logs only the total generation time, so the time spent decoding the answer
+cannot be separated in these runs; the near-proportional scaling indicates that processing the prompt sets
+the cost of a question. Measured per sitting, the phone processed 10.9 to 15.4 prompt tokens per second of
+query time, and 11.0 to 11.9 in the full-context sittings. Averaged over sittings, full context took 7.7
+times as long per question as vector retrieval, 420.7 against 54.5 seconds (Section~\ref{sec:ch5_resources}).
+
+Memory was measured as system-wide RAM in use (total minus available memory), not per process. Peak use in
+the E2B sittings averaged about 6.7~GB under both strategies (Figure~\ref{fig:ch5_resource_dashboard}). The
+server reserves the key--value cache for its whole 8,192-token context when it loads, so the reservation was
+the same for every strategy: prompt length changed time, not memory. The size of that cache follows from the
+model files. Twenty of Gemma-4 E2B's 35 layers reuse the KV cache of earlier layers, and 12 of the 15 layers
+that keep their own cache use a 512-token sliding window, so only three global layers grow with context.
+Calculated from the GGUF header shapes, the E2B cache is 57~MB at 8,192 tokens and 0.81~GB at 131,072 tokens,
+against 4.4~GB still free at the highest measured E2B peak (Figure~\ref{fig:app_ch5_kv_wall}). The layout
+behind that calculation is the published one: the Gemma~4 technical report states a four-to-one ratio of
+local to global attention blocks for E2B and five-to-one for E4B, and KV-cache sharing across 20 of 35 layers
+in E2B and 18 of 42 in E4B~\citep{gemma4}, which are the counts used here. Its Table~3 also reports the
+footprint of an int8 cache at a 32,768-token context, 0.05~GB for E2B and 0.14~GB for E4B, about half of what
+the calculation above gives for the same contexts at half precision. The calculated figures are therefore
+treated as an upper bound on the cache; the comparison against free memory only becomes more favourable if
+the published footprints are the operative ones. Apart from a four-question pilot that doubled the
+history budget to 8,192 tokens and was not pursued further (Appendix~\ref{app:reproducibility}), no
+longer context was run on the phone and no long-context study was done on it; the long-window
+full-context runs of Section~\ref{sec:ch4_long_fc} were made on the workstation. The runtime's other
+buffers were not measured at longer contexts, so this comparison bounds the cache alone rather than
+showing that a longer context would fit.
+Bounded KV growth does not make a long context cheap either, because prefill time and energy still grow with
+every prompt token, as the query times show.
+
+\section{The measured graph-construction boundary}
+\label{sec:ch5_graph_boundary}
+
+Graph memory remains preliminary on the phone. Figure~\ref{fig:ch5_phone_graph_pilot} shows the one
+direct construction pilot. Building an SLM-extracted graph for 419 dialogue turns took 92.1 minutes
+and consumed 21.9 kJ under the same voltage-weighted integration used elsewhere in this chapter, or
+52.3 J per turn. Fifty-eight of 84 extraction batches failed. The pilot then answered zero of four
+questions correctly. Four answers do not support a comparative accuracy estimate.
+
+The timeline in Figure~\ref{fig:ch5_phone_graph_pilot} shows how the handset behaved during
+extended extraction. The temperature trace is the hottest of all readable thermal zones. Its first
+sample, taken after the model servers had loaded, read $47.9^\circ\text{C}$, with the battery at
+$33.3^\circ\text{C}$. The hottest zone peaked at $95.4^\circ\text{C}$ 74 seconds after launch, 29 seconds
+into extraction, and the Cortex-X3 prime core reached its 3.36~GHz maximum only within the first minute.
+For most of the 92.1-minute construction span the fastest core then ran at 1.59~GHz, and the hottest zone
+had a median of $74.6^\circ\text{C}$, with ten-minute medians between $73.4$ and $77.8^\circ\text{C}$ after
+the first ten minutes. The charge counter gives an average of 3.96~W over the span; with the clock held
+down, the heat input and with it the temperature stayed nearly constant. A steady clock ceiling under a
+CPU-bound workload is consistent with thermal or power throttling, but the trace does not record governor
+state, so it cannot confirm the cause. Battery temperature rose steadily from $33.3^\circ\text{C}$ to
+$44.3^\circ\text{C}$. The two traces diverge throughout, which is why hottest-zone peaks are not reported
+as battery or chassis temperatures.
+
+The construction cost is the most informative measurement from this pilot.
+Table~\ref{tab:ch5_construction} shows how it is compared with building a vector memory. Each side
+is the whole-device battery energy spent while the phone built memory, measured with the same
+charge-counter method as the rest of this chapter, divided by the number of dialogue turns built.
+Graph construction is the Gemma~4 E2B reader writing triples for batches of five turns. Vector
+ingestion is the Nomic embedder embedding each turn once. Neither side includes answering questions.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \begin{tabular}{p{0.27\linewidth}p{0.30\linewidth}p{0.33\linewidth}}
+    \toprule
+    & Graph construction & Vector ingestion \\
+    \midrule
+    Work done per turn & Triple extraction by Gemma~4 E2B, five turns per call & One embedding by Nomic
+    Embed v1.5 \\
+    Measured runs & One pilot build & Three Gemma E2B vector sittings \\
+    Histories built & One conversation (\texttt{conv-26}, 419 turns) & Six per sitting; two windows
+    left out$^{a}$ \\
+    Duration and mean power & 92.1 min at 3.96~W & 31.7 min at 4.29~W in the first sitting \\
+    Energy per dialogue turn & 52.3~J & 2.04~J (1.85 to 2.37 by sitting) \\
+    \midrule
+    Ratio & \multicolumn{2}{l}{About 26$\times$ (22$\times$ to 28$\times$ against each vector sitting)} \\
+    \bottomrule
+  \end{tabular}
+  \caption{How the construction ratio is computed. The graph column is the single early phone build
+  (256-token extraction limit, 58 of 84 batches failed), not a usable repaired graph, and the ratio
+  applies to that build only. Both columns are direct phone measurements over the build windows only (\texttt{results/golden\_metric.json}, \texttt{construction} entry;
+  duration and power from \texttt{results/phone\_power\_phases.json}). $^{a}$Two embedding windows
+  began while the charge counter was paused at full charge and are left out.}
+  \label{tab:ch5_construction}
+\end{table}
+
+The two builds drew a similar average power, so the ratio comes almost entirely from time. Writing
+triples took about 13 seconds per dialogue turn (92.1 minutes for 419 turns), while embedding took
+about half a second per turn in the first vector sitting (31.7 minutes for 3,435 turns). Neither
+side depends on judged accuracy, on token counts or on the workstation record.
+
+The ratio describes this one attempted build, not the cost of constructing a usable graph, and three
+limits apply to it. The graph side is a single build of one conversation, so it has no replicate
+spread; the 22--28$\times$ range reflects only the variation between vector sittings. The build used
+the early 256-token extraction limit, and 58 of its 84 batches failed; failed batches still spent
+their decoding energy, so they are included in the cost, but they contributed no triples. Finally,
+the repaired 512-token configuration of Chapter~\ref{ch:graph_mechanisms} was not built on the phone,
+so its construction energy was not measured.
+
+The asymmetry matters because a memory policy that inspects only query prompts cannot observe
+either term: construction is paid before the first question is asked.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{results/thesis_visuals/fig06_phone_graphrag_pilot.pdf}
+  \caption{Early graph-construction pilot on the Galaxy S23 Ultra: 419 turns, 92.1 minutes and 21.9~kJ
+  (52.3~J/turn), with 58 of 84 extraction batches failing. The red trace is the hottest readable
+  thermal zone, not battery temperature; sampling begins after server loading. Core frequencies
+  and charge use describe the recorded workload. The four subsequent answers do not constitute a
+  comparative graph-QA evaluation.}
+  \label{fig:ch5_phone_graph_pilot}
+\end{figure}
+
+The pilot supports one narrow conclusion: a memory policy must account for construction
+as well as query service, as in the accounting of Equation~\ref{eq:ch2_amortization}. It
+does not support a phone routing comparison among graph,
+vector and full-context memory because no complete phone GraphRAG QA cell exists.
+Figure~\ref{fig:ch5_graph_build_scaling} places the build time of this directly measured 419-turn phone
+build ($21.9\,\text{kJ}$, $52.3\,\text{J/turn}$) beside workstation build times across dialogue lengths,
+which grow linearly with the number of turns. The figure shows time only; the energy values are the
+ones given here.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{results/thesis_visuals/fig11_graph_build_scaling.pdf}
+  \caption{Graph construction time. Left: 50 workstation builds across ten LoCoMo histories and five
+  Gemma extractor configurations (E2B v1--v3; E4B v1 and v3), with a linear fit per
+  configuration. Right: fitted workstation times at 419 turns and the directly measured
+  92.1-minute phone build, on a logarithmic axis. The early phone pilot differs from the
+  repaired workstation configurations.}
+  \label{fig:ch5_graph_build_scaling}
+\end{figure}
+
+The earlier token-routing grid is therefore removed from the main argument. Appendix~\ref{app:on_device_statistics} records why it is exploratory and keeps the long-context
+and amortization calculations separate from direct measurements.
+
+\section{Position relative to mobile systems literature}
+\label{sec:ch5_literature}
+
+Section~\ref{sec:ch2_device} reviews the mobile studies closest to this chapter and the gap
+they leave. Two of them report measurements that bear directly on the results above.
+SmartRAG reports average power of 2.37 to 4.77~W during triplet extraction and 2.12 to
+5.36~W during question answering on its two OnePlus handsets, but not energy per
+answer~\citep{smartrag}. It also finds that retrieval-conditioned prefill dominates latency:
+on a Snapdragon 8 Elite Gen 5 with the 1.7B backbone, median time to first token was 1.32~s
+for question decomposition but 36.9~s for answering, consistent with the prompt-driven query
+times observed here in Section~\ref{sec:ch5_prefill_decode_memory}. MobileRAG reports real-phone energy
+for document RAG on a Galaxy S24, from 24.71~J per query to more than 200~J in some
+configurations~\citep{mobilerag_energy}.
+In both cases the handset, model, corpus, retrieval work and measurement span differ, so
+their numbers are not pooled with the measurements in this chapter.
+
+\section{Implications for resource-aware long-term memory}
+\label{sec:ch5_implications}
+
+The measurements support four design choices for a phone-native agent.
+
+\begin{enumerate}
+  \item \textbf{Optimize correct answers per unit of energy rather than one counter.} Energy, latency and
+  accuracy changed together. Correct answers per kilojoule and per charge reveal cases
+  in which the lowest-energy reader is not the most useful one.
+
+  \item \textbf{Use bounded retrieval as the default path for the tested workload.}
+  Vector RAG occupied a better measured accuracy, energy and latency point than full
+  context in all five reader pairs. The conclusion is limited to this retriever, device
+  and balanced question slice.
+
+  \item \textbf{Keep a lifecycle ledger.} Embedding, graph extraction, prefill, decode
+  and persistent storage are different operations. Prompt tokens describe reader input
+  but omit memory construction entirely, and on this phone construction is where the
+  strategies separate most sharply: the early graph build cost about 26 times more energy per
+  turn than embedding (Table~\ref{tab:ch5_construction}). A ledger that prices only the query
+  path misses that difference before the first question is served.
+
+  \item \textbf{Treat completion and provenance as system properties.} A run that
+  consumes battery but cannot be resumed has delivered no sealed work. Checkpoints,
+  model digests, runtime identity and explicit measurement spans are necessary if a
+  memory policy is to learn from device telemetry.
+\end{enumerate}
+
+On a phone, ``long term'' does not mean only a larger store or a longer prompt. It means
+recovering useful history across repeated interactions without exhausting the resources
+that allow the agent to continue operating.
+
+\section{Experimental limitations}
+\label{sec:ch5_threats}
+
+\paragraph{One device and runtime.}
+The measurements come from one Galaxy S23 Ultra, one Android and kernel build and a
+CPU-oriented llama.cpp configuration. A newer SoC, accelerator support, another thread
+count or another operating-system governor may change the ordering.
+
+\paragraph{Small phone sample and uneven replication.}
+Each accuracy cell contains 20 balanced questions. Question family is associated with
+correctness in the larger workstation sample, but the phone slice is too small for
+family-specific phone claims. Vector energy has three sittings for every reader, while
+full-context replication is complete only for Gemma E2B. Appendix~\ref{app:on_device_statistics} reports this asymmetry instead of hiding it in main-text
+error bars.
+
+\paragraph{Short-workload overhead.}
+In the 20-question Gemma E2B vector sittings, building the memory for six histories took about
+60\% of the energy (Appendix~\ref{app:ch5_run_length}). A separate 100-question E2B Vector-RAG
+run, which spread ten histories over 100 questions, used less energy per answer, but it used the
+task prefixes and its question composition and execution time differ. It is evidence that the
+number of questions per history matters, not a matched estimate of a universal amortization factor.
+
+\paragraph{Automated judging.}
+Phone answers are scored by the same automatic judge as the workstation answers, with the
+limits stated in Section~\ref{sec:judge}.
+
+\paragraph{Model and binary provenance.}
+Exact model revisions and digests were reconstructed from the surviving cache and
+server logs. The per-run directories did not preserve immutable hashes. The installed
+server identifies itself as \texttt{0.1.2-dev}, build zero, with an unknown commit. A
+source checkout survives, but it cannot be asserted to be the binary's build commit.
+
+\paragraph{Incomplete and inaccessible evidence.}
+The incomplete E4B sitting is excluded from the sealed tables. The audit covered all
+experimental locations accessible through ADB and Termux, but not protected Android
+sandboxes or root-only kernel interfaces.
+
+\paragraph{Graph evidence.}
+Only one early phone graph construction pilot was measured, and no complete phone graph
+QA cell exists. The main chapter makes no graph-routing or graph-accuracy claim.
+
+\section{Chapter conclusion}
+\label{sec:ch5_conclusion}
+
+The phone results support a direct systems conclusion. Vector retrieval produced higher
+accuracy point estimates, lower energy per answer and much shorter query times than
+full context under all five readers. It delivered 40.8 to 68.8 correct answers per
+full-charge equivalent, and its finite observed advantage over full context ranged from
+5.8$\times$ to 26.9$\times$ correct answers per kilojoule. This combined measure summarizes the
+separate quality and energy results.
+
+Two statistical results set the limits of that claim. The workstation-to-phone parity
+gate failed, so phone accuracy must be measured on the phone. Question family was also
+associated with correctness in every primary Gemma cell, so the balanced phone result
+must remain attached to its question mix. RAM and thermal peaks do not reduce to the
+same ordering as energy and latency, and the graph pilot shows that construction can be
+a large part of the memory lifecycle. A resource-aware memory policy therefore needs these
+device measurements before it can route between strategies.

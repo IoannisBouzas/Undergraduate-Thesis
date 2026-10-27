@@ -1,0 +1,654 @@
+
+\chapter{Methodology}
+\label{ch:methodology}
+
+This chapter describes how the experiments were run. One shared pipeline evaluates small language
+models across memory strategies and model sizes on a smartphone and on a workstation. The evaluation
+harness, question sets, configuration baselines and quantization tier are the same in both settings;
+the two platforms differ in their hardware, runtime software and weight packaging.
+
+\paragraph{Contribution of this chapter.} The individual components are established: dense turn
+retrieval~\citep{dpr}, a reference-guided automatic judge using the LongMemEval
+rubric~\citep{longmemeval}, Coulomb counting of battery charge, and accuracy per joule as an
+efficiency measure~\citep{intelligence_per_watt}. The contribution is the protocol that combines
+them for conversational memory on a phone. Two of its elements distinguish it from the on-device
+studies reviewed in Section~\ref{sec:ch2_device}. First, every compared memory strategy runs on the
+phone, and its accuracy and energy come from the same phone workload: the answers it produced there
+are the ones judged, and the energy is measured over the span that produced them. In the reviewed
+studies, either the competing systems did not run on the phone~\citep{smartrag} or the workload was
+document retrieval rather than a conversation history~\citep{mobilerag_energy}. Second, a rule fixed
+before the comparison decides whether workstation accuracy may stand in for phone accuracy. A third
+element serves the graph analysis of Chapter~\ref{ch:graph_mechanisms}: the
+graph pipeline is changed one stage at a time (Table~\ref{tab:graph_versions}), so that losses in
+retrieval, extraction and representation can be told apart.
+
+\section{Research design: one pipeline, two measurement settings}
+\label{sec:design}
+
+The study compares three ways of giving a small language model access to a long conversation, at
+several model sizes, on two long-context benchmarks. Running every condition on the phone is not
+practical: the full grid spans hundreds of paired questions across five readers, two benchmarks and
+a sweep of retrieval depths, while one 20-question full-context sitting on the phone took up to about
+four hours. Energy, battery drain, thermal throttling and memory pressure, however, exist only on the
+real device. The two settings therefore have complementary jobs:
+
+\begin{itemize}
+  \item The phone (a Samsung Galaxy S23 Ultra, running models locally through the
+        llama.cpp runtime~\citep{llamacpp}) is the main measurement platform. It measures
+        whole-device energy, battery charge, latency, memory use and heat, and it records the
+        answers it generates, which the same judge then scores under the same rubric. Phone
+        accuracy is therefore measured on the phone, not assumed from the workstation.
+  \item The workstation (referred to as ``the box'') runs the same memory modules through the
+        Ollama runtime~\citep{ollama} on more questions: up to 200 LoCoMo and 60 LongMemEval-S
+        questions per condition, five readers, and the graph and retrieval-depth variants. It also
+        hosts the 70B judge. Its larger samples allow paired statistical tests of the main strategy
+        comparisons.
+\end{itemize}
+
+Phone accuracy and energy per query are reported separately, and correct answers per unit of energy
+combines the answers and energy of the same phone workload. Because the runtimes and weight packaging
+differ, platform equivalence was tested rather than assumed: a predefined parity rule
+(Section~\ref{sec:validity}) decided whether workstation accuracy could substitute for phone accuracy,
+and every on-device claim uses phone-measured accuracy. The one exploratory projection that combines
+the two platforms is labelled as such in Appendix~\ref{app:ch5_routing_sensitivity}.
+
+The comparison is \emph{paired} throughout: for a given benchmark and model, all memory strategies see
+the same questions, dialogue histories and reference answers, which enables paired tests and guards
+against data-handling mistakes. Figure~\ref{fig:ch3_architecture} gives an overview of the pipeline.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{results/thesis_visuals/fig13_architecture_diagram.pdf}
+  \caption{Shared memory and evaluation pipeline. Upper rows: truncated full context, vector retrieval and
+  SLM-extracted graph memory construct evidence for the same reader and answer prompt; GraphRAG v4
+  adds source turns to v3 triples. (B) The workstation evaluates all five readers through
+  Ollama. (C) The Galaxy S23 Ultra runs selected configurations through llama.cpp and records
+  device resources. A workstation-hosted 70B judge scores both platforms' answers; their
+  accuracies remain separate.}
+  \label{fig:ch3_architecture}
+\end{figure}
+
+\section{Language models and runtime environment}
+\label{sec:models}
+
+The model that reads the supplied conversational context and produces the answer is called the
+\emph{reader}. Five readers are evaluated, drawn from two open-weight families and spanning from
+0.8 to 4 billion parameters (Table~\ref{tab:readers}). Using two families shows whether the
+comparison between memory strategies holds beyond one model family.
+
+\begin{table}[t]
+  \centering
+  \begin{tabular}{llll}
+    \toprule
+    Family & Reader & Parameter scale & Attention design \\
+    \midrule
+    Gemma 4~\citep{gemma4}   & E2B  & 2.3B effective (5B total) & Hybrid local/global attention \\
+    Gemma 4~\citep{gemma4}   & E4B  & 4.5B effective (8B total) & Hybrid local/global attention \\
+    Qwen3.5~\citep{qwen35}   & 0.8B & 0.8B         & Hybrid linear/full attention \\
+    Qwen3.5~\citep{qwen35}   & 2B   & 2B           & Hybrid linear/full attention \\
+    Qwen3.5~\citep{qwen35}   & 4B   & 4B           & Hybrid linear/full attention \\
+    \bottomrule
+  \end{tabular}
+  \caption{The five reader models evaluated across the memory strategies.}
+  \label{tab:readers}
+\end{table}
+
+\paragraph{Model architectures.} The two families differ in how they handle long inputs. The
+Gemma~4 readers use a hybrid attention scheme that interleaves local sliding-window attention with
+full global attention, with the final layer always global; the global layers apply proportional
+rotary position encoding, and many layers share the key--value cache of earlier layers, both of which reduce the
+memory cost of long contexts~\citep{gemma4}. The ``E'' in E2B and E4B stands for \emph{effective} parameters: the smaller
+Gemma models use per-layer embeddings, giving each decoder layer its own small lookup table per
+token, so the effective parameter count is much lower than the raw total. These design choices matter
+here because they bear directly on the on-device memory analysis presented later. The Qwen3.5 readers
+are dense models (no mixture of experts) with a different hybrid design: in every block of four
+layers, three use Gated DeltaNet linear attention and one uses gated full attention~\citep{qwen35}.
+Gemma~4 is the primary reader family of this thesis; the Qwen3.5 readers were added as a second
+family to test whether the findings hold beyond Gemma.
+
+\paragraph{Quantization and packaging.} Running local inference on mobile hardware requires weight
+compression. All five readers are evaluated at one quantization tier, the standard \texttt{Q4\_K\_M}
+format, which stores weights at roughly four bits each with a fixed per-layer layout. The phone runs
+the Unsloth-distributed GGUF files directly through llama.cpp~\citep{unsloth_gguf,llamacpp}, while
+the workstation serves the same \texttt{Q4\_K\_M} tier through Ollama~\citep{ollama}. These are the
+standard static \texttt{Q4\_K\_M} builds, not the adaptive-width Dynamic variants. One on-device
+cell was repeated on an adaptive 4-bit build (\texttt{UD-Q4\_K\_XL}) to check whether the choice of
+4-bit build changes the results. It returned the same verdict on all twenty questions as the
+standard build, so one build is used throughout. Higher-precision weights were not tested.
+
+\paragraph{On-device hardware and runtime.} On-device measurements were performed on a Samsung
+Galaxy S23 Ultra. Inference ran on the CPU of its Snapdragon 8 Gen 2 (one Cortex-X3 prime core at
+3.36~GHz, four performance cores at 2.80~GHz and three efficiency cores at 2.00~GHz), with 12~GB of
+RAM and a 5,000~mAh battery; temperature was read from the phone's thermal zones. Inference ran
+through a local inference server inside a Termux environment, with
+execution pinned to the five high-performance cores, five worker threads, and FlashAttention
+enabled. The phone server ran with an 8,192-token context. The llama.cpp server rejects a prompt
+longer than its context, and full-context prompts built to the 4,096-token budget are longer than
+4,096 tokens (Section~\ref{sec:strategies}), so the server was given this room to keep them from
+failing. The workstation was a dedicated Linux host running Ollama on GPU hardware. Ollama does not
+reject an over-long prompt; it trims it to its 4,096-token window.
+
+\paragraph{Decoding.} Every reader generates its answer by greedy decoding: taking the most likely
+token at each step, with temperature set to zero ($T=0.0$). Greedy decoding removes sampling
+randomness. On the phone, repeated sittings returned identical answers on every question they
+shared, so the variation between repeated sittings reflects physical energy and runtime differences,
+not differences in what the model said. Model cards typically document a non-zero sampling
+temperature (for example $T=1.0$), so greedy decoding is an intentional deviation, chosen because
+deterministic decoding is standard for benchmarking and makes repeated runs directly comparable; the
+paired tests themselves rest on every condition answering the same questions. A
+control experiment on LoCoMo found no detectable difference between greedy decoding and the vendor
+sampling setting (36.0\% against 35.0\%, $p=0.69$, McNemar's exact test).
+
+\paragraph{Step-by-step reasoning.} Some readers can write out intermediate reasoning before the
+final answer. This is toggled through the vendor-documented request parameter. In the baseline
+configuration reasoning is off, and the models return concise answers of about a dozen tokens. In the
+dedicated reasoning experiments reasoning is on and the generation budget is raised from 64 to 768
+tokens.
+
+\section{Memory strategies}
+\label{sec:strategies}
+
+Three ways of giving the reader access to past dialogue turns are compared. The reader, the decoding
+settings, and the answer format are held constant; only the way the context is built differs.
+All three strategies work from the same rendered turns. When a LoCoMo turn shares a photo, the
+caption that the dataset provides for that photo is appended to the turn's text.
+
+\begin{description}
+  \item[Full context (concatenation).] The whole conversation is placed in the prompt in
+        chronological order, each turn rendered with its timestamp, speaker, and text. The oldest
+        turns are dropped until the history fits a 4,096-token budget, less 192 tokens reserved for
+        the template and the answer. The harness counts tokens as characters divided by four, which
+        undercounts LoCoMo dialogue, so the resulting prompts measured 4,670 to 5,254 tokens. The
+        phone server held them in full. Ollama on the workstation trimmed the oldest part of each
+        prompt to exactly 4,096 tokens, so workstation full context read somewhat less history than
+        phone full context. On the twenty questions that both platforms answered, the wording of the
+        answers differed, but the judged verdicts agreed on 18 or 19 of 20 for every reader. An
+        exploratory workstation rerun for three readers raised the window to 131,072 tokens
+        (262,144 for one cell), so that the history fit whole in every prompt except four
+        LongMemEval-S prompts per Gemma reader. Those four lost their oldest 2 to 4 turns
+        (Section~\ref{sec:ch4_long_fc}).
+  \item[Vector retrieval (dense turn retrieval).] Each turn is embedded once at ingestion time. At
+        query time the question is embedded, its cosine similarity to every stored turn is computed,
+        and the most similar turns (by default the top ten) are retrieved, sorted back into
+        chronological order, and placed in the prompt.
+  \item[Graph memory (SLM-extracted graph).] The reader model itself acts as the extractor while the
+        conversation is ingested. Reading the dialogue in batches of five turns, it writes out
+        factual relationships as (subject, relation, object) triples in structured form. The facts
+        are stored in a directed multigraph, from which the facts relevant to a question are
+        retrieved at query time. Because the graph is built by the small model itself rather than by
+        an external rule-based parser or a larger model, it is called an \emph{SLM-extracted graph}
+        throughout.
+\end{description}
+
+Figure~\ref{fig:ch3_lookup_methods} sets the three lookups side by side: what each strategy stores
+when the conversation is ingested, what it does when a question arrives, and what text the reader
+finally receives.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{results/thesis_visuals/fig22_lookup_methods.pdf}
+  \caption{How each memory strategy looks up evidence (schematic; the turns are illustrative).
+  Full context performs no search: it keeps the newest turns that fit the 4,096-token budget, less
+  192 tokens, and drops the oldest. Vector retrieval scores every stored turn embedding against the
+  question embedding and passes the ten most similar turns to the reader in time order. Graph memory
+  (GraphRAG v2--v4) uses the same top ten turns to find edges extracted from their five-turn batches,
+  ranks those edges by the similarity of their best turn multiplied by the edge weight, and keeps
+  twelve; v3 shows them as triples and v4 adds each source turn once. GraphRAG v1 instead matched
+  question terms to node names and took the one-hop neighbourhood (Table~\ref{tab:graph_versions}).}
+  \label{fig:ch3_lookup_methods}
+\end{figure}
+
+\subsection{Vector retrieval}
+\label{sec:vector_details}
+
+Vector retrieval is a standard retrieval-augmented generation
+arrangement~\citep{rag_lewis} built on a dual-encoder dense retriever~\citep{dpr}. There is no
+reranking stage, no query rewriting or expansion, and no summarization or compression of the
+retrieved text. The design choices made here are the unit of retrieval and the decision to add
+nothing on top of the retriever.
+
+\paragraph{Unit and ingestion.} The retrieval unit is a single dialogue turn, rendered with its
+timestamp, speaker, and text exactly as the full-context condition renders it. Each turn is embedded
+once when it is ingested, and turns longer than roughly 1500 tokens are truncated before embedding.
+Nothing is re-embedded at query time and nothing is embedded twice, so one ingestion pass serves
+every question asked of that conversation and every retrieval depth swept over it.
+
+\paragraph{Query time.} The question is embedded with the query-side prefix, cosine similarity to
+every stored turn is computed as a dot product over unit-normalized vectors, and the $k$ highest
+scoring turns are taken. Those turns are then sorted back into chronological order before they enter
+the reader prompt, so the reader sees dialogue in the order it happened, not in similarity
+rank. The default depth is $k = 10$; Chapter~\ref{ch:memory_evaluation} sweeps it from 2 to 50.
+
+\paragraph{Embedder.} Nomic Embed Text v1.5~\citep{nomic_embed} is used off the shelf, with no
+fine-tuning on either benchmark and no training or tuning for this study. It is a
+general-purpose embedder trained on large collections of text pairs, and general-purpose dense
+retrievers are known to work on new collections without task-specific training~\citep{contriever}.
+The retrieval arm therefore has no advantage from tuning to these benchmarks. The task prefixes this model expects, and the one respect in which the workstation
+and on-device runs differ in applying them, are described in Section~\ref{sec:retrieval}.
+
+\paragraph{What is stored.} The ingestion artifact is a set of per-turn embeddings that depends only
+on the embedding model and on whether the task prefixes were applied, not on the reader or the
+retrieval depth; depth is applied at query time by slicing the ranked list. Every reader compared at
+a given depth therefore sees byte-identical retrieved turns, and every depth in a sweep reads the same
+stored embeddings, so differences across readers or depths reflect what was shown, not how it was
+indexed.
+
+\subsection{Graph construction and retrieval}
+\label{sec:graph_details}
+
+The base SLM-extracted graph works as follows.
+
+\paragraph{Extraction and normalization.} Turns are ingested in non-overlapping, consecutive batches
+of five. The extractor is prompted to identify factual relationships, to preserve dates, times, and
+locations, to resolve pronouns to explicit speaker names where the reference is clear, and to return a
+list of triples. Extraction is limited to 256 tokens of output in the baseline (raised to 512 or 1024 in
+specific repair runs). The extracted text is stripped of formatting markers and parsed; entity and
+relation strings are then normalized deterministically by lower-casing, removing trailing
+punctuation and possessives, and collapsing familial aliases to a canonical form (for example,
+\emph{mom} to \emph{mother}). A short stop-list of bare pronouns filters out ungrounded nodes.
+
+\paragraph{Graph structure and reinforcement.} Facts are stored as a directed multigraph. A new
+triple adds a weighted edge between its two entities, carrying the dialogue timestamp and the source
+turn range; a repeat of the same relation between the same pair of entities reinforces the existing
+edge's weight up to a ceiling and updates its timestamp and sources. The implementation supports edge
+decay and pruning, but decay is disabled in every reported run (the decay rate is fixed so weights
+never shrink), so the evaluated graph is strictly append-only with reinforcement. No claim about
+forgetting is made.
+
+The four evaluated versions, GraphRAG v1 to v4, form a controlled improvement ladder
+(Table~\ref{tab:graph_versions}). They are named after the whole retrieval pipeline, not the graph:
+every version stores the same kind of triple edges in a directed multigraph of the same form.
+Each version changes one part of the preceding configuration, which separates a retrieval problem from
+an extraction-budget problem or a loss of evidence during graph compression; the v1-to-v2 step also
+adds source links and name standardization (Chapter~\ref{ch:graph_mechanisms}).
+
+\begin{table}[t]
+  \centering
+  \small
+  \begin{tabular}{@{}p{0.08\linewidth}p{0.30\linewidth}p{0.12\linewidth}p{0.19\linewidth}p{0.19\linewidth}@{}}
+    \toprule
+    Version & Retrieval mechanism & Extraction budget & Graph contents & Context given to reader \\
+    \midrule
+    v1 & Fuzzy entity matching and one-hop ego-subgraph & 256 tokens & Original build & Retrieved triples \\
+    v2 & Dense turn search followed by associated-triple ranking & 256 tokens & Rebuilt with source links and standardized names & Retrieved triples \\
+    v3 & Same vector-first retrieval as v2 & 512 tokens & Rebuilt; more triples survive extraction & Retrieved triples \\
+    v4 & Same retrieval as v3 & 512 tokens & Same as v3 & Triples and verbatim source turns \\
+    \bottomrule
+  \end{tabular}
+  \caption{Configuration of GraphRAG v1 to v4. The triple schema is the same in every version; the
+  columns show which stage each version changes.}
+  \label{tab:graph_versions}
+\end{table}
+
+The v1-to-v2 step asks whether entity matching retrieves the wrong part of the conversation, v2-to-v3
+whether structured output cut off at 256 tokens loses facts, and v3-to-v4 whether triples preserve
+enough evidence or the original wording is still needed. Version~4 reuses the v3 graph and adds the
+supporting source turns when the answer prompt is assembled.
+
+\section{Benchmarks and task configuration}
+\label{sec:benchmarks}
+
+Two conversational long-context benchmarks are used.
+
+\paragraph{LoCoMo}~\citep{locomo} contains long, multi-session dialogues between recurring speakers,
+with paired questions. The benchmark defines several tasks; this study evaluates only the
+\emph{question-answering} task, and every result statement refers to that task. Evaluation uses a
+fixed set of 200 questions, 50 from each of Categories 1 through 4, taken in turn from each of the
+ten conversations (round-robin) so that every conversation contributes. The benchmark paper reports
+a fifth, adversarial category as well~\citep{locomo}; later work that evaluates on LoCoMo commonly
+reports only the first four, and this thesis follows that convention. \citet{budgetmem}, for example,
+state the same exclusion when reporting per-category LoCoMo results. The exclusion keeps the
+results comparable with that work and is not a judgement about the omitted category.
+
+\paragraph{LongMemEval-S}~\citep{longmemeval} provides much longer histories, averaging about 500
+dialogue turns, with each question labelled by one of six reasoning types. Because the questions are
+stored grouped by type, a simple prefix of the file would sample only one type; to avoid that, a
+stratified subset of 60 questions is used, ten from each of the six types, drawn with a fixed random
+seed so the subset is reproducible.
+
+\paragraph{Roles of the two benchmarks.} LoCoMo is the primary benchmark: it carries the full
+experimental grid, the graph-repair and selective-expansion studies, the answer-prompt substitution
+and all on-device measurements. LongMemEval-S tests whether the main strategy ordering holds at
+500-turn scale; it carries the core memory-strategy comparison, a retrieval-depth sweep and a
+reasoning probe. Where a result exists for only one benchmark, the text says so.
+
+\paragraph{Balanced sampling and population weighting.} Both benchmarks are sampled with equal
+questions per category, which gives every category the same number of questions for fine-grained
+error analysis, so the plain sample mean is an unweighted category average. Because the real benchmark
+populations are not evenly split across categories (for example, Category~4 is about 55\% of the four
+evaluated LoCoMo categories), a population-weighted accuracy is also computed as a secondary
+sensitivity check.
+Table~\ref{tab:ch3_benchmarks} summarizes both evaluated datasets, and
+Figure~\ref{fig:ch3_benchmark_anatomy} shows the structure of one LoCoMo history and where the
+evidence for one question lies.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \begin{tabular}{@{}p{0.22\linewidth}p{0.34\linewidth}p{0.34\linewidth}@{}}
+    \toprule
+     & LoCoMo & LongMemEval-S \\
+    \midrule
+    Histories & 10 conversations & 60 histories, one per question \\
+    Turns per history & 369--689 (mean 588) & 396--561 (mean 491) \\
+    Sessions per history & 19--32 & 39--61 (mean 48) \\
+    Words per history & 8.0k--16.2k (mean 13.4k) & 74k--82k (mean 79k) \\
+    Questions evaluated & 200, 50 from each of Categories 1--4 & 60, 10 from each of six types \\
+    Phone runs & a 20-question slice & not run on the phone \\
+    Role & primary benchmark & tests whether the ordering transfers \\
+    \bottomrule
+  \end{tabular}
+  \caption{The two evaluated datasets. Sizes are computed from the evaluated data files; token
+  counts depend on the reader's tokenizer and are not shown.}
+  \label{tab:ch3_benchmarks}
+\end{table}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{results/thesis_visuals/fig00_benchmark_anatomy.pdf}
+  \caption{One LoCoMo history, \texttt{conv-26}: 419 turns across 19 sessions. The labelled evidence
+  for ``What did Caroline research?'' lies in session 2, outside the 79 newest turns that full context
+  retains. Those 79 turns occupy 4,762 tokens on the phone; the workstation trims the prompt further
+  to 4,096. The strip below the sessions draws all 419 turns to scale.}
+  \label{fig:ch3_benchmark_anatomy}
+\end{figure}
+
+\subsection{Fixed configuration and the one-variable rule}
+\label{sec:config}
+
+Apart from the variable under study, every run uses one fixed configuration. Most comparisons change a
+single element of this baseline. Three change more than one and are reported as combined changes:
+GraphRAG v2 (retrieval, source links and name standardization together), the reasoning runs (reasoning
+mode together with a longer answer limit), and the graph model-size comparison (extractor and reader
+together).
+
+\begin{itemize}
+  \item \textbf{History budget.} 4,096 tokens across all models and conditions, which sets where
+        full context truncates the history; the only exception is the long-window full-context
+        rerun of Section~\ref{sec:ch4_long_fc}. Section~\ref{sec:strategies} describes how each platform
+        applies it.
+  \item \textbf{Decoding.} Greedy ($T=0.0$), reasoning off.
+  \item \textbf{Answer length.} A generation budget of 64 tokens. In practice this ceiling is almost
+        never reached: the reader is asked for a short, direct answer and returns about ten to
+        fifteen tokens. The reasoning runs raise the budget to 768 tokens, because the reasoning has
+        to be written out; that change is confined to those runs and is treated as a controlled
+        variable, not part of the fixed baseline.
+  \item \textbf{Reader prompt.} One curated short-answer prompt is given to the reader across all
+        models, strategies, and benchmarks.
+  \item \textbf{Retrieval.} Ten retrieved turns by default, ranked by cosine similarity using Nomic
+        Embed Text v1.5 with its task prefixes (Section~\ref{sec:retrieval}). Turns are truncated to
+        about 1500 tokens before embedding.
+  \item \textbf{Graph construction.} Extractor batches of five turns, a 256-token extraction budget,
+        up to twelve retrieved facts per question, decay disabled, and the extractor model set to the
+        same model that answers.
+  \item \textbf{Scoring.} The same 70B judge and the same judge prompt for every answer, on both
+        benchmarks and both devices (Section~\ref{sec:judge}).
+\end{itemize}
+
+The varied elements are the memory strategy, the model size, the number of retrieved turns, whether
+reasoning is on, the graph's extraction budget and the answer prompt, with the three combined changes
+named above. Everything else stays as above.
+
+\section{Retrieval configuration}
+\label{sec:retrieval}
+
+Dense retrieval and vector-first graph retrieval use Nomic Embed Text
+v1.5~\citep{nomic_embed,nomic_embed_card}, which expects asymmetric task prefixes:
+\texttt{search\_document:} for stored turns and triple strings, and \texttt{search\_query:} for
+questions. The prefixes were added partway through the study, and the affected workstation
+conditions were rerun (Appendix~\ref{app:reproducibility}).
+
+\paragraph{Reporting convention.} A completed prefixed rerun replaces the earlier unprefixed result
+for the same condition, whether its score is higher or lower; historical values appear only where
+needed to explain development or fixed evaluation criteria, and are identified as such. Three
+configurations result:
+\begin{itemize}
+  \item all primary workstation comparisons use prefixed retrieval;
+  \item the primary 20-question phone comparison keeps its original unprefixed runs, because the
+        replicated campaign was too costly to repeat, and footnotes mark this exception;
+  \item the E2B and E4B 100-question phone runs and the E2B two-turn phone probe use prefixes.
+\end{itemize}
+Full context and GraphRAG v1 perform no embedding, so the setting does not apply to them.
+
+\paragraph{Comparability.} The prefixed 100-question phone runs contain all 20 questions of the
+primary phone comparison. Apart from the prefixes, they use the same reader, retrieval depth,
+history budget, prompt, decoding and judge. On those 20 questions, the prefixes changed Gemma~4 E2B
+from 10 to 8 correct answers and E4B from 8 to 10. Each reader had two discordant questions, in
+opposite directions (exact McNemar $p=0.5$ for each). At this sample size, the phone shows no
+detectable effect of the prefixes on accuracy. The check covers accuracy only: the 100-question
+sittings spread their memory build over five times as many questions, so their energy per answer is
+not comparable. Workstation prefix gains are not applied to phone scores, and every phone
+efficiency result uses answers and energy from the same measured workload.
+
+\section{Answer scoring and judge characterization}
+\label{sec:judge}
+
+Answer correctness is decided by an automatic judge: Llama~3.1 70B Instruct at \texttt{Q4\_K\_M}
+precision~\citep{llama31}, run on the workstation. The judge is prompted with the official
+LongMemEval correctness rubric, which supplies the question, the reference answer, and the model's
+prediction, and asks whether the response contains or is equivalent to the reference answer. This
+correctness prompt is distinct from the answer prompt given to the reader. LoCoMo answers use its
+standard form; LongMemEval answers use the benchmark's own variants for temporal, knowledge-update,
+preference and abstention questions (Appendix~\ref{app:repro_prompts}). Answers produced on the phone are
+transferred to the workstation and scored by the same judge under the same rubric. Every accuracy
+figure in the thesis, on either device, comes from this judge and is stamped with the judge's
+identity so that its provenance is traceable.
+
+\paragraph{Judge characterization and reliability.} The judge is treated as an instrument with
+measurable noise, not an infallible oracle. Its consistency was checked by re-judging identical
+prediction sets at $T=0$. Three back-to-back re-judgings of 500 predictions in one server session
+changed no verdict. When 100 predictions were judged again in a later session, one verdict changed;
+GPU-level non-determinism is a plausible cause, and a single comparison of this size does not give a
+tight bound. Lexical measures (exact match, token overlap, substring containment) are computed
+as sanity checks, to confirm that the relative ranking of the strategies is not an artifact of judge
+leniency.
+
+\paragraph{Human validation.} Because an automatic judge cannot validate itself, a blind human audit
+checked its verdicts on 100 judged answers. The answers were drawn from eight runs covering both
+benchmarks, all three memory strategies and both Gemma readers, about half of them judged correct and
+half judged incorrect; some come from runs made before the embedding-prefix correction, which does not
+affect what the judge is asked to decide. Every condition identifier was removed and the order was
+shuffled. Because the runs answer the same questions, the 100 answers cover 86 distinct questions.
+The author labelled each answer as correct, incorrect or ambiguous against the reference answer, using
+the judge's rubric, without seeing the judge's verdicts.
+
+On the 83 answers given a decisive label, the judge agreed with the human label on 82 (98.8\%, Cohen's
+$\kappa=0.976$); keeping one answer per question gives 73 of 74. The single disagreement was a
+false positive: the reference was ``fitness tracker'' and the judge accepted the hedged answer
+``fitness tracker or smartwatch''. The judge marked no correct answer as wrong. The other 17 answers
+were labelled ambiguous. Thirteen were LoCoMo answers that matched the reference only partly or
+loosely, such as a specific date where the reference names a week; four were LongMemEval answers,
+three of them to abstention questions. Ambiguous answers were not assigned a label and are left out
+of the agreement denominator, which is therefore 83. The judge had accepted 14 of the 17. Counting
+every ambiguous answer as a disagreement instead would lower agreement to 82 of 100. The audit has one annotator,
+so it does not measure agreement between humans, and no second judge model was compared. Because
+the sample is balanced between judged-correct and judged-incorrect answers, it measures how often
+the judge's verdicts are right, not how far any particular accuracy figure would move.
+
+\paragraph{Missing data and error handling.} Model generation failures and judge infrastructure
+errors are kept distinct. Predictions that are genuinely empty, contain only unclosed formatting
+tags, or exhaust the generation budget before producing an answer are kept in the denominator and
+scored as incorrect. Transient connection failures or timeouts during judging are retried with
+exponential backoff; verdicts that still cannot be parsed are isolated and logged rather than counted
+as wrong.
+
+\section{On-device resource measurement}
+\label{sec:energy}
+
+Physical resource measurements are made on the Samsung Galaxy S23 Ultra.
+
+\paragraph{Measurement environment.} Runs are performed with the device unplugged, held under a
+continuous wake-lock so the processor does not sleep, and with the display off.\footnote{The 22
+sittings behind the main phone tables started at 86 to 100\% charge and a battery temperature of
+31.7 to $36.8^\circ\text{C}$, and each reached 38.6 to $43.3^\circ\text{C}$ within ten minutes.
+Eight of them, and three further runs, started at the highest possible charge (100\%), where the
+phone's charge counter can pause for the first few minutes, so those runs under-count their energy
+(Appendix~\ref{app:ch5_energy_conventions}).}
+
+\paragraph{Energy method of record.} Battery-side energy is estimated from the phone's charge counter
+and measured voltage. The counter's charge decrease agrees with the reported battery-level decrease
+to within about one percentage point. A separate cross-check using integrated current and voltage
+agrees with counter-based energy to within 10\% on sittings longer than 50 minutes
+(Appendix~\ref{app:ch5_energy_conventions}). Resource telemetry is sampled every 0.5~seconds by a background
+profiler logging directly to file. The physical quantity directly measured on the handset is the battery
+charge consumed, $\Delta Q$ (in $\text{mAh}$), recorded by the battery's hardware Coulomb counter:
+\begin{equation}
+  \label{eq:charge_formula}
+  \Delta Q = \frac{Q(t_0)-Q(t_N)}{1000}.
+\end{equation}
+Here, $Q(t)$ is the charge counter in $\mu\text{Ah}$ and $t_0,\ldots,t_N$ are the usable unplugged
+samples inside the measured run span. Whole-device battery energy is then calculated by pairing each
+charge interval with the mean battery voltage measured over that interval:
+\begin{equation}
+  \label{eq:energy_formula}
+  E = 3.6 \times 10^{-3}
+      \sum_{i=0}^{N-1}
+      \left[Q(t_i)-Q(t_{i+1})\right]
+      \frac{V(t_i)+V(t_{i+1})}{2},
+\end{equation}
+where $V(t)$ is measured in volts and $E$ is obtained in joules. The factor
+$3.6\times10^{-3}$ converts $\mu\text{Ah}$ to coulombs. This voltage-weighted Coulomb-counting
+calculation uses the phone's recorded voltage, not a fixed nominal-voltage assumption. The
+study reports both $\text{mAh}$ and $\text{J}$: the former is the direct charge measurement, while
+the latter is the corresponding battery-side energy estimate.
+
+\paragraph{On-device efficiency metric.} Accuracy $a$ measures the fraction of answers judged correct,
+while energy per query, $E/N$, measures the cost of producing an answer, whether correct or wrong.
+Both are reported separately. Their combined measure asks how many correct answers the workload
+produces per unit of energy. For a run containing $N$ scored answers with phone-measured accuracy
+$a$, correct answers per unit of energy are
+\begin{equation}
+  \label{eq:golden_metric}
+  G_E = \frac{aN}{E/1000},
+\end{equation}
+reported per kilojoule. The denominator includes the energy consumed over the recorded workload,
+including queries answered incorrectly. Answer correctness does not validate the energy instrument;
+the telemetry cross-checks and instrument limitations are assessed separately.
+When a full-charge equivalent is reported, it is calculated
+directly from charge use as $G_Q = aN \times 5000 / \Delta Q$, where $5000\,\text{mAh}$ is the rated
+battery capacity. Thus the energy-normalized metric uses the measured voltage trace, whereas the
+full-charge metric does not require an assumed battery voltage.
+
+\paragraph{Instrument limits.} Energy uses the hardware Coulomb counter, which integrates charge
+continuously at the battery controller, rather than polled instantaneous current, which drifts under
+rapid load changes; the current reading serves only as a cross-check. The counter moves in 0.1\% steps
+and holds its value at full charge, which affected nine of the eleven sittings that started at 100\%
+(Appendix~\ref{app:ch5_energy_conventions}).
+
+\paragraph{Physical telemetry and resource metrics.} Beyond battery charge, the background profiler
+requests a sample every 0.5~seconds. Each battery query through Termux:API takes a second or more,
+so the realized interval was 1.2 to 3.2~seconds (median per run). Each sample records:
+\begin{itemize}
+  \item \textbf{Battery charge and energy.} Directly measured charge drop ($\Delta Q$ in $\text{mAh}$)
+        and derived whole-device energy estimate ($E$ in Joules) consumed across the entire smartphone
+        (SoC, memory, display-off circuitry, background services) from initial ingestion to the final
+        emitted token.
+  \item \textbf{CPU clock frequencies.} Active clock frequencies (in MHz) sampled across
+        all eight CPU cores (the Cortex-X3 prime core and the Cortex-A7x and A510 clusters) via
+        \texttt{/sys/devices/system/cpu/cpu*/cpufreq/} to monitor frequency scaling. A frequency
+        trace shows when cores slowed, but not whether the thermal governor caused it.
+  \item \textbf{Temperature.} The hottest reading across all thermal zones that can be read without
+        root (per-core CPU, GPU and other sensors), in degrees Celsius ($^\circ\text{C}$). It is a
+        device-wide maximum, not one SoC sensor, and it is not the battery temperature, which
+        is logged separately. Sampling starts with the harness, after the model servers have loaded,
+        so the first sample is not an idle baseline.
+  \item \textbf{Memory footprint (RAM).} System used and available physical memory (in MB) sampled via
+        \texttt{/proc/meminfo} to evaluate memory pressure and KV-cache overhead during long-context
+        processing.
+  \item \textbf{Latency.} End-to-end wall-clock time per question, with the prompt and answer token
+        counts reported by the server. The phone records only the total generation time, so prefill
+        and decode time are not separated.
+\end{itemize}
+
+\paragraph{Replicates and reporting conventions.} Vector retrieval on all five readers and full
+context on Gemma E2B were each run in three independent sittings, to measure how
+much the energy varies between runs. Full context on Gemma E4B and on the three Qwen readers used
+one sitting each. Because a fixed-question run spreads its one-time memory-construction cost over
+only twenty questions, per-answer energy includes building the memory, and the ratios between
+strategies are specific to this workload. Graph-construction energy on the phone comes from one
+directly measured 419-turn build ($21.9\,\text{kJ}$, or $52.3\,\text{J/turn}$); any value at other
+conversation lengths is a projection from a workstation-measured slope and is labelled as such.
+
+\section{Controls, validity, and statistical plan}
+\label{sec:validity}
+
+The statistical analysis has three specific purposes. It compares memory strategies on the same
+questions, checks whether the grouping of LoCoMo questions by conversation affects those comparisons,
+and tests whether workstation accuracy can be used in place of phone accuracy. The three procedures
+below are kept separate because they answer different questions.
+
+\paragraph{Paired strategy comparisons.} For a fixed benchmark and reader, every memory strategy
+answers the same questions. Each answer is reduced to a binary outcome (correct or incorrect), and
+the strategies are compared with McNemar's exact test~\citep{mcnemar}. The test uses only the
+discordant pairs: questions answered correctly by one strategy and incorrectly by the other. Results
+report the accuracy of each strategy, the difference in percentage points, the two discordant counts,
+and the exact $p$-value. Statistical claims are limited to the main comparisons between full context,
+vector retrieval, and the graph versions. Retrieval-depth sweeps, prompt experiments, and other
+ablations are treated as descriptive analyses rather than separate significance claims.
+
+\paragraph{Conversation-level sensitivity.} The 200 LoCoMo questions come from ten multi-session
+conversations, so questions from the same conversation may be correlated. A conversation-level block
+bootstrap is used as a sensitivity analysis: complete conversations are resampled with replacement,
+and the paired accuracy difference is recalculated for each bootstrap sample. With only ten
+conversation clusters, this analysis checks the stability of the result rather than replacing the
+question-level McNemar test. LongMemEval-S contains 60 questions drawn from 60 separate sessions and
+therefore does not use this conversation-level check.
+
+\paragraph{Cross-environment agreement check.} The workstation and phone use different runtimes and
+weight packages, so workstation accuracy is not assumed to transfer to the phone. The same 100 E2B
+vector-retrieval questions were evaluated in both environments. The comparison reports the percentage
+of matching correctness labels, Cohen's $\kappa$, and an exact McNemar test for directional bias. The
+decision rule was fixed before the comparison: workstation accuracy could be substituted only if
+agreement reached at least 90\% and McNemar's test gave $p>0.05$. The outcome is reported in
+Section~\ref{sec:ch5_parity}.
+
+\paragraph{Answer-prompt robustness.} The reader is given one curated short-answer prompt across all
+conditions and both benchmarks, so that strategy and benchmark comparisons are not confounded with
+prompt wording. Because a fixed prompt could still interact with the context representation, the
+LoCoMo grid was re-run with LoCoMo's own official question prompt, an externally defined standard, in
+place of the curated one, with everything else held fixed (Section~\ref{sec:ch4_robustness}). The
+substitution was not evaluated on LongMemEval-S, which limits claims about absolute accuracy on that
+benchmark.
+
+\paragraph{Reporting conventions.} Every result in Chapters~\ref{ch:memory_evaluation}
+to~\ref{ch:spe} carries one of four labels. Tables~\ref{tab:ch9_claims} and~\ref{tab:ch9_claims_b} list the main claims with
+their label, sample size and test.
+\begin{itemize}
+  \item \emph{Pre-registered}: a criterion fixed before the run that tests it. Only the parity
+        threshold above and the two SPE criteria of Chapter~\ref{ch:spe} have this status, and
+        only these are confirmatory tests.
+  \item \emph{Primary}: nine paired comparisons, eight on Gemma and one on Qwen3.5 4B, reported with
+        their exact McNemar $p$-value and a Holm correction across the nine. This family was
+        designated during the analysis, after the results were available, so it is not
+        pre-registered.
+  \item \emph{Exploratory}: every other paired test, reported with its unadjusted exact $p$-value.
+  \item \emph{Descriptive}: measurements reported without a test, including all phone energy
+        and efficiency ratios.
+\end{itemize}
+Four readings apply throughout and are not repeated in each chapter. A difference that does not
+reach significance is never read as evidence that two conditions are equivalent. Workstation
+results carry no phone-energy measurement, and workstation accuracy never stands in for phone
+accuracy. Graph conclusions concern graphs extracted by the tested small models and retrieved by
+turn-anchored triple selection, not knowledge graphs in general. Finally, restoring source text
+adds both content and prompt length, so its effect does not isolate the information lost when
+dialogue is reduced to triples.
+
+\section{Software and reproducibility}
+\label{sec:repro}
+
+The pipeline is implemented in Python and coordinates a llama.cpp inference server on the phone
+(under Android Termux) and Ollama on the Linux workstation. The graph is implemented with
+NetworkX~\citep{networkx}, and embeddings use Nomic Embed Text v1.5~\citep{nomic_embed}.
+
+Every result, table, and statistical test reported in the thesis is produced by scripts directly from
+the stored per-run logs rather than copied by hand: one script aggregates the master accuracy table,
+one derives the on-device energy metric and is the sole method of record for that number, and one
+produces the statistical report. Hand-computed intermediate figures from working sessions are not
+used in the text.
+
+To keep the exact artifacts identifiable, an artifact manifest collects the runtime build versions,
+model repository revisions and file hashes, and the exact prompt and template texts used in the
+measured runs. The model revisions and hashes were reconstructed afterwards from the surviving model
+cache and server logs, and the build commit of the phone runtime could not be recovered
+(Section~\ref{sec:ch5_boundary}). The exact identifiers, command flags, and prompt texts are listed
+in the reproducibility appendix.

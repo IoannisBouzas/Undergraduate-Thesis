@@ -1,0 +1,105 @@
+
+\chapter{Conclusion}
+\label{ch:conclusion}
+
+This thesis asked what a small language model running on a phone should do with a conversation it
+can no longer fit in its context window. The question was answered by measuring, in one pipeline,
+what each memory strategy delivers in answer quality and what it costs on the device that has to
+run it.
+
+\section{Findings}
+\label{sec:ch10_findings}
+
+\paragraph{Retrieval choices mattered as much as reader size.}
+Vector retrieval answered more questions correctly than truncated full context for all five readers
+on the phone, had the highest accuracy point estimate for every reader on the workstation under the
+same truncation, and kept that ordering on LongMemEval-S. Full context failed because of the
+truncation: with a long window, the three readers tested matched or exceeded vector retrieval on
+LoCoMo, where they read the whole history, and trailed it, without separating, on LongMemEval-S, with prompts about 39 and 48 times
+longer. For readers of 0.8 to 4 billion parameters under a 4,096-token history
+budget, the tested range of retrieval depth moved accuracy more than the tested doublings of reader
+size. For readers of this size, the evidence placed in front of the reader is therefore worth tuning
+alongside the choice of model.
+
+\paragraph{On the phone, the better answer was also the cheaper one.}
+Vector retrieval had higher accuracy point estimates, lower energy per answer and shorter query times
+than truncated full context in all five reader pairs, with 5.8 to 26.9 times more correct answers per
+kilojoule where the ratio is finite. Building a graph in the phone pilot cost about 26 times more
+energy per dialogue turn than embedding, a cost paid before the first question that prompt-token
+accounting does not show, and peak RAM and temperature did not follow the energy ordering.
+
+\paragraph{The graph lost evidence that its own sources still held.}
+On the same retrieved turns, restoring the source text behind the selected triples raised Gemma~4~E2B
+from 21.5\% to 33.0\%: adding the associated source text recovered much of the observed deficit. Below
+that sits an extraction floor: where most
+extraction batches failed, as for the smaller Qwen extractors and the phone pilot, retrieving more
+facts did not recover the answers.
+
+\paragraph{The proposed selection rule did not work.}
+Selective Provenance Expansion failed its first pre-registered criterion, and its second passed
+numerically without a distinguishable gain; the repaired selector chose no source turn in any of the
+800 pre-specified prompts. A post hoc oracle using judged labels shows headroom at the question
+level, so the negative result bounds this per-fact rule rather than selective expansion itself.
+
+\section{Implications for on-device memory}
+\label{sec:ch10_implications}
+
+The most general implication is that answer quality and device cost have to be measured in the same
+experiment, on the device, because prompt-level proxies miss the cost of building memory. Three design
+consequences follow.
+
+\begin{enumerate}
+  \item \textbf{Price the whole lifecycle, not the prompt.} Construction, retrieval, prefill and
+        decode are separate operations, and the strategies separated most sharply in construction,
+        which never appears in a prompt-token count.
+
+  \item \textbf{Default to bounded retrieval of source text, and keep device limits visible.} On
+        this phone it had higher accuracy point estimates, shorter query times and lower energy per
+        correct answer than truncated full context. On the workstation it trailed long-window full
+        context by up to 8 points on LoCoMo and stayed ahead of it on LongMemEval-S, with 2 to 3\% of the
+        prompt tokens. A compact derived representation must earn its construction bill, and peak memory and
+        temperature still decide whether a configuration can run at all.
+
+  \item \textbf{Instrument for provenance and repeatability.} Digests, explicit measurement spans
+        and checkpoints turn a battery-consuming run into evidence. A budgeted selection rule also
+        needs a defined tie-break: in the first graph retrieval rule, 164 of 200 questions had a score
+        tie at the fact budget.
+\end{enumerate}
+
+\section{Future work}
+\label{sec:ch10_future_work}
+
+\paragraph{Close the measured gaps first.}
+The most direct next steps address the limits stated in Chapter~\ref{ch:discussion}: a second
+annotator and a second judge model for the human audit, adding matched full-context phone sittings so that every
+efficiency ratio rests on comparable replication, and running a complete repaired graph-QA cell on
+the phone with separate meters for construction and query service. A few whole-history LoCoMo
+prompts should also be timed and metered on the phone, so that the cost of long-window full context
+rests on a measurement rather than on the arithmetic in Section~\ref{sec:ch4_long_fc}. Because building the memory took
+about 60\% of the energy in a 20-question E2B vector sitting, the same questions should also be
+repeated at 20, 50 and 100 queries per history, to measure how construction amortizes with reuse.
+
+\paragraph{Cheaper construction.}
+Graph memory cost 52.3~J per turn on the phone because a general-purpose small model wrote it. A
+specialized extractor, such as the distilled entity recognizer of SmartRAG~\citep{smartrag}, or a
+construction pipeline distilled into one compact model, as in MemoryCPT~\citep{memorycpt}, would
+attack that term directly. Such a component should be judged by the ledger used here: joules for
+construction and joules per correct answer, not tokens alone.
+
+\paragraph{A better representation to store.}
+The measured deficit belongs to one representation: short triples produced by a small model, with
+their source spans reachable but not present. Representations that keep text with their structure,
+or store a retrieval gist beside a pointer to the original turn, should preserve the qualifiers and
+temporal detail that source restoration returned, and can be tested against the same matched
+comparison.
+
+\paragraph{Decide expansion once per question.}
+The SPE analysis points to a utility that is comparable across representations and to a decision
+taken once per question instead of once per fact. Reserving part of the budget for source text, or
+deciding at query level as LeanMem does with a planner~\citep{leanmem}, are the variants the oracle
+bound justifies testing.
+
+\paragraph{Beyond question answering.}
+The measured task is memory-dependent question answering. A phone agent also acts: it calls tools,
+changes device state and observes the result. Extending this evaluation to tool use means scoring
+whether the memory supplied the evidence behind a correct action, at a measured cost.

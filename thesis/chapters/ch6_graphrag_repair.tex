@@ -1,0 +1,535 @@
+
+\chapter{Repairing the graph memory pipeline: what improved and what remained}
+\label{ch:graph_mechanisms}
+
+On 200 LoCoMo questions, the initial Gemma~4 E2B graph baseline scored 15.0\%, against
+36.0\% for vector retrieval.\footnote{The earlier unprefixed vector-retrieval runs scored
+32.5\%.} We investigated whether
+the graph deficit came from implementation problems
+or from the evidence supplied by the graph. A repair sequence changed retrieval, increased
+the extraction budget and restored source dialogue. Further controls varied graph depth
+and separated the extractor from the reader.
+
+The repairs improved accuracy, with the largest single gain following source restoration.
+This chapter examines where evidence was lost and which repairs recovered it, motivating
+the budgeted source-selection policy evaluated in Chapter~\ref{ch:spe}.
+
+\paragraph{Contribution of this chapter.} \citet{rag_vs_graphrag} compare triples, triples with
+source text and plain retrieval using larger models, and \citet{kelesis2026} show that small-model
+extraction lowers graph-reasoning accuracy. This chapter adds a repair sequence that changes one
+stage of a small-model graph pipeline at a time, on the same 200 questions. It uses that sequence
+to locate where evidence is lost: in extraction, in selection, in the triple representation or in
+the reader. The individual repairs are not new. Using a graph together with passage retrieval has
+precedents (Section~\ref{sec:ch6_scope}), and attaching source text to triples is one of the
+conditions compared by \citet{rag_vs_graphrag}. The contribution
+is applying them one at a time to a small-model pipeline, so that each loss of evidence can be
+assigned to one stage. Two controls complete the sequence. An extraction-budget control shows a floor below
+which retrieving more facts does not recover answers, and a reader--extractor crossover separates
+the model that builds the graph from the model that answers.
+
+\section{What the graph baseline represents}
+\label{sec:ch6_scope}
+
+The graph arm is the SLM-extracted dialogue pipeline defined in Chapter~\ref{ch:methodology},
+not an unchanged Microsoft GraphRAG installation. It stores extracted triples as directed
+edges, merging repeated relations. Its results depend both on which facts survive
+construction and on how evidence reaches the reader. Graph-guided retrieval and presenting
+triples as evidence are distinct choices: HippoRAG, for example, uses a graph to rank
+source passages~\citep{hipporag2024}. The repairs below test these choices within our pipeline.
+
+\section{The repair sequence}
+\label{sec:ch6_ladder}
+
+The versions are called GraphRAG v1 to v4 because each repair changes one stage of the whole
+retrieval pipeline (construction, selection or reader input), not the form of the graph. Every
+version stores (subject, relation, object) edges in a directed multigraph. Table~\ref{tab:graph_versions} lists what each version changes. Version 2 changes how
+triples are selected, and at the same time stores source links and standardizes names. Version 3
+raises the extraction budget, which rebuilds the graph with more triples. Version 4 keeps the graph
+and the selected triples of version 3 and changes only the text given to the reader.
+
+Version 1 was the original implementation. Each later version addresses the failure that remained
+visible in the one before it: selection that depended on exact name matches (v2), cut-off extraction
+output (v3) and missing detail in the triples (v4). Source restoration therefore came last. While
+selection and extraction still lost evidence, its effect could not have been separated from theirs.
+
+The main comparisons use 200 category-balanced LoCoMo questions under the workstation
+protocol of Chapter~\ref{ch:methodology}; earlier 100-question runs guided development.
+Version 1 performs no embedding; the other conditions follow the reporting convention
+in Section~\ref{sec:retrieval}.
+
+\subsection{GraphRAG v1: entity-match retrieval}
+
+The original implementation extracted triples from batches of up to five dialogue turns. Each
+extraction call had a 256-token output limit. At question time, the system searched for graph
+nodes whose names matched terms in the question, then collected relationships within one link
+of the matching nodes. It ranked those relationships using term matches and simple rules for
+dates and session information, and supplied up to 12 triples to the reader.
+
+This baseline could fail during extraction or during selection. Failed extraction removed
+facts before retrieval, while name matching and score ties could exclude useful stored
+relationships. The following case illustrates both problems.
+
+\subsubsection{A traced retrieval failure}
+\label{sec:ch6_retrieval_failure}
+
+Figure~\ref{fig:ch4_extracted_subgraph_case_study} traces ``What did Caroline research?''
+on LoCoMo \texttt{conv-26}, using the early phone graph with a 256-token extraction limit
+and v1 one-hop retrieval. That graph has 148 nodes and 154 edges; the repaired workstation
+\emph{v3} graph of the same conversation has 537 nodes and 551 edges. Phone extraction
+failed on 58 of 84 batches, compared with 9 of 1,179 across all ten workstation E2B v3
+graphs. Speaker-incident edges account for 85\% of this phone graph and 81\% of this
+single workstation v3 graph. The ten-history v3 aggregate is reported separately in
+Section~\ref{sec:graph_topology}; the phone pilot is not the graph behind the workstation
+accuracy grid.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{results/thesis_visuals/fig21_extracted_subgraph_case_study.pdf}
+  \caption{Retrieval failure with the v1 one-hop rule in the early Gemma~4 E2B phone graph for
+  LoCoMo \texttt{conv-26}. (A) Scores
+  of 77 one-hop candidate facts; colours identify the 12 facts included in the recorded prompt.
+  Seventy-two candidates tie, making selection depend on iteration order. (B) The path from
+  omitted evidence to the incorrect answer. Workstation vector retrieval also misses the
+  evidence turn, so this case does not demonstrate vector superiority.}
+  \label{fig:ch4_extracted_subgraph_case_study}
+\end{figure}
+
+The labelled evidence turn says ``Researching adoption agencies'', but no extracted
+relation records that fact. Retrieval matched the speaker hub and tied 72 of its 77
+candidate facts. The recorded prompt contained nine exchanges between the speakers
+among its twelve facts, omitted the tied adoption fact, and produced the wrong answer.
+The figure traces each stage; adding the adoption fact would not itself restore the
+missing research relation.
+
+The tie order follows Python's per-process hash seed. Repeating the query under 50 seeds
+kept the adoption triple in 31 runs and reproduced the pilot's twelve facts in 19.
+In the workstation v1 runs, 164 of 200 questions per Gemma reader had ties across the
+12-fact cutoff, including 138 shared cases. Their reported v1 accuracies are single draws
+from that variation. Vector-first retrieval from v2 onward returned identical contexts
+under three tested seeds (\texttt{results/ego\_tie\_order.json}). Workstation vector
+retrieval also missed this question's evidence at every tested $k$ from 2 to 50; this
+case does not demonstrate that vector retrieval would answer it correctly.
+
+\subsection{GraphRAG v2: turn-first retrieval}
+
+Version 2 began with the same kind of vector search used by the vector-retrieval baseline.
+The system embedded each dialogue turn, selected the ten turns most similar to the question,
+and considered graph edges whose recorded source batches overlapped those turns. It ranked
+candidate edges by the similarity of their best matching turn, multiplied by the edge's stored
+weight, and kept up to 12.
+
+This change reduced dependence on matching the question to the exact wording of graph nodes.
+It also stored links back to the dialogue and standardized some names, for example by treating
+``mom'' and ``mother'' alike. Because these changes were introduced together, version 2 is a
+combined retrieval and naming repair. Its accuracy change cannot be assigned to vector search
+alone.
+
+The source links have a further limitation. Each edge records the range of turns in the batch
+from which it was extracted. It does not record which individual sentence supports that edge.
+A selected edge can therefore be associated with a retrieved turn from the same batch even
+when that turn expresses a different fact. This detail affects both source restoration in
+version 4 and the later SPE design.
+
+Version 2 still showed only triples to the answer model. On the 200 E2B questions, accuracy
+rose from 15.0\% to 18.5\%. The extraction counters remained at 507 failed
+batches out of 1,179. Better selection could only work with the facts that had entered the graph.
+
+\subsection{GraphRAG v3: larger extraction budget}
+
+The failure logs included structured responses cut off before a triple or the enclosing object
+was complete. An output limit of 256 tokens could be too short for the relationships in five
+dialogue turns. Version 3 retained version 2's retrieval method and doubled the extraction
+limit to 512 tokens.
+
+For E2B, failed batches fell from 507 to 9 out of 1,179, or from 43.0\% to 0.8\%. The number
+of extracted triples rose from 3,531 to 7,699. Accuracy moved from 18.5\% to 21.5\%, a modest
+difference that did not separate statistically. The clear
+effect of version 3 was on graph construction, not on the answer score.
+
+The large reduction in failed batches establishes that the output budget was a practical
+problem for this extractor. It does not establish that every original failure had the same
+cause. The original version 2 log contains 504 JSON decoding errors, where the response could not
+be read as a structured object, and three type errors caused by fields with the wrong value type.
+The version 3 log contains four JSON decoding errors and five type errors. These counters
+record whether the extraction pipeline could process a response, not whether every resulting
+fact was correct or complete.
+
+\subsection{GraphRAG v4: source turns restored}
+
+After version 3, E2B could build a substantially larger graph with few failed batches, yet its
+answer accuracy remained below vector retrieval. Version 4 tested whether useful details were
+missing from the representation given to the reader. It kept the same graph and selected
+triples as version 3, then appended retrieved dialogue turns whose indices overlapped the
+selected edges' source batches. Each source turn was included once.
+
+This comparison changes the text available for answering without changing the graph contents or
+changing which triples are selected. It can test whether the attached text helps. Because the
+source links are recorded by batch, it cannot establish that each added detail was a faithful
+expansion of one particular selected triple.
+
+The reported runs use the corrected graph loader; an earlier attempt that failed to apply
+source expansion was excluded (Appendix~\ref{app:repro_graph_loader}).
+
+\section{How much the repairs recovered}
+\label{sec:ch6_repair_results}
+
+Figure~\ref{fig:ch6_repair_ladder} shows the E2B sequence on 200 questions. Accuracy increased
+from 15.0\% in version 1 to 33.0\% in version 4. The largest individual increase, 11.5
+percentage points, followed source restoration. Mean prompt length stayed near 520 tokens
+through version 3 and rose to 813 tokens in version 4. Vector retrieval scored 36.0\% with a
+mean prompt length of 824 tokens.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{results/thesis_visuals/fig03_graph_repair.pdf}
+  \caption{E2B repair sequence on the same 200 LoCoMo questions, using the record runs. Version 1
+  retrieves by matching names and embeds nothing; versions 2 to 4 and vector retrieval use the
+  corrected task prefixes. The accuracy intervals are Wilson 95\% intervals. Prompt tokens are
+  the measured whole-prompt counts on the workstation. Table~\ref{tab:ch6_primary_results}
+  extends versions 3 and 4 and vector retrieval to the other four readers.}
+  \label{fig:ch6_repair_ladder}
+\end{figure}
+
+Source restoration helped four of five readers (Table~\ref{tab:ch6_primary_results}).
+For E2B, 27 answers changed from wrong to correct and four from correct to wrong,
+giving an 11.5-point gain that survives the designated Holm correction ($p=0.00017$).
+The E4B gain is five points (exploratory, raw $p=0.0129$).
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \setlength{\tabcolsep}{5pt}
+  \begin{tabular}{lrrrr}
+    \toprule
+    Model & v3 triples & v4 triples + text & Vector retrieval & v4 gain \\
+    \midrule
+    Gemma 4 E2B  & 21.5\% & 33.0\% & 36.0\% & +11.5 \\
+    Gemma 4 E4B  & 27.5\% & 32.5\% & 40.5\% & +5.0 \\
+    Qwen3.5 0.8B &  6.0\% &  9.0\% & 22.0\% & +3.0 \\
+    Qwen3.5 2B   &  9.5\% &  9.0\% & 32.5\% & -0.5 \\
+    Qwen3.5 4B   & 23.5\% & 32.0\% & 39.0\% & +8.5 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Primary workstation results with corrected embedding prefixes, 200 paired LoCoMo
+  questions per condition. Versions 3 and 4 use a 512-token extraction limit and allow up to
+  12 selected triples. The final column is the change from v3 to v4 in percentage points.
+  Qwen rows are descriptive checks in a second model family.}
+  \label{tab:ch6_primary_results}
+\end{table}
+
+Qwen 4B gained 8.5 percentage points, whereas Qwen 0.8B remained weak and Qwen 2B was
+essentially unchanged. The latter's extraction failed on 84.6\% of batches
+(Table~\ref{tab:ch6_extraction}), limiting the evidence available for restoration.
+
+By question category, source restoration mainly helps single-hop questions: it fixes 13
+and breaks one for E2B, and fixes seven and breaks none for E4B. These category comparisons
+are exploratory.
+
+No source-restored point estimate reached vector retrieval. E2B's remaining three-point
+gap did not separate statistically; E4B retained an eight-point gap (exploratory
+$p=0.0070$). E2B mean prompt length rose from 519.6 to 812.7 tokens, close to vector
+retrieval's 824.4.
+
+\section{What reached the answer model}
+\label{sec:ch6_evidence}
+
+The saved prompts allow a more direct inspection than the accuracy totals alone. Consider
+the LoCoMo question ``What martial arts has John done?'' The reference answer names kickboxing
+and taekwondo. Version 3 supplied 12 triples, none of which named either sport, and E2B replied
+``No information available.'' One selected triple referred only to a question about a martial
+arts place or yoga studio.
+
+Version 4 supplied the same 12 triples and added five dialogue turns. Two contained John's
+statements ``I'm doing kickboxing'' and ``I'm off to do some taekwondo!'' E2B then answered
+``kickboxing and taekwondo,'' which the judge accepted. This example shows information absent
+from the selected triple text becoming available through source restoration. It also shows why
+batch-level source links must be described carefully: useful text can accompany a triple
+without expressing that triple's particular relationship. The example illustrates a mechanism;
+it does not estimate how often that mechanism explains the full set of errors.
+
+We also checked whether the prompts contained dialogue turns identified as evidence by
+LoCoMo. This analysis covered 199 questions with usable evidence labels; one question was
+excluded from this diagnostic, while all 200 remained in the accuracy calculation.
+Table~\ref{tab:ch6_evidence} reports the proportion of questions for which at least one
+labelled evidence turn appeared in the prompt. It does not measure whether all the evidence
+needed for an answer was present.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \begin{tabular}{lrr}
+    \toprule
+    E2B condition & At least one evidence turn & Reference answer string \\
+    \midrule
+    v3 triples           & 1/199 (0.5\%)   & 33/199 (16.6\%) \\
+    v4 triples + text    & 97/199 (48.7\%) & 40/199 (20.1\%) \\
+    Vector retrieval     & 127/199 (63.8\%) & 42/199 (21.1\%) \\
+    \bottomrule
+  \end{tabular}
+  \caption{Prompt checks for the primary E2B conditions. The first diagnostic searches for
+  the text of dataset-labelled evidence turns. The second searches the normalized prompt for
+  the reference answer string. Both are text-matching checks, not semantic assessments of
+  whether the prompt is sufficient to answer.}
+  \label{tab:ch6_evidence}
+\end{table}
+
+The near-zero evidence-turn match for version 3 is expected because triples reword the
+dialogue. It does not mean the graph contains no useful facts. The answer-string check is
+also limited: it can miss paraphrases and differently written dates, and it searches the
+whole prompt, including the question. We therefore use these measures as supporting
+diagnostics. The paired source-restoration experiment and the inspected example provide
+stronger evidence that useful detail was absent from the text supplied by version 3.
+
+All five readers' graph and vector conditions start from the same ten retrieved turns.
+For E2B, these contain labelled evidence on 127 questions, of which the twelve-triple
+selection retains evidence-linked triples on 97. On those 97 questions, v3 answers 26
+correctly, while v4 and vector retrieval both answer 44 correctly. Within the 127-question
+subset, the remaining gap is in the 30 questions whose evidence the graph selection drops:
+v3, v4 and vector retrieval answer 4, 6 and 10 correctly. Separately, on the 72 questions
+with labelled evidence that retrieval misses, v4 answers 15 correctly and vector retrieval
+17. These group counts locate the observed shortfall; they do not isolate the causes of
+errors.
+
+When complete labelled evidence is present, the two methods have similar conditional
+accuracy, without a consistent advantage across readers (Table~\ref{tab:ch4_complete_use}).
+The groups contain different questions, so the comparison is descriptive.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \setlength{\tabcolsep}{7pt}
+  \begin{tabular}{lrrrr}
+    \toprule
+    & \multicolumn{2}{c}{Graph + sources} & \multicolumn{2}{c}{Vector retrieval} \\
+    \cmidrule(lr){2-3} \cmidrule(lr){4-5}
+    Reader & Complete cases & Accuracy & Complete cases & Accuracy \\
+    \midrule
+    Gemma E2B & 67 & 56.7\% & 88 & 50.0\% \\
+    Gemma E4B & 67 & 53.7\% & 88 & 56.8\% \\
+    \bottomrule
+  \end{tabular}
+  \caption{Accuracy when the complete labelled evidence is present. The case counts differ because
+           graph source restoration and vector retrieval do not cover the same number of questions.}
+  \label{tab:ch4_complete_use}
+\end{table}
+
+\section{Would more triples be enough?}
+\label{sec:ch6_depth}
+
+The default limit of 12 triples was another possible constraint. We therefore reused the
+version 3 graphs and varied the maximum number of triples placed in the answer prompt.
+The main extraction settings stayed fixed. Table~\ref{tab:ch6_depth} shows the results with
+corrected embedding prefixes.
+
+\begin{table}[htbp]
+  \centering
+  \scriptsize
+  \setlength{\tabcolsep}{4pt}
+  \resizebox{\textwidth}{!}{%
+  \begin{tabular}{lrrrrrrrr}
+    \toprule
+    & \multicolumn{2}{c}{4 triples} & \multicolumn{2}{c}{12 triples}
+    & \multicolumn{2}{c}{24 triples} & \multicolumn{2}{c}{Vector retrieval} \\
+    \cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}
+    Reader & Accuracy & Tokens & Accuracy & Tokens & Accuracy & Tokens & Accuracy & Tokens \\
+    \midrule
+    Gemma E2B & 13.0\% & 287 & 21.5\% & 520 & 29.5\% & 870 & 36.0\% & 824 \\
+    Gemma E4B & 16.0\% & 295 & 27.5\% & 539 & 29.5\% & 909 & 40.5\% & 824 \\
+    Qwen 4B & 11.5\% & 283 & 23.5\% & 513 & 29.0\% & 864 & 39.0\% & 812 \\
+    Qwen 0.8B & n/a & n/a & 6.0\% & --- & 7.0\% & --- & 22.0\% & --- \\
+    Qwen 2B & n/a & n/a & 9.5\% & --- & 10.0\% & --- & 32.5\% & --- \\
+    \bottomrule
+  \end{tabular}%
+  }
+  \caption{Graph-depth controls on 200 paired LoCoMo questions. Each reader's v3 graph
+  is fixed; only the maximum number of retrieved triples changes. Tokens are mean
+  whole-prompt counts. Vector retrieval is the reference from Chapter~\ref{ch:memory_evaluation}.
+  The four-triple condition was not run for the two smallest Qwen models (n/a);
+  dashes indicate token means omitted from this table.}
+  \label{tab:ch6_depth}
+\end{table}
+
+Increasing the limit from twelve to twenty-four triples gives E2B 18 improvements and two
+regressions, an eight-point gain (exploratory $p=0.00040$). Its mean prompt grows from
+519.6 to 870.2 tokens, yet its 29.5\% accuracy remains below source restoration's 33.0\%
+at 812.7 tokens. This is a descriptive comparison between different evidence sets.
+E4B gains two points and Qwen 4B gains 5.5; the smaller Qwen models change by only one
+or two answers (raw $p=0.5$ for 0.8B and $p=1$ for 2B).
+
+Reducing the limit from twelve to four costs E2B 23 correct answers while gaining six
+(raw $p=0.002316$). E4B loses 28 and gains five; Qwen 4B loses 26 and gains two.
+With losses at four and gains at twenty-four for E2B and Qwen 4B, twelve triples does
+not saturate observed accuracy for those readers. None of the tested limits
+for these three readers reaches the accuracy of source restoration.
+
+The answer-cap and reasoning controls show no consistent recovery from additional output
+tokens under the tested settings (Section~\ref{sec:ch4_reasoning}).
+
+\section{Extraction quality and model choice}
+\label{sec:ch6_extractors}
+
+The Gemma repair did not establish that a 512-token limit would suit every model.
+Table~\ref{tab:ch6_extraction} compares extraction failures and output volume across the
+five models, including the 1,024-token controls for Qwen 0.8B and 2B. All conditions
+processed the same 1,179 batches from the ten LoCoMo conversations.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \setlength{\tabcolsep}{5pt}
+  \begin{tabular}{lrrrrr}
+    \toprule
+    Extractor & Output limit & Failed batches & Extracted triples & Stored edges & QA accuracy \\
+    \midrule
+    Gemma 4 E2B  & 512   & 9 (0.8\%)    & 7,699 & 7,458 & 21.5\% \\
+    Gemma 4 E4B  & 512   & 7 (0.6\%)    & 6,264 & 6,228 & 27.5\% \\
+    Qwen3.5 4B   & 512   & 45 (3.8\%)   & 7,699 & 7,292 & 23.5\% \\
+    Qwen3.5 0.8B & 512   & 931 (79.0\%) & 1,898 & 1,678 & 6.0\% \\
+    Qwen3.5 0.8B & 1,024 & 889 (75.4\%) & 2,742 & 2,427 & 6.5\% \\
+    Qwen3.5 2B   & 512   & 998 (84.6\%) & 1,925 & 1,853 & 9.5\% \\
+    Qwen3.5 2B   & 1,024 & 802 (68.0\%) & 5,683 & 5,323 & 11.0\% \\
+    \bottomrule
+  \end{tabular}
+  \caption{Extraction-budget controls over 1,179 LoCoMo batches. Output limits are tokens per call.
+  Failed batches cannot be processed; valid empty returns are separate. Triples are counted
+  before repeated edges merge. E2B and Qwen 4B happen to produce the same number of triples;
+  their stored edges differ. QA uses v3 retrieval, corrected prefixes, and the same model for
+  extraction and answering. No transport errors were recorded in the inspected logs.}
+  \label{tab:ch6_extraction}
+\end{table}
+
+Doubling the Qwen 2B extraction allowance nearly tripled its output, from 1,925 to 5,683
+triples. The number of stored graph edges rose from 1,853 to 5,323. Accuracy changed from
+9.5\% to 11.0\%, a net gain of three answers, which did not separate statistically and is
+too small to interpret as a recovery. Qwen 0.8B rose only from 6.0\% to 6.5\%
+with the larger allowance. Neither result reproduced the near-elimination of
+failed batches seen with Gemma E2B.
+
+These controls show that extraction volume alone was insufficient to recover answer
+quality in the tested small Qwen configurations. They do not prove that extraction quality
+is unimportant. Many batches still failed at 1,024 tokens, and we did not measure the
+correctness or completeness of every surviving triple. Within Qwen, the 4B condition was
+the first tested size with a low failure rate at the 512-token setting. This is a boundary
+observed for this prompt, budget, model family, and runtime, rather than a universal model-size
+threshold for graph construction.
+
+\subsection{Structure of the repaired Gemma graphs}
+\label{sec:graph_topology}
+
+Table~\ref{tab:graph_topology} describes the workstation E2B and E4B \emph{v3} caches
+across ten LoCoMo conversations. These repaired graphs also supply the SPE evaluation.
+
+\begin{table}[htbp]
+  \centering
+  \scriptsize
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabular}{lrrrrrcc}
+    \toprule
+    Extractor & Nodes ($|V|$) & Edges ($|E|$) & Degree ($\bar{k}$) & Components & Giant \% & Empty \% & Extraction failure \% \\
+    \midrule
+    E2B & $676.6 \pm 140.1$ & $745.8 \pm 151.0$ & 2.21 & $36.5 \pm 12.2$ & 86.1\% & 0.00\% & 0.76\% \\
+    E4B & $588.2 \pm 108.0$ & $622.8 \pm 115.2$ & 2.12 & $24.3 \pm 8.6$  & 89.7\% & 7.12\% & 0.59\% \\
+    \bottomrule
+  \end{tabular}
+  \caption{Properties of the repaired Gemma~4 v3 graphs used in the SPE evaluation across 10 LoCoMo
+           conversations. Nodes, edges and components are per-conversation means $\pm$ standard
+           deviations. Degree is $2|E|/|V|$ counting every stored edge; read as a simple undirected
+           graph, the mean degree is 1.96 (E2B) and 1.97 (E4B). Empty \% and Extraction failure \% are
+           pooled over all 1,179 extraction batches.}
+  \label{tab:graph_topology}
+\end{table}
+
+Across the ten repaired workstation E2B v3 graphs, the mean share of edges touching
+either speaker is 83\%.
+For each question, \texttt{graph\_audit.py} takes the entities of all triples whose source
+batches overlap the ten retrieved turns, then counts graph edges incident to those entities
+(one step). This edge share averages 87\% across questions. Excluding speakers as stepping
+stones, the first step adds under four percentage points to the seed triples' edge share
+and the second adds less than one. These observations describe graph reachability;
+a traversal policy designed for this structure was not tested.
+
+E4B has fewer disconnected components and a larger giant-component share than E2B.
+Only 1.7\% of E2B edges are reinforced across multiple dialogue turns, so repeated
+relations contribute little consolidation in this representation. These measurements
+describe the graph inputs; they do not establish why one extractor answers better.
+
+\subsection{Empty responses and discarded values}
+\label{sec:ch6_extraction_replay}
+
+The original E4B v3 extraction returned 84 empty batches out of 1,179 (7.12\%), against
+none for E2B. Because the original counter did not retain those responses, all 1,179 E4B
+calls were replayed with instrumentation. Total extraction volume reproduced within 0.6\%;
+all 96 replayed empty batches were explicit \texttt{\{"triples": []\}} returns.
+The count difference is treated as runtime variation.
+
+Replacing each original empty batch with E4B's mean non-empty yield would recover about
+484 of the 1,435-triple difference from E2B, roughly one third. E4B also produces fewer
+triples in non-empty batches. Inspection found both appropriate omissions of social
+exchanges and missed facts such as named pets, purchases and dated activities. Empty
+returns therefore do not establish better precision, nor does this audit estimate
+extraction recall or explain downstream accuracy.
+
+The replay also found that a rule removing list numbers discarded three bare-numeric
+triples out of 6,231 returned triples. It caused none of the empty batches. The stored
+graphs were not rebuilt with a revised normalizer, so this diagnostic bounds the defect's
+observed effect in the replay rather than establishing that all implementation errors
+were removed.
+
+\subsection{Separate the model that builds the graph from the model that answers}
+
+E4B extracted fewer triples than E2B but achieved higher version 3 accuracy. In the usual
+runs, however, the same model both built the graph and answered the questions. We separated
+those roles by giving each reader the graph produced by each extractor
+(Table~\ref{tab:ch6_crossover}). The retrieval settings and question set stayed fixed.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \begin{tabular}{lrr}
+    \toprule
+    Answer model & Graph built by E2B & Graph built by E4B \\
+    \midrule
+    Gemma 4 E2B & 21.5\% & 26.0\% \\
+    Gemma 4 E4B & 22.0\% & 27.5\% \\
+    \bottomrule
+  \end{tabular}
+  \caption{Reader-extractor crossover on the same 200 LoCoMo questions, using version 3
+  and corrected embedding prefixes. Rows hold the reader fixed; columns hold the graph
+  producer fixed. With the graph fixed, both readers received the same graph cache and
+  retrieved context, and retrieval metadata matched for all 200 questions.}
+  \label{tab:ch6_crossover}
+\end{table}
+
+Changing the extractor from E2B to E4B gains 4.5--5.5 points with the reader fixed;
+changing only the reader gains 0.5--1.5 points. Most of the difference in these four
+cells is therefore associated with the graph producer. The crossover does not identify
+whether fact selection, naming or edge ranking is responsible, and it does not show
+that reader size is generally unimportant. Graph size and empty-batch frequency alone
+cannot explain the advantage.
+
+\section{What the study establishes and where it stops}
+\label{sec:ch6_limits}
+
+The experiments distinguish failed or omitted extraction, evidence excluded during
+selection, detail missing from selected triples, and errors after evidence reaches the
+reader. These constraints should not be collapsed into one explanation. Larger-model
+work likewise finds that graph retrieval design and the supplied representation both
+affect outcomes~\citep{rag_vs_graphrag}.
+
+The depth controls are not exactly token-matched. Source links identify batches,
+normalization defects remain, and there is no complete manually verified reference graph.
+The results therefore do not assign all remaining error to triple compression.
+
+Repairs were developed while inspecting this benchmark, so the repair sequence is a
+development record on LoCoMo, not a test held out from it; Section~\ref{sec:ch4_lme} repeats
+the repaired pipeline on LongMemEval-S. The repaired graph was not
+built on the phone; the available phone pilot is reported in
+Chapter~\ref{ch:on_device_memory}.
+
+\section{From full source restoration to selective expansion}
+\label{sec:ch6_to_spe}
+
+Source restoration improves answers but increases prompt length. This motivates choosing
+whether each retrieved fact should be omitted, retained as a triple or accompanied by
+source text under a shared context budget. Chapter~\ref{ch:spe} develops Selective
+Provenance Expansion and evaluates that decision against criteria fixed before its runs.

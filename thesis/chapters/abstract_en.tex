@@ -1,0 +1,34 @@
+
+\chapter*{Abstract}
+
+Small language models can run on smartphones, but remembering long interactions strains their
+limited context, battery, memory and thermal headroom. The on-device studies reviewed here do not compare memory
+representations for a conversation history by both answer quality and energy on one handset.
+This thesis examines how memory strategies affect answer quality, what resource trade-offs
+they create on a phone, and where knowledge-graph memory succeeds or fails.
+
+A shared pipeline compares truncated full context, vector retrieval and graphs extracted by
+small language models. The main study runs on a Samsung Galaxy S23 Ultra and measures accuracy,
+energy, latency, memory use and temperature, reporting accuracy and energy separately and as
+correct answers per kilojoule. A workstation runs the same modules with more questions and
+Gemma and Qwen readers on LoCoMo and LongMemEval, and tests retrieval depth, graph repairs and
+source-text restoration.
+
+On the phone, vector retrieval answered more questions correctly than truncated full context
+and used less energy per correct answer. On the workstation, full context with a long window had higher
+accuracy point estimates than vector retrieval on LoCoMo and lower ones on LongMemEval-S, while
+using many times more prompt tokens. In a single construction pilot on the phone, building
+a graph cost substantially more energy than building the vector index. The accuracy of
+graph memory was measured on the workstation. There, graph memory was limited by extraction
+failures and by how its evidence reached the reader, and restoring the source text behind
+retrieved facts improved graph answers for most readers without reaching vector retrieval.
+Selective Provenance Expansion, developed to choose between compact facts and source text under
+a token budget, did not reliably recover that benefit.
+
+The results suggest evaluating memory by both the evidence it delivers and the resources needed
+to build and use it. They are limited by one handset, a small phone sample and automatic
+judging, and cover question answering rather than complete mobile-agent workflows.
+
+\medskip
+\noindent\textbf{Keywords:} small language models; long-term memory; retrieval-augmented
+generation; knowledge graphs; on-device inference; energy efficiency.

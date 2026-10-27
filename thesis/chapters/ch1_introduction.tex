@@ -1,0 +1,213 @@
+
+\chapter{Introduction}
+\label{ch:introduction}
+
+\section{Motivation}
+\label{sec:ch1_motivation}
+
+Small language models make it possible to run language-based applications on a
+smartphone, close to the user and without a remote inference service~\citep{ondevice_lm_review}.
+Running on the device is only part of an assistant's usefulness, however. An assistant that
+supports repeated interactions must also retain what it learned earlier, such as a user's
+preferences, earlier requests, observations of the device and the outcomes of previous
+actions, and recover it when it becomes relevant again. Acting on a previously stated
+preference is therefore a memory problem as well as an inference problem.
+
+The resources for this process are limited. A smartphone shares its memory and processing
+capacity with the operating system and other applications, and battery capacity and heat
+limit how much computation can be sustained; studies of small-model deployment therefore
+evaluate prompt processing, generation speed and memory alongside model
+capability~\citep{slm_edge_deployment}. Keeping the whole interaction history in the model's
+context window is the simplest way to make past information available, but the history keeps
+growing, and longer inputs require more prompt processing and more storage for attention
+states, depending on the architecture and runtime~\citep{ondevice_lm_review}. Even when a long
+context fits in memory, processing it may take too much time or energy for repeated use on a
+phone.
+
+External memory separates the amount of information retained from the amount presented to the
+model for a particular request. A system can store a long history and retrieve only a small part
+of it, following the retrieval-augmented generation approach of supplying external evidence at
+inference time~\citep{rag_lewis}. This creates a design choice: how should the history be
+represented, which parts should be retrieved, and what should the model receive within its
+available context budget? This thesis studies that choice for small language models, with
+particular attention to the physical cost of memory use on a smartphone.
+
+\section{Problem statement}
+\label{sec:ch1_problem}
+
+A useful memory strategy must make relevant past information available at a cost the
+application can afford. Storage alone does not meet this requirement: the stored information
+must be retrievable, the retrieved representation must preserve enough detail for the model to
+use it correctly, and construction, retrieval and answer generation all add to the cost.
+
+This thesis compares three approaches. The full-context baseline presents the dialogue
+history within a configured input limit, truncating it when necessary. Vector retrieval
+stores dialogue text and selects relevant turns using embedding similarity. The graph
+approach asks a small language model to extract subject--relation--object triples, stores
+the resulting relations and retrieves graph evidence for answering. These approaches
+differ both in the work required to prepare memory and in the evidence subsequently
+shown to the answer model, referred to here as the \emph{reader}.
+
+Knowledge graphs are of particular interest because they represent explicit relations
+between entities. A compact relational representation may allow the reader to receive
+several relevant facts without processing their full conversational context. Its utility
+depends, however, on the extraction and retrieval stages. A missing relation cannot be
+recovered through traversal alone, and a short triple may omit a qualification or
+temporal detail needed to answer a question. Prior comparisons of retrieval and graph
+retrieval show that performance depends on the graph design and the evidence supplied
+to the reader~\citep{rag_vs_graphrag}. This motivates testing specific graph-memory
+choices rather than assuming that structure is beneficial by itself.
+
+The same distinction applies to efficiency. A short query prompt does not reveal the cost
+already paid to build its memory: generating a graph requires repeated model calls, while
+vector indexing embeds the stored text. Whether that work pays off depends on answer quality
+and on how often the memory is reused, so an on-device comparison must account for measured
+physical cost as well as prompt length.
+
+Related work already examines parts of this problem. MobileRAG evaluates retrieval for
+document question answering on a smartphone, including its energy
+cost~\citep{mobilerag_energy}. SmartRAG studies an on-device graph-based system and
+reports memory and power measurements, while its comparison baselines use a cloud-side
+simulation~\citep{smartrag}. A benchmark of memory architectures for compact mobile agents
+measures latency on a laptop and lists real-phone latency and device-level cost
+measurement as future work~\citep{mobile_memory_architectures}. These studies each cover part
+of the problem, but they do not compare alternative memory representations for a conversation
+history on one phone while measuring both answer quality and energy. This thesis makes that
+comparison with small readers,
+combining a broader workstation evaluation with direct smartphone measurements and a
+detailed analysis of the tested graph pipeline.
+
+\section{Research questions}
+\label{sec:ch1_research_questions}
+
+The thesis addresses three research questions.
+
+\begin{description}
+  \item[RQ1.] How do different long-term memory strategies affect the question-answering
+  performance of small language models?
+
+  \item[RQ2.] What trade-offs between answer quality and resource consumption arise when
+  deploying long-term memory strategies on smartphones?
+
+  \item[RQ3.] What are the capabilities and limitations of knowledge-graph-based memory
+  for small language models under constrained context and resource budgets?
+\end{description}
+
+RQ1 establishes the quality comparison, including how it depends on retrieval depth, reader
+size and the context budget. RQ2 relates answer quality measured on the phone to energy, latency, memory use
+and thermal behavior; correct answers per kilojoule give a joint measure, while the individual
+resource measurements explain practical deployment constraints. RQ3 asks how extraction,
+evidence selection and representation affect what reaches the reader, what repairing retrieval
+or restoring source text recovers, and whether Selective Provenance Expansion (SPE), a policy
+developed in this thesis, can choose whether a retrieved fact is omitted, kept as a triple or
+accompanied by its source text under a context budget.
+
+The phone comparison of answer quality covers vector retrieval and truncated full context;
+graph memory enters the phone study through a directly measured construction pilot. The graph
+repairs and SPE are evaluated for quality on the workstation, and their prompt lengths and
+retrieval times do not substitute for phone-energy measurements.
+
+\section{Approach and scope}
+\label{sec:ch1_scope}
+
+The experiments use question answering to evaluate whether a memory system can recover
+and supply information from an extended interaction history. LoCoMo provides long
+conversations and questions that require using information from those
+conversations~\citep{locomo}. LongMemEval evaluates long-term interactive memory across
+several abilities, including information extraction, reasoning across sessions,
+temporal reasoning, knowledge updates and abstention~\citep{longmemeval}. The thesis
+uses specified subsets and configurations of these benchmarks, described in
+Chapter~\ref{ch:methodology}.
+
+These tasks give the comparison an observable outcome: whether the answer produced from
+the available memory is correct under a common judging procedure. They also allow the
+memory representation to change while the question and underlying history remain fixed.
+Mobile agents motivate the study broadly, but the measured task is memory-dependent
+question answering. Improvements in action selection, tool-call correctness or complete
+mobile workflows would require additional evaluation.
+
+One experimental pipeline runs in two settings that complement each other. The main
+platform is a Samsung Galaxy S23 Ultra, where the memory modules run locally and each run
+records the phone's answers together with their energy, battery charge, latency, memory use
+and temperature. A workstation runs the same modules on more questions, five readers, both
+benchmarks and several graph variants, more than a phone can process in practical time. One
+automatic judge, run on the workstation outside the measured phone workload, scores both.
+Device runtimes and model packaging can change the generated answers, so a workstation score
+is never used as a phone score: every phone efficiency figure uses the accuracy of the answers
+the phone itself produced.
+
+The findings concern the evaluated models, histories and execution conditions. The
+phone measurements come from one handset, with a smaller question sample and uneven
+replication across phone conditions. Graph construction on the phone is
+represented by an early pilot, not a complete graph-QA comparison. The study
+also characterizes the repeatability of its automatic judge and checks its verdicts against a
+blind human audit with a single annotator. These limits define how far the results can be
+generalized and are developed in the relevant chapters.
+
+\section{Contributions}
+\label{sec:ch1_contributions}
+
+The thesis contributes an empirical comparison of long-term memory strategies for small
+language models and an analysis of the costs and failure mechanisms that shape their
+use on a phone. Its main contributions are:
+
+\begin{enumerate}
+  \item A controlled comparison of full context, truncated and with a long window, vector retrieval
+  and SLM-extracted graph memory for conversational question answering. The evaluation examines
+  reader size and retrieval depth alongside memory strategy, with a second benchmark used to
+  assess whether the observed ordering persists beyond the primary question set.
+
+  \item A smartphone study that relates answer quality to measured energy and other
+  device resources. It reports correct answers per unit of energy alongside latency,
+  memory and thermal observations, and compares the energy of building vector and graph
+  memory on the tested handset.
+
+  \item An analysis of graph-memory limitations through successive retrieval repairs,
+  source-text restoration and controls that distinguish extractor choice from reader
+  choice. The analysis identifies several stages at which useful evidence can be
+  lost or fail to reach the reader, rather than attributing all errors to a single
+  property of knowledge graphs.
+
+  \item The design and evaluation of Selective Provenance Expansion against criteria
+  recorded before its evaluation runs. The result is negative: the tested policies did
+  not reliably recover the benefit of source-text restoration under the evaluated
+  budgets, and the repaired selector chose no source turns. The measured costs are
+  consistent with the per-token scoring rule and the budget favouring triples, which bounds
+  this per-fact policy without ruling out query-level selective expansion.
+\end{enumerate}
+
+Each of Chapters~\ref{ch:methodology} to~\ref{ch:spe} opens by stating what it adds to the work
+reviewed in Chapter~\ref{ch:background}, and Tables~\ref{tab:ch9_claims} and~\ref{tab:ch9_claims_b} list the main claims
+with their sample sizes, tests and status.
+
+On the phone, vector retrieval had a higher accuracy point estimate, lower energy per
+answer and shorter query time than truncated full context in every reader pair, with
+5.8--26.9$\times$ more correct answers per kilojoule where the ratio is defined; on the
+workstation, with full context truncated to a 4,096-token window, it had the highest accuracy point
+estimate for every reader. Long-window full context, which held the whole LoCoMo history, matched or
+exceeded vector retrieval on LoCoMo and trailed it, without separating, on the much longer
+LongMemEval-S histories, at about 39 and 48 times the prompt tokens. Building memory in the phone graph pilot cost about 26 times more
+energy per dialogue turn than vector ingestion. Restoring source text raised Gemma~4 E2B's
+graph accuracy from 21.5\% to 33.0\% and narrowed the gap to vector retrieval for some readers
+without closing it for any, and the repaired SPE selector chose no source turns.
+
+\section{Thesis organization}
+\label{sec:ch1_organization}
+
+Chapter~\ref{ch:background} introduces small language models, external memory, graph
+retrieval and on-device execution, and positions the thesis against related work.
+Chapter~\ref{ch:methodology}
+describes the shared pipeline, benchmarks, judging procedure and resource measurements.
+
+Chapter~\ref{ch:memory_evaluation} addresses RQ1 through the memory-strategy comparison
+and its sensitivity to retrieval depth and reader choice.
+Chapter~\ref{ch:on_device_memory} addresses RQ2 through the smartphone measurements.
+RQ3 spans Chapter~\ref{ch:graph_mechanisms}, which analyzes the graph-repair sequence,
+and Chapter~\ref{ch:spe}, which presents and evaluates SPE.
+
+Chapter~\ref{ch:discussion} brings the findings together as answers to the three research
+questions and examines their limitations. Chapter~\ref{ch:conclusion} sets out the implications
+for on-device memory and the remaining research directions. Supporting statistical
+analyses appear in Appendix~\ref{app:on_device_statistics}, and
+Appendix~\ref{app:reproducibility} records the prompts, question sets, model artifacts and
+runtime settings needed to interpret and repeat the experiments.

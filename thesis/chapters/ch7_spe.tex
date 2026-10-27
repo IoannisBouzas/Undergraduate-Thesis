@@ -1,0 +1,418 @@
+
+\chapter{Selective Provenance Expansion}
+\label{ch:spe}
+
+Graph triples give a compact index of past dialogue, but extraction can remove qualifiers, temporal
+context and other details a question needs. Restoring the source turn keeps those details at a higher
+token cost. We designed and pre-registered \emph{Selective Provenance Expansion} (SPE) to choose
+between the two: under a retrieval-context token budget, it decides whether to omit a retrieved fact,
+keep it as a triple, or include its source dialogue turn. This chapter describes the two versions of
+the selection rule, evaluates the repaired implementation against the corrected baselines, and
+examines why the expected trade-off did not appear.
+
+\paragraph{Contribution of this chapter.} SPE is proposed in this thesis. The closest systems also
+return from a compact memory unit to its source text (Section~\ref{sec:ch2_graphs}). SEEM does so
+for every retrieved event frame~\citep{seem}, and LeanMem does so when an LLM planner judges that a
+question needs detail~\citep{leanmem}. SPE differs in where the decision is made. It weighs the
+two representations of each retrieved fact against each other under one shared token budget, and
+it was evaluated against criteria registered before its record runs. The result is negative. The
+chapter's second contribution is the explanation of that result: the rule's per-token scoring,
+together with the measured token costs, sets a bar for source text that the tested inputs did not
+clear (Section~\ref{sec:spe_why_triples}).
+
+\section{Why source text may matter}
+\label{sec:spe_motivation}
+
+A long-term conversational memory has to trade compactness against fidelity:
+
+\begin{enumerate}
+  \item \textbf{Compactness}: Longer prompts increase prefill work and KV-cache storage. Within the
+        operating range measured in this thesis, they also increased inference energy. In the SPE runs,
+        a selected triple cost 17.5 to 19.2 tokens on average, while upgrading it to its source text
+        cost about 75. The shorter representation allows more retrieved facts to fit in the context
+        window.
+  \item \textbf{Fidelity}: A triple does not preserve every detail of its source turn. Qualifiers,
+        temporal expressions, speaker intent, and surrounding context may disappear during extraction,
+        leaving the reader with less evidence than the original dialogue contained.
+\end{enumerate}
+
+The tension is not an artefact of small extractors: \citet{rag_vs_graphrag} find the same pattern
+with a 70B reader, while small-model extraction itself lowers graph-reasoning
+accuracy~\citep{kelesis2026}.
+
+The current E2B results in Chapter~\ref{ch:graph_mechanisms} show the trade-off: v3 reaches
+21.5\%, source-restored v4 reaches 33.0\%, and vector retrieval reaches 36.0\%.
+SPE was specified before these reruns.\footnote{At the design freeze, the
+earlier v3 and v4 baselines were 22.0\% and 30.0\%; the registered criteria retain
+those values.} Because v3 and v4 select the same graph edges, the gain comes from what the reader
+is shown.
+
+This tension motivated the core question of this chapter: \emph{Under an explicit retrieval-context
+budget, can an algorithm selectively decompress only the facts that require verbatim evidence,
+retaining unambiguous facts as compact triples, to achieve high accuracy at a lower resource footprint?}
+
+SPE uses the repaired Gemma~4 E2B and E4B v3 graph caches described in
+Section~\ref{sec:graph_topology}; this chapter concerns how to select representations
+from those fixed inputs.
+
+SPE is therefore not a separate method to be combined with GraphRAG v4. It runs on the graph and
+the source links that v4 uses. v3 shows every selected fact as a triple only, and v4 attaches the
+source turns of every selected fact; SPE makes that choice fact by fact. It selects from a larger
+candidate pool (up to 40 edges) under a token budget instead of a fixed twelve, and v4 is the
+accuracy reference it was required to approach at a lower prompt cost.
+
+\section{SPE design}
+\label{sec:spe_formulation}
+
+SPE was designed as a small change to the existing graph retrieval path, not as a learned routing
+system. The existing pipeline already stored three useful pieces of information: the similarity between
+the query and each retrieved dialogue turn, the triples extracted from that turn, and the link from each
+triple back to its source. We used those values to decide how much of each fact to place in the prompt.
+
+Candidate construction follows the implementation. Dense retrieval first selects the top-$k$ dialogue
+turns. SPE then collects graph edges whose provenance overlaps those turns, orders the edges by the
+similarity of their best matching turn, and keeps at most 40 candidates. Each candidate can be omitted,
+shown as a triple, or shown as a triple together with the retrieved source turn. Source quotes shared by
+several triples are included only once, so the cost of a choice depends on what has already been selected.
+
+Algorithm~\ref{alg:spe} summarizes the resulting greedy selection rule.
+
+\begin{algorithm}[htbp]
+\caption{Selective provenance expansion using a greedy density rule}
+\label{alg:spe}
+\small
+\begin{algorithmic}[1]
+\REQUIRE Query $q$, candidate facts $\mathcal{E}$, retrieved source turns, token budget $B$
+\STATE Mark every candidate as omitted and set the spent budget to zero.
+\WHILE{some representation change fits within $B$ and has $\Delta U > 0$}
+  \FORALL{valid changes: omit$\rightarrow$triple, omit$\rightarrow$expanded, triple$\rightarrow$expanded}
+    \STATE Compute the additional tokens $\Delta C$, excluding source quotes already present.
+    \STATE Compute the additional utility $\Delta U$ supplied by the change.
+  \ENDFOR
+  \STATE Among the changes that fit and have $\Delta U > 0$, choose the one with the largest $\Delta U/\Delta C$.
+  \STATE Apply the change and update the spent tokens, included source turns, and covered terms.
+\ENDWHILE
+\STATE \textbf{return} the selected triples followed by the selected source quotes.
+\end{algorithmic}
+\end{algorithm}
+
+The two SPE versions differ only in how they define utility.
+
+\subsection{SPE-1: a simple heuristic score}
+The first version combined signals already available in the retrieval pipeline. Similarity measured
+query relevance, lexical overlap rewarded uncovered query terms, a binary flag favored timestamped
+facts for temporal questions, and a redundancy term discouraged repeated evidence:
+\begin{equation}
+  U_1(e, r, \mathcal{S}, \mathcal{C}) = \text{sim}(q, s_e) + \lambda_1 \cdot \text{Cov}(e, q \setminus \mathcal{C}) + \lambda_2 \cdot \text{Temp}(e, q) - \lambda_4 \cdot \text{Red}(e, \mathcal{S})
+\end{equation}
+Here, $\mathcal{S}$ is the set of source turns already included and $\mathcal{C}$ is the set of query
+terms already covered. The similarity, temporal and redundancy terms were identical for a fact's triple
+and expanded forms; only the coverage term could differ, because the expanded form also contains the
+source text. This issue is examined below.
+The three weights were set to 0.3 before evaluation and were not tuned on the test questions. This was
+an intentionally simple starting point: it tested whether readily available metadata was enough to
+choose which facts deserved more context.
+
+\subsection{SPE-2: score the two representations separately}
+SPE-1 had a basic problem. The triple and expanded versions of a fact shared the
+same similarity term even though they contained different text. Apart from lexical coverage, the
+selector therefore had little information about whether paying for the source turn was worthwhile.
+Before running the SPE-2 cells, we replaced that shared similarity with one for the triple and another
+for the source turn:
+\begin{align}
+  u_{\text{triple}}(e) &= \cos(\mathbf{e}_q, \mathbf{e}_{\text{triple}(e)}) \\
+  u_{\text{source}}(e) &= \cos(\mathbf{e}_q, \mathbf{e}_{\text{source}(e)}) \\
+  \text{gap}(e) &= u_{\text{source}}(e) - u_{\text{triple}}(e)
+\end{align}
+
+The difference between the two scores is a proxy for detail that may have been lost during extraction.
+An upgrade from a selected triple to its source turn competes using $\text{gap}(e)/\Delta C$. SPE-2
+removes the three heuristic weights, but it retains the candidate cap and token budget. The change was
+recorded before the SPE-2 evaluation and no further selection rule was introduced afterward.
+
+\section{Evaluation against the pre-registered criteria}
+\label{sec:spe_results}
+
+The registered evaluation used Gemma~4~E2B on 200 LoCoMo questions, with answers judged by a 70B
+model. A frozen addendum repeated the comparison with E4B. The retrieval-context budget $B$ covers
+retrieved triples and source quotes; total prompt length also includes the instructions, answer format,
+and question.
+
+The registered criteria used the baseline values available when the design was frozen:
+\begin{itemize}
+  \item \textbf{Criterion 1}: reach at least 30.0\% accuracy with at least 25\% fewer total prompt
+        tokens than the expand-all baseline;
+  \item \textbf{Criterion 2}: exceed 22.0\% accuracy while keeping total prompt length below 600 tokens.
+\end{itemize}
+
+The fixed criteria remain unchanged; the comparisons below use the current baselines
+under the convention in Section~\ref{sec:retrieval}.
+
+\subsection{The selector repair and why the repaired rule is the one evaluated}
+\label{sec:spe_repair}
+
+After the first SPE-2 runs and before the record runs, a code audit found two bookkeeping defects in
+the selector. The registered design states that choosing the expanded
+form of a fact \emph{supersedes} its triple, and that the greedy step takes the remaining option with
+the highest utility per token (Algorithm~\ref{alg:spe}). The code departed from that design in two ways:
+\begin{enumerate}
+  \item Choosing the expanded form of an already selected fact appended a second copy of the fact
+        instead of replacing the triple, so the triple line appeared twice in the prompt.
+  \item An upgrade from triple to expanded form was charged only its extra tokens, but it was
+        credited with the full utility of the expanded form, $u_{\text{source}}$. The triple's
+        utility, $u_{\text{triple}}$, had already been counted when the triple was selected, so
+        the upgrade's value was counted partly twice.
+\end{enumerate}
+The repair made the expanded form replace the triple and credited an upgrade with what it adds,
+$\text{gap}(e) = u_{\text{source}} - u_{\text{triple}}$, divided by what it adds in tokens. The
+first change implements the supersession that the recorded design states. The second is the
+implementation's reading of that design: the design sets the expanded form's utility to
+$u_{\text{source}}$ and selects greedily by utility per token, but it does not write out how an
+upgrade from an already selected triple is credited. In a greedy
+budgeted selection, every step must be scored by the value it adds per token it adds. When an
+upgrade is credited with value the prompt already contains, the selector pays for source text for
+an accounting reason, not because the source text is worth its cost. The repaired rule can still
+choose source text. It does so whenever an upgrade's gap per extra token exceeds what the best
+remaining triple offers per token, or once every candidate triple has been taken and budget remains.
+That it never did so is therefore a result about these inputs, and Section~\ref{sec:spe_why_triples}
+explains it.
+
+The earlier version, which did quote source turns, also did not succeed. At $B=370$ it quoted at
+least one source turn in 39 of the 200 E2B prompts, and it reached 26.0\%, against 27.0\% for the
+repaired rule; both are below the 30.0\% that Criterion~1 requires.\footnote{At $B=240$ the earlier
+version reached 24.0\% for E2B, and 24.5\% and 27.0\% for E4B at the two budgets. These earlier runs
+also used embeddings without the task prefixes, so they differ from the record runs in two respects
+and are not used elsewhere in this chapter.} Neither version met Criterion~1. Because the embedding
+prefixes changed at the same time, the repair's own effect on accuracy cannot be isolated. The repair defines the valid implementation used in this chapter and is not a new SPE variant;
+the registered design had already declared SPE-2 the final variant.
+
+\subsection{Registered E2B results}
+Table~\ref{tab:spe_results} reports the registered E2B comparison.
+
+\begin{table}[htbp]
+  \centering
+  \scriptsize
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabular}{lccccc}
+    \toprule
+    Configuration & Retrieval control & Total Prompt Tokens & Kept Triples & Source Turns & Accuracy \\
+    \midrule
+    Full context                       & 4096-token window       & 4096.0 & n/a   & n/a   & 7.5\% \\
+    GraphRAG v3 (triples)              & cap: 12 triples         & 519.6  & 12.00 & 0.00  & 21.5\% \\
+    GraphRAG v4 (triples + sources)    & cap: 12 triples         & 812.7  & 12.00 & 4.50  & 33.0\% \\
+    Vector RAG                         & top-10 dialogue turns   & 824.4  & 0.00  & 10.00 & \textbf{36.0\%} \\
+    SPE-2 tight                        & context budget: 240 tokens & 545.7  & 13.81 & 0.00  & 23.0\% \\
+    SPE-2 registered                   & context budget: 370 tokens & 737.1  & 20.68 & 0.00  & 27.0\% \\
+    SPE-1                              & context budget: 240 tokens & 547.4  & 14.03 & 0.00  & 15.0\% \\
+    SPE-1                              & context budget: 370 tokens & 738.3  & 20.85 & 0.00  & 20.5\% \\
+    \bottomrule
+  \end{tabular}
+  \caption{Corrected baseline, repaired SPE-2 and SPE-1 results on LoCoMo ($n=200$, Gemma~4~E2B reader,
+           70B judged accuracy). The baselines use fact-count or context-window controls, not
+           SPE's explicit retrieval-context budget. Token and retrieval counts are means over 200 questions.
+           The SPE-1 rows are exploratory and outside the registered criteria.}
+  \label{tab:spe_results}
+\end{table}
+
+Criterion 1 failed. At $B=370$, SPE-2 reached 27.0\%, compared with 33.0\% for GraphRAG v4, and
+reduced mean prompt length by only 9.3\%. The paired difference did not separate (McNemar $p=0.0576$,
+Holm-adjusted $p=0.1152$), but the configuration missed both registered thresholds.
+
+Criterion 2 passed numerically but remained inconclusive. The tighter configuration reached 23.0\%
+within the prompt limit, yet its 1.5-point gain over GraphRAG v3 was not statistically distinguishable
+($p=0.711$).
+
+SPE-1, run on the same pipeline as an exploratory comparison, did worse at both budgets: 15.0\% at
+$B=240$ and 20.5\% at $B=370$. Like SPE-2, it selected no source turns. At the tighter budget it fell
+below GraphRAG v3 itself (exact McNemar $p=0.029$, unadjusted), so the simpler scoring rule was not
+merely unable to recover the benefit of source text but spent its budget less well than the triple cap
+it replaced.
+
+\subsection{E4B addendum and reader--extractor factorization}
+\label{sec:scale_generalization}
+
+The frozen scale addendum tested whether E4B could make better use of selectively compressed evidence.
+Because E4B initially served as both extractor and reader, this was an end-to-end comparison rather
+than a reader-only test. Table~\ref{tab:scale_comparison} places the registered E2B result beside the
+E4B addendum.
+
+\begin{table}[htbp]
+  \centering
+  \scriptsize
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabular}{lcc}
+    \toprule
+    Memory Configuration & Gemma 4 E2B (2B) & Gemma 4 E4B (4B) \\
+    \midrule
+    GraphRAG v3 (triples) & 21.5\% & 27.5\% \\
+    SPE-2 repaired ($B=240$) & 23.0\% & 25.5\% \\
+    SPE-2 repaired ($B=370$)& 27.0\% & 25.0\% \\
+    SPE-1 ($B=240$) & 15.0\% & 19.0\% \\
+    SPE-1 ($B=370$) & 20.5\% & 22.5\% \\
+    GraphRAG v4 (triples + sources) & 33.0\% & 32.5\% \\
+    Vector RAG & \textbf{36.0\%} & \textbf{40.5\%} \\
+    \bottomrule
+  \end{tabular}
+  \caption{End-to-end scale sensitivity between Gemma~4~E2B and E4B on LoCoMo ($n=200$). For
+           graph-based configurations, each column initially used the same model for extraction and
+           reading, so the cross-column difference is not a reader-only effect. The E4B SPE
+           comparisons are exploratory.}
+  \label{tab:scale_comparison}
+\end{table}
+
+E4B did not rescue SPE. Its two SPE-2 conditions reached 25.5\% and 25.0\%, and its two SPE-1
+conditions 19.0\% and 22.5\%, all below GraphRAG v4 at 32.5\% and Vector RAG at 40.5\%. The larger configuration therefore preserved the main result rather
+than narrowing the representation gap. Figure~\ref{fig:spe_trajectory} places these record cells, with
+the post hoc oracle of Section~\ref{sec:spe_discussion}, on one plane of accuracy against prompt length
+for both Gemma scales.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{results/thesis_visuals/fig10_spe_story.pdf}
+  \caption{Accuracy against mean prompt tokens for Gemma~4 E2B and E4B on 200 LoCoMo questions, with
+  corrected prefixes and the repaired selector. Whiskers are Wilson 95\% intervals. Hexagons
+  show the post hoc oracle selecting between v3 and v4 using judged labels; they bound those
+  choices rather than represent an achievable policy. S2-b240 and S2-b370 mark SPE-2 at
+  budgets $B=240$ and $B=370$. SPE-1 is omitted for legibility and
+  reported in Tables~\ref{tab:spe_results} and~\ref{tab:scale_comparison}.}
+  \label{fig:spe_trajectory}
+\end{figure}
+
+The two columns change extractor and reader together; the crossover in
+Table~\ref{tab:ch6_crossover} associates most of the v3 difference with the graph producer
+rather than reader scale.
+
+\subsection{Why SPE retained only triples}
+\label{sec:spe_why_triples}
+Across both models and both budgets, none of the 800 pre-specified SPE-2 prompts (the registered
+E2B study and its frozen E4B addendum) selected a source turn.\footnote{Only the
+repaired record runs are counted here; the earlier selector is described in
+Section~\ref{sec:spe_results}.} The exploratory SPE-1 variant selected none either. At
+$B=370$, E2B retained 20.7 triples on average and E4B retained 18.9. SPE-2 was therefore a larger
+triple-only retriever, not a selective expansion policy.
+
+Three properties of the inputs explain this outcome: what source text costs, what an upgrade
+adds, and how many triples were available.
+
+\paragraph{Cost of source text.} Source text was much more expensive than a triple. Measured offline from the
+logged prompts and graph caches, in the selector's own token units, the 4,136 triples that E2B
+SPE-2 selected at $B=370$ cost 17.5 tokens each on average. Upgrading one of them would have cost
+75.4 more tokens (median 68), because a quarter of these facts pointed to two or more retrieved
+turns. The median ratio $r=\Delta C/C$ of upgrade cost to triple cost was 3.9 for E2B and 3.5 for
+E4B, and $r$ was below two for only 10\% of E2B upgrades and 13\% of E4B upgrades
+(\texttt{results/spe\_upgrade\_cost.json}).
+
+\paragraph{What an upgrade adds.} At each step the selector compares what each option adds per token. A new
+triple with similarity $u'$ to the query and cost $C'$ adds its full similarity, $u'/C'$. An
+upgrade adds only the gap,
+$\text{gap}(e)/\Delta C$, because the triple's similarity is already in the prompt. For a competing
+triple of similar length, the upgrade wins only if
+\begin{equation}
+  \text{gap}(e) > r \cdot u' .
+\end{equation}
+The figure of about 0.26 below follows from this inequality under four stated assumptions:
+\begin{enumerate}
+  \item the cost ratio $r$ takes its median value of 3.9 (E2B); for an individual fact it can be
+        smaller or larger;
+  \item the competing triple is about as long as the triple being upgraded, so $C' \approx C$;
+  \item both the triple and its source turn have non-negative similarity to the query, so the gap,
+        which is the source turn's similarity minus the triple's, is below the source turn's
+        similarity and therefore below 1;
+  \item the greedy step compares the upgrade with the best remaining triple that still fits.
+\end{enumerate}
+Under these assumptions an upgrade can win only when every competing triple has a similarity below
+$\text{gap}(e)/r < 1/3.9 \approx 0.26$, and in practice below a quarter of the actual gap. Adding a
+fact directly in expanded form faces a similar bar: it costs the triple and the source text
+together, about 5.3 times a triple, so under the same assumptions the competing triples would need a
+similarity below about 0.19. The threshold is a consequence of the scoring rule, not a measured
+value: the per-candidate similarities were not logged.
+
+\paragraph{Number of triples.} An upgrade could also have won by default if the triples had run out
+with budget left, but they never ran out. Including every candidate triple would take at least 727
+tokens on average for E2B and 814 for E4B, about twice $B=370$. The selector logs confirm this for
+every prompt: in none of the 800 SPE-2 prompts did it take every candidate triple, and it stopped only
+after spending at least 220 of 240 and 348 of 370 tokens (\texttt{spe\_spent\_tokens} and
+\texttt{candidate\_edges} in the run records). The logs show only that this default route never
+opened. They do not show why each upgrade lost its comparison with a triple; that part of the
+explanation rests on the scoring calculation above. Finally, the selector discards options whose
+utility is not positive, so a fact whose triple was at least as similar to the query as its source
+turn had no upgrade option at all.
+
+The first expansion is the difficult step. Once one source turn is in the prompt, upgrading another fact
+that points to the same turn costs only one token, but under the repaired rule that first expansion
+never happened. The earlier version did reach it in 39 E2B prompts because it credited an upgrade
+with the source turn's full similarity instead of the gap (Section~\ref{sec:spe_repair}). Its
+condition was $u_{\text{source}} > r \cdot u'$, which is easier to meet because the source turn's
+similarity is larger than the gap.
+
+This explanation follows from the rule and the measured costs. The runs did not log the
+utilities, so how often gaps were non-positive, and how close the best upgrades came to the bar,
+remain unmeasured; establishing either requires logged utilities or an ablation of the selector.
+
+The representation-specific scoring also added query-time work. Mean retrieval time on the workstation was
+about 7.1 seconds per question for both SPE-2 budgets, compared with 0.21 seconds for the SPE-1
+cells, 0.19 seconds for E2B GraphRAG v4 and 0.24 seconds for E2B Vector RAG. This implementation of
+the selection rule therefore carried a substantial latency cost.
+
+\section{Discussion}
+\label{sec:spe_discussion}
+
+In both Gemma configurations, the selector did not recover the value of the omitted dialogue text.
+That conclusion concerns the selection rule, not whether a useful middle point existed; a post hoc
+oracle bound separates the two. For each question it keeps the v4 answer when v4 was judged correct
+and v3 was not, and the cheaper v3 answer otherwise. For E2B this reaches 35.0\% at a mean of 560.3
+prompt tokens, 31.1\% fewer than v4, which would satisfy Criterion~1; for E4B it reaches 33.5\% at
+555.6 tokens, 29.7\% fewer than v4. Expanding the same share of questions at random would give 23.1\%
+and 27.8\%. The oracle reads the judged labels, so it is an upper bound on question-level selection
+between two existing configurations rather than an achievable policy. Its value is to show where the
+headroom lay: source restoration turned 27 E2B answers and 12 E4B answers from wrong to right while
+reversing 4 and 2, so a selector had to find a small minority of questions. The tested rule never
+spent its budget on source text, so it could not find them.
+
+For these graphs and this dialogue QA task, the tested greedy policies did not identify a useful
+middle point between compact triples and source text. Text-attributed graph nodes might perform
+differently, although adding longer text to each node would narrow the practical distinction from
+chunk-based retrieval while retaining the graph-construction cost measured in
+Section~\ref{sec:ch5_graph_boundary}.
+
+SEEM and LeanMem also return from a compact memory unit to its source text
+(Section~\ref{sec:ch2_graphs}): SEEM for every
+retrieved event frame, within twice the initial retrieval budget~\citep{seem}, and LeanMem
+only when an LLM planner judges that a query needs detailed evidence~\citep{leanmem}. Both
+are evaluated with server-scale backbones. SPE differs in where the decision is made: it
+weighs the two representations of each retrieved fact against each other under a shared
+token budget. That per-fact comparison is what failed here. A query-level decision of the
+kind LeanMem makes, for which the oracle bound above shows headroom, was not tested.
+
+\section{Limitations}
+\label{sec:spe_limitations}
+
+The limits of the LoCoMo sample, the automatic judge and graph extraction stated in
+Chapters~\ref{ch:memory_evaluation} and~\ref{ch:graph_mechanisms} apply here, and SPE ran on the
+workstation only. Three limits are specific to SPE:
+\begin{enumerate}
+  \item \textbf{Selection policies}: SPE tested one heuristic and one representation-specific cosine
+        score, both ranked by utility per token. That normalization was never ablated. Cosine
+        similarity is not a ratio-scale measure of usefulness, so dividing it by token cost favors the
+        shorter representation (Section~\ref{sec:spe_why_triples}). Calibrated utilities, learned
+        policies, cross-encoder reranking, a budget share reserved for source turns and a query-level
+        expansion decision were not tested.
+  \item \textbf{Scope}: All SPE runs used Gemma~4, E2B for the registered study and E4B for the frozen
+        addendum, at budgets of 240 and 370 tokens. The negative result does not establish cross-family
+        generality; testing another family now would be a new replication, not part of the frozen
+        evaluation.
+  \item \textbf{Post hoc analyses}: The oracle bound reads judged labels, and the reader--extractor
+        crossover was added after the scale comparison exposed a confound. Both are exploratory
+        diagnostics, not deployable policies or confirmatory tests.
+\end{enumerate}
+
+\section{Summary}
+\label{sec:spe_summary}
+
+Selective Provenance Expansion did not provide a reliable middle point between triple-only retrieval
+and source dialogue for the tested Gemma configurations. On E2B, Criterion~1 failed, and Criterion~2
+cleared its numerical threshold without a statistically distinguishable gain; E4B also stayed below
+the source-bearing baselines. None of the 800 pre-specified SPE-2 prompts selected a source turn: the
+density rule spent the budget on additional triples. A post hoc oracle shows question-level headroom
+between v3 and v4, so the negative result applies to the tested selection rule, not to selective
+expansion as a whole.

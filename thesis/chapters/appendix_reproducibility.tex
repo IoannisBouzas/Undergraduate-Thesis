@@ -1,0 +1,484 @@
+
+\chapter{Reproducibility record}
+\label{app:reproducibility}
+
+This appendix records the configuration values that the main chapters rely on but do not
+state, so that a reader can interpret the reported numbers and repeat the experiments. It
+holds the prompt texts, question sets, settings, artifact identifiers, a worked prompt example
+and a glossary. The measurements themselves are in
+Chapters~\ref{ch:memory_evaluation} to~\ref{ch:spe} and the statistical detail is in
+Appendix~\ref{app:on_device_statistics}.
+
+\section{Prompts}
+\label{app:repro_prompts}
+
+Each prompt below was held fixed across every condition in which it was used, so that a
+difference between conditions cannot be a difference in instructions. The texts are reproduced
+from the harness source. Long lines are wrapped for display, and placeholders in braces are
+filled at run time.
+
+\subsection*{Reader answer prompt (\texttt{qa\_short\_answer\_v3})}
+
+Used for every memory strategy, every reader and both benchmarks. \texttt{\{context\}} holds the
+memory text built by the strategy (Section~\ref{app:repro_example} shows examples).
+\texttt{\{date\_line\}} is empty on LoCoMo; on LongMemEval it gives the question date
+(``Today's date is \ldots''), so that relative terms can be resolved. The answer is read from
+between the \texttt{<answer>} tags.
+
+\begin{small}
+\begin{verbatim}
+You are answering a question based on a conversation history.
+
+Conversation history:
+{context}
+
+{date_line}Question: {question}
+Rules:
+1. Answer the question in as few words as possible.
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve
+   relative terms like "yesterday", "last week", "last year" mathematically
+   using the timestamp of the fact.
+3. For names, the name only.
+4. For yes/no questions, answer "Yes" or "No".
+5. Do not explain.
+6. Do not repeat the question.
+7. Put the final answer between <answer> and </answer>.
+Answer:
+\end{verbatim}
+\end{small}
+
+\subsection*{Official LoCoMo prompt (prompt-robustness check only)}
+
+Used only for the substitution test of Section~\ref{sec:validity}. It is reproduced verbatim
+from the LoCoMo repository, including its original spelling of ``wriiten''; \texttt{\{s1\}} and
+\texttt{\{s2\}} are the two speakers.
+
+\begin{small}
+\begin{verbatim}
+Below is a conversation between two people: {s1} and {s2}. The conversation
+takes place over multiple days and the date of each conversation is wriiten
+at the beginning of the conversation.
+
+{context}
+
+Based on the above context, write an answer in the form of a short phrase
+for the following question. Answer with exact words from the context
+whenever possible.
+
+Question: {question} Short answer:
+\end{verbatim}
+\end{small}
+
+\subsection*{Graph extraction prompt (\texttt{triple\_json\_v2})}
+
+Sent once per batch of five turns, each rendered as ``speaker: text''. The reply is parsed as
+JSON under an extraction budget of 256 tokens (baseline) or 512 tokens (repaired pipeline).
+
+\begin{small}
+\begin{verbatim}
+Identify factual relationships in this dialogue segment, preserving all
+dates, times, locations, and specific details.
+
+Dialogue:
+{dialogue}
+
+Respond with a JSON object containing a 'triples' key which is a list of
+objects. Each object in 'triples' must have exactly three string keys:
+'subject', 'relation', and 'object'.
+Do not use pronouns (he, she, it, I) as subjects; resolve them to concrete
+names if clear from context.
+Capture key attributes of the speakers and any temporal details.
+Example output structure:
+{"triples": [{"subject": "alice", "relation": "works at", "object":
+"north clinic"}, {"subject": "bob", "relation": "graduated in", "object":
+"2019"}]}
+\end{verbatim}
+\end{small}
+
+\subsection*{Judge prompts (LongMemEval \texttt{get\_anscheck\_prompt})}
+
+The judge receives the question, the reference answer and the reader's parsed answer. A reply
+beginning with ``yes'' counts as correct and one beginning with ``no'' as incorrect; a reply that
+cannot be parsed is set aside for review rather than scored as wrong. LoCoMo answers use the
+standard form:
+
+\begin{small}
+\begin{verbatim}
+I will give you a question, a correct answer, and a response from a model.
+Please answer yes if the response contains the correct answer. Otherwise,
+answer no. If the response is equivalent to the correct answer or contains
+all the intermediate steps to get the correct answer, you should also answer
+yes. If the response only contains a subset of the information required by
+the answer, answer no.
+
+Question: {question}
+
+Correct Answer: {gold}
+
+Model Response: {pred}
+
+Is the model response correct? Answer yes or no only.
+\end{verbatim}
+\end{small}
+
+LongMemEval answers use the same standard form except for four question types, as in the
+benchmark's own evaluation:
+\begin{itemize}
+  \item \textbf{Temporal reasoning} adds: ``In addition, do not penalize off-by-one errors for the
+        number of days. If the question asks for the number of days/weeks/months, etc., and the
+        model makes off-by-one errors (e.g., predicting 19 days when the answer is 18 days), the
+        model's response is still correct.''
+  \item \textbf{Knowledge update} replaces the equivalence sentences with: ``If the response
+        contains some previous information along with an updated answer, the response should be
+        considered as correct as long as the updated answer is the required answer.''
+  \item \textbf{Single-session preference} supplies a rubric in place of a correct answer: ``Please
+        answer yes if the response satisfies the desired response. Otherwise, answer no. The model
+        does not need to reflect all the points in the rubric. The response is correct as long as
+        it recalls and utilizes the user's personal information correctly.''
+  \item \textbf{Abstention} questions ask whether the model ``correctly identifies the question as
+        unanswerable''; the model may say that the information is incomplete, or that other
+        information is given but the asked information is not.
+\end{itemize}
+
+\section{Question sets}
+\label{app:repro_questions}
+
+LoCoMo comparisons use 200 questions from the released ten-conversation set, 50 from each of
+Categories 1 to 4, taken in turn from each conversation (round-robin). The
+LongMemEval subset is a stratified sample of 60 questions, ten from each of the six question
+categories, drawn with seed 42 and stored as a fixed file so that every run sees the same
+questions in the same order. Question identifiers are assigned per run and depend on the
+sample size, so cross-run joins use the stable identifier carried in each record.
+
+Each run records a SHA-256 hash of its loaded question set. The 200 LoCoMo questions hash to
+\texttt{8f7200d571bd6391}\ldots, the 60 LongMemEval questions to \texttt{64f5c89412584b98}\ldots{}
+and the 20-question phone slice to \texttt{231afbb0f95fac1b}\ldots{} (first 16 hexadecimal digits).
+
+\subsection*{The 20-question phone slice}
+
+The primary phone comparison uses the 20 questions below, drawn by the same round-robin procedure
+with five questions per category. Every phone accuracy in Chapter~\ref{ch:on_device_memory} rests
+on them. Questions and reference answers are reproduced as they appear in the dataset, including
+its spelling errors.
+
+\begin{description}
+  \item[Multi-hop (Category 1)]
+  \begin{enumerate}
+    \item \texttt{conv-26}: What did Caroline research? \emph{Reference:} Adoption agencies
+    \item \texttt{conv-30}: What do Jon and Gina both have in common? \emph{Reference:} They lost their jobs and decided to start their own businesses.
+    \item \texttt{conv-41}: What martial arts has John done? \emph{Reference:} Kickboxing, Taekwondo
+    \item \texttt{conv-42}: What kind of interests do Joanna and Nate share? \emph{Reference:} Watching movies, making desserts
+    \item \texttt{conv-43}: what are John's goals with regards to his basketball career? \emph{Reference:} improve shooting percentage, win a championship
+  \end{enumerate}
+  \item[Temporal reasoning (Category 2)]
+  \begin{enumerate}
+    \item \texttt{conv-26}: When did Caroline go to the LGBTQ support group? \emph{Reference:} 7 May 2023
+    \item \texttt{conv-30}: When Jon has lost his job as a banker? \emph{Reference:} 19 January, 2023
+    \item \texttt{conv-41}: Who did Maria have dinner with on May 3, 2023? \emph{Reference:} her mother
+    \item \texttt{conv-42}: When did Joanna first watch ``Eternal Sunshine of the Spotless Mind? \emph{Reference:} 2019
+    \item \texttt{conv-43}: In which month's game did John achieve a career-high score in points? \emph{Reference:} June 2023
+  \end{enumerate}
+  \item[Open-domain knowledge (Category 3)]
+  \begin{enumerate}
+    \item \texttt{conv-26}: What fields would Caroline be likely to pursue in her educaton? \emph{Reference:} Psychology, counseling certification
+    \item \texttt{conv-41}: What might John's financial status be? \emph{Reference:} Middle-class or wealthy
+    \item \texttt{conv-42}: Is it likely that Nate has friends besides Joanna? \emph{Reference:} Yesteammates on hisvideo game team.
+    \item \texttt{conv-43}: Would Tim enjoy reading books by C. S. Lewis or John Greene? \emph{Reference:} C. S.Lewis
+    \item \texttt{conv-44}: What is an indoor activity that Andrew would enjoy doing while make his dog happy? \emph{Reference:} cook dog treats
+  \end{enumerate}
+  \item[Single-hop (Category 4)]
+  \begin{enumerate}
+    \item \texttt{conv-26}: What did the charity race raise awareness for? \emph{Reference:} mental health
+    \item \texttt{conv-30}: How do Jon and Gina both like to destress? \emph{Reference:} by dancing
+    \item \texttt{conv-41}: What is John's main focus in local politics? \emph{Reference:} Improving education and infrastructure
+    \item \texttt{conv-42}: What is one of Joanna's favorite movies? \emph{Reference:} ``Eternal Sunshineof the Spotless Mind''
+    \item \texttt{conv-43}: Which team did John sign with on 21 May, 2023? \emph{Reference:} The Minnesota Wolves
+  \end{enumerate}
+\end{description}
+
+\section{Memory configuration}
+\label{app:repro_memory}
+
+\begin{itemize}
+  \item \textbf{Truncated full context.} The most recent turns that fit the reader's context
+        budget, which is 4,096 tokens throughout, less a reserve for the prompt template and
+        the answer.
+  \item \textbf{Vector retrieval.} Turn-level embeddings with mean pooling, cosine similarity,
+        and the ten most similar turns by default; Chapter~\ref{ch:memory_evaluation} sweeps
+        this from 2 to 50. Retrieved turns are re-sorted into chronological order before they
+        enter the prompt. The embedding model expects task prefixes: stored turns are indexed
+        as \texttt{search\_document:~} and questions are encoded as \texttt{search\_query:~}.
+        Runs that predate this repair are identified where they appear. On the workstation the
+        repair raised vector accuracy by 3.5 points for E2B and 6.0 for E4B, and changed
+        triple-only graph accuracy by at most half a point.
+  \item \textbf{Graph memory.} Triples are extracted from batches of five turns and stored in a
+        directed multigraph. Edges start at weight 0.6 and are reinforced by 0.3 on repetition,
+        capped at 1.0, with a decay factor of 1.0 and a pruning threshold of 0.15. Retrieval
+        returns at most twelve triples. The extraction token budget is 256 in the baseline
+        configuration and 512 in the repaired pipeline of Chapter~\ref{ch:graph_mechanisms}.
+\end{itemize}
+
+\section{Worked prompt example}
+\label{app:repro_example}
+
+The four context formats below come from the recorded Gemma~4~E2B workstation prompts for the
+LoCoMo question ``What martial arts has John done?'' (\texttt{conv-41}; reference answer:
+kickboxing and taekwondo), which Chapter~\ref{ch:graph_mechanisms} also discusses. Each block
+replaces \texttt{\{context\}} in the reader prompt; ``[\ldots]'' marks omitted lines, and long
+lines are wrapped for display.
+
+\paragraph{Truncated full context.} 85 turns were sent and the server trimmed the oldest to fit
+4,096 tokens. The retained suffix begins in August 2023, after every turn that mentions kickboxing
+or taekwondo. Answer: ``John has not mentioned any martial arts.'' (judged incorrect).
+
+\begin{small}
+\begin{verbatim}
+[5:19 pm on 5 August, 2023] John: I appreciate it! Your words are really
+motivating.
+[...]
+[11:08 am on 16 August, 2023] John: Yeah, Maria, let's keep each other and
+everyone else motivated to make a difference! Together, our impact will
+surely last.
+\end{verbatim}
+\end{small}
+
+\paragraph{Vector retrieval, $k=10$.} Ten turns re-sorted into chronological order, 628 prompt
+tokens. Answer: ``kickboxing and taekwondo'' (judged correct).
+
+\begin{small}
+\begin{verbatim}
+[11:01 am on 17 December, 2022] John: Woah, Maria, that sounds cool! I'm
+doing kickboxing and it's giving me so much energy.
+[6:10 pm on 22 December, 2022] John:  Yep, let's keep making great memories
+with our loved ones and cherishing the time we have. I'm off to do some
+taekwondo!
+[...]
+[6:21 pm on 22 July, 2023] John: Yeah, they offer a a bunch, like yoga,
+kickboxing, and circuit training. It keeps things interesting!
+[...]
+\end{verbatim}
+\end{small}
+
+\paragraph{Graph triples, version 3.} Twelve selected triples rendered as timestamped statements,
+511 prompt tokens. None names either sport. Answer: ``No information available'' (judged
+incorrect).
+
+\begin{small}
+\begin{verbatim}
+[6:03 pm on 6 March, 2023] System: Maria volunteering at Homeless shelter.
+[11:08 am on 16 August, 2023] System: John expressed gratitude to Maria.
+[...]
+[6:21 pm on 22 July, 2023] System: Maria asked about location Martial arts
+place or yoga studio.
+[6:21 pm on 22 July, 2023] System: Shared photo depicts Two women standing in
+a room full of black mats.
+[11:01 am on 17 December, 2022] System: John returned from Family road trip
+yesterday.
+\end{verbatim}
+\end{small}
+
+\paragraph{Graph triples with sources, version 4.} The same twelve triples followed by five source
+turns, 774 prompt tokens. Answer: ``kickboxing and taekwondo'' (judged correct).
+
+\begin{small}
+\begin{verbatim}
+[... the twelve triples of version 3 ...]
+
+Source: [11:01 am on 17 December, 2022] John: Woah, Maria, that sounds cool!
+I'm doing kickboxing and it's giving me so much energy.
+[...]
+Source: [6:10 pm on 22 December, 2022] John:  Yep, let's keep making great
+memories with our loved ones and cherishing the time we have. I'm off to do
+some taekwondo!
+[...]
+\end{verbatim}
+\end{small}
+
+\paragraph{Source-expansion loader correction.}
+\label{app:repro_graph_loader}
+An early source-restoration run loaded a cached graph without reapplying the source-append
+option. The loader was corrected to restore the requested query settings, and that invalid
+attempt was excluded from the repair results.
+
+\section{Model artifacts}
+\label{app:repro_models}
+
+Every reported cell uses a community-distributed GGUF build at standard
+\texttt{Q4\_K\_M} quantization, with uniform per-layer bit widths. The single exception is the
+quantization check described in Chapter~\ref{ch:methodology}, which repeated one phone cell on
+an adaptive \texttt{UD-Q4\_K\_XL} build and reproduced its verdicts exactly.
+Table~\ref{tab:app_artifacts} gives the identity of each file as recovered from the device
+cache.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \begin{tabular}{llrl}
+    \toprule
+    Role & Repository & Size (GB) & SHA-256 (first 16) \\
+    \midrule
+    Gemma 4 E2B reader & \texttt{unsloth/gemma-4-E2B-it-GGUF} & 3.11 & not recorded \\
+    Gemma 4 E4B reader & \texttt{unsloth/gemma-4-E4B-it-GGUF} & 4.98 & \texttt{85a896a047553e84} \\
+    Qwen 3.5 0.8B reader & \texttt{unsloth/Qwen3.5-0.8B-GGUF} & 0.53 & \texttt{bd258782e35f7f45} \\
+    Qwen 3.5 2B reader & \texttt{unsloth/Qwen3.5-2B-GGUF} & 1.28 & \texttt{aaf42c8b7c3cab2b} \\
+    Qwen 3.5 4B reader & \texttt{unsloth/Qwen3.5-4B-GGUF} & 2.74 & \texttt{00fe7986ff5f6b46} \\
+    Vector embedder & \texttt{nomic-ai/nomic-embed-text-v1.5-GGUF} & 0.08 & \texttt{d4e388894e09cf38} \\
+    \bottomrule
+  \end{tabular}
+  \caption{On-device model artifacts. Digests were recomputed from the cached file bytes;
+           full values and the repository revisions are kept with the run records. The E2B
+           entry is the later of two revisions used during the campaign, discussed in
+           Section~\ref{app:repro_limits}.}
+  \label{tab:app_artifacts}
+\end{table}
+
+The automatic judge is \texttt{llama3.1:70b-instruct-q4\_K\_M}, served on the workstation and
+run at temperature 0 with a 256-token answer budget. Judging is performed on the workstation
+in every case and is outside the measured phone workload.
+
+\section{Runtime configuration}
+\label{app:repro_runtime}
+
+\paragraph{Workstation.} Models are served through Ollama. The reader context window is
+4,096 tokens and decoding is greedy at temperature 0. The long-window full-context reruns
+(Section~\ref{sec:ch4_long_fc}) raise the window to 131,072 tokens, or 262,144 for Qwen3.5 4B on
+LongMemEval-S, and change nothing else.
+
+\paragraph{Smartphone.} Models are served locally through llama.cpp, one inference slot per
+server, with an 8,192-token slot context (16,384 for the long-window sittings), five threads
+pinned to the performance cluster through a CPU affinity mask, flash attention enabled, the
+model's own chat template applied, and the runtime's reasoning budget set to zero. Every
+phone sitting therefore runs without reasoning traces. The thinking conditions evaluated in
+the workstation experiments were not repeated on the device, so no on-device energy figure
+in this thesis describes a thinking configuration. The embedding server runs separately with
+mean pooling. Decoding is greedy, which is a deliberate
+deviation from the vendor-recommended sampling settings; Section~\ref{sec:validity} reports
+the check that compared it against the recommended operating point. Greedy decoding is what
+makes the replicate comparison possible: repeated sittings produced byte-identical
+predictions, so the variation between them is physical rather than sampling noise.
+
+\section{Software versions and phone server commands}
+\label{app:repro_software}
+
+\paragraph{Phone.} The phone ran Android 15 with llama.cpp built from source in Termux. The binary
+reports version \texttt{0.1.2-dev} (build 0, commit not recorded) and was built with Clang 21.0.0
+for Android aarch64; the source checkout was at commit \texttt{dcad77cc}. Readers were served with
+the command below (Gemma~4~E2B shown; the other readers differ only in the model reference), with
+\texttt{-c 16384} for the long-window sittings. Network ports are omitted.
+
+\begin{small}
+\begin{verbatim}
+llama-server -hf unsloth/gemma-4-E2B-it-GGUF:Q4_K_M -c 8192 -np 1
+    --cpu-mask f8 -t 5 -fa on --jinja --reasoning-budget 0 --cache-ram 0
+\end{verbatim}
+\end{small}
+
+Here \texttt{-np 1} gives one inference slot, \texttt{--cpu-mask f8} pins execution to cores 3 to 7
+(the prime core and the four performance cores), \texttt{-t 5} sets five threads, \texttt{-fa on}
+enables flash attention, \texttt{--jinja} applies the model's own chat template,
+\texttt{--reasoning-budget 0} disables reasoning traces and \texttt{--cache-ram 0} disables the
+server's prompt cache between requests. The embedder ran as a separate server:
+
+\begin{small}
+\begin{verbatim}
+llama-server -hf nomic-ai/nomic-embed-text-v1.5-GGUF:Q4_K_M --embeddings
+    --pooling mean
+\end{verbatim}
+\end{small}
+
+The \texttt{-hf} selector resolves the latest repository revision at download time;
+Table~\ref{tab:app_artifacts} gives the file digests, and Section~\ref{app:repro_limits} records the
+one revision change during the campaign.
+
+\paragraph{Workstation.} Ollama served the readers and the judge; its server version was not
+recorded in the run records. The harness's locked Python environment uses Python 3.12.10 with
+NumPy 2.4.3, SciPy 1.17.1, NetworkX 3.6.1 and the Ollama client library 0.6.2.
+
+\section{Instrumentation}
+\label{app:repro_instrumentation}
+
+Resource sampling runs alongside the harness, requested every 0.5~seconds (realized 1.2 to
+3.2~seconds, median per run, because each battery query takes a second or more), and records the battery
+charge counter, voltage and current, memory from the kernel's own reporting, and the
+device-wide maximum temperature across the available sensors. Sampling starts after the model
+servers have loaded, so server start-up is excluded from the measured spans. A wake lock keeps
+the processor running with the screen off. Energy is obtained by voltage-weighted Coulomb
+counting from the charge counter rather than from a nominal-voltage assumption.
+
+\section{Analysis scripts}
+\label{app:repro_scripts}
+
+Every table, figure and statistical test in the thesis is produced from the stored per-run
+records by script, not transcribed by hand. Three scripts carry the reported numbers: one
+aggregates the accuracy table across runs, one derives the on-device energy metric and is the
+sole method of record for it, and one produces the statistical tests. Re-running them on the
+stored records regenerates the reported values.
+
+\section{Known limitations of this record}
+\label{app:repro_limits}
+
+Four gaps are stated here rather than left for a reader to find.
+
+\begin{enumerate}
+  \item \textbf{The E2B artifact changed during the campaign.} The reader was resolved by
+        repository and quantization rather than by pinned revision, and the published file was
+        updated between sittings. Byte-comparison of the two builds showed identical model
+        tensors; the difference is confined to the chat template, in a branch that handles
+        tool-call arguments and that these experiments never exercise. Predictions were
+        byte-identical across the sittings that span the change, which is what a
+        template-only difference predicts. Later runs pin the revision.
+  \item \textbf{Run records do not embed the artifact digest.} The link between a result
+        directory and the exact model file is reconstructed from the surviving device cache
+        and the server logs, not attested inside each run record. The device audit that
+        recomputed digests covered five of the six artifacts; the E2B reader had been
+        recorded earlier, by revision and file size only, so Table~\ref{tab:app_artifacts}
+        leaves its digest blank rather than carrying an unverified value.
+  \item \textbf{The primary phone retrieval campaign remains unprefixed.} The 20-question,
+        ten-turn retrieval comparison was not rerun with prefixes. The prefixed 100-question
+        runs answer the same 20 questions and give the accuracy comparison in
+        Section~\ref{sec:retrieval}; no prefixed energy measurement exists for this comparison.
+  \item \textbf{The charge counter can stall at the start of a sitting.} Several sittings show
+        a frozen counter for the first few minutes with no later catch-up, which under-counts
+        energy. The affected sittings and the size of the effect are reported in
+        Appendix~\ref{app:on_device_statistics}.
+\end{enumerate}
+
+\section{Glossary}
+\label{app:repro_glossary}
+
+\begin{description}
+  \item[Reader] The model that receives the memory text and writes the answer.
+  \item[E2B, E4B] The two Gemma~4 readers, with about 2.3 and 4.5 billion effective parameters.
+  \item[Workstation (``the box'')] The Linux host that runs the larger accuracy study through
+        Ollama and hosts the judge.
+  \item[Sitting] One complete phone run of a workload, unplugged and measured from start to end;
+        repeated sittings measure energy variation.
+  \item[Truncated full context] The newest dialogue turns that fit a 4,096-token budget, with
+        older turns dropped.
+  \item[Vector retrieval (Vector RAG)] The $k$ dialogue turns most similar to the question by
+        embedding, re-sorted into chronological order; $k=10$ by default.
+  \item[SLM-extracted graph] A graph of (subject, relation, object) triples extracted by the reader
+        model itself. Figures and tables label its versions GraphRAG v1--v4; it is not Microsoft's
+        GraphRAG (Section~\ref{sec:ch6_scope}).
+  \item[v1--v4] The four graph versions of Table~\ref{tab:graph_versions}; v3 shows triples only and
+        v4 adds the source turns linked to them.
+  \item[Source restoration] The v4 step of adding the linked dialogue turns to the selected
+        triples.
+  \item[Extraction failure] An extraction call whose output the pipeline could not parse; a valid
+        empty list is counted separately.
+  \item[SPE, SPE-1, SPE-2, $B$] Selective Provenance Expansion, its heuristic and
+        representation-specific scoring versions, and its retrieval-context token budget
+        ($B=240$ or $370$).
+  \item[Oracle] A post hoc upper bound that chooses v3 or v4 per question using the judged labels;
+        not an implementable policy.
+  \item[Prefixed, unprefixed] Retrieval with or without the embedding model's task prefixes
+        (Section~\ref{sec:retrieval}).
+  \item[Prefill, decode] Processing the input prompt, and generating the answer token by token.
+  \item[KV cache] The stored attention keys and values that let a model reuse earlier tokens during
+        generation.
+  \item[Correct answers per kilojoule ($G_E$)] Phone-judged correct answers divided by the
+        voltage-weighted energy of the same workload; $G_Q$ is the same count per 5,000~mAh full
+        charge.
+  \item[Parity gate] The predefined rule that decided whether workstation accuracy could stand in
+        for phone accuracy.
+\end{description}

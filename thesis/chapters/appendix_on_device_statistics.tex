@@ -1,0 +1,336 @@
+
+\chapter{Supplementary analyses for on-device memory}
+\label{app:on_device_statistics}
+
+This appendix keeps the main argument of Chapter~\ref{ch:on_device_memory} separate from
+the details needed to reproduce it. The chapter uses two formal statistical results:
+the workstation-to-phone agreement rule and the omnibus question-family test. The
+remaining material below describes replicate variation, run-length sensitivity,
+thermal peaks and analytical routing scenarios. These secondary calculations are not
+additional primary claims.
+
+\section{Cross-device agreement}
+\label{app:ch5_parity}
+
+The parity cell used the same 100 stable question identifiers on both devices. Both
+runs used Gemma 4 E2B with Vector RAG, \texttt{top\_k=10},
+\texttt{num\_ctx=4096}, prompt style v3 and the Nomic embedding prefix. The workstation
+used Ollama, while the phone used the quantized llama.cpp path.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \begin{tabular}{lr}
+    \toprule
+    Quantity & Result \\
+    \midrule
+    Paired questions & 100 \\
+    Matching correctness labels & 83 (83.0\%) \\
+    Required agreement & at least 90\% \\
+    Cohen's $\kappa$ & 0.621 \\
+    Workstation-only correct & 5 \\
+    Phone-only correct & 12 \\
+    Exact McNemar $p$ & 0.1435 \\
+    Exact answer-string matches & 40 (40.0\%) \\
+    \bottomrule
+  \end{tabular}
+  \caption{Components of the predefined workstation-to-phone agreement check. The rule
+  required at least 90\% label agreement and McNemar $p>0.05$. It failed on agreement.}
+  \label{tab:app_ch5_parity}
+\end{table}
+
+Agreement and McNemar's test serve different purposes. The first asks whether the two
+environments label the same questions the same way. The second uses only the 17
+discordant pairs and asks whether their direction is imbalanced. The observed $p=0.1435$
+does not demonstrate equivalence. It only fails to establish a directional shift. The
+83\% agreement therefore remains the operative result, and all Chapter 5 accuracy
+numerators come from phone outputs. Figure~\ref{fig:app_parity_gate} illustrates the
+predefined parity threshold, measured label agreement, and the paired $2\times 2$ decision matrix.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{results/thesis_visuals/fig15_parity_gate.pdf}
+  \caption{Predefined workstation-to-phone parity gate diagnostic ($n=100$ paired LoCoMo questions).
+  Left: required threshold (90\%) vs measured label agreement (83.0\%, Wilson 95\% CI [74.5\%, 89.0\%])
+  and exact string match (40.0\%). Right: $2\times 2$ concordance matrix, where ``Box'' is the workstation. The phone scored 37\% and the workstation
+  30\%, and the two runtimes worded many answers differently. Under the predefined rule the gate failed,
+  so phone accuracy is always measured on the phone.}
+  \label{fig:app_parity_gate}
+\end{figure}
+
+The result can be regenerated with:
+
+\begin{verbatim}
+python parity_check.py \
+  results/lap_locomo100_e2b_vr_parity \
+  results_phone/phone_locomo100_e2b_vectorrag_n100
+\end{verbatim}
+
+The saved report is \texttt{results/parity\_check\_2026-08-04.md}.
+
+\section{Question-family randomization test}
+\label{app:ch5_question_family_test}
+
+Chapter~\ref{ch:memory_evaluation} reports 50 LoCoMo questions from each of four
+families in every primary Gemma cell. To test the visible category separation without
+treating the 200 answers as independent, the analysis works within the ten source
+conversations.
+
+For a given reader-memory cell, the observed statistic is Pearson's chi-square from the
+$4\times2$ table of question family by correct or incorrect outcome. Under the null,
+correctness is exchangeable across family labels within a conversation. Each of 100,000
+randomizations shuffles the observed binary labels only within their source
+conversation. This keeps the conversation's total number correct and its category
+composition fixed. The randomization $p$-value is the proportion of shuffled statistics
+at least as large as the observed statistic, with the standard plus-one correction.
+Holm's procedure adjusts the eight cell-level $p$-values as one family.
+The test was added after the category decomposition was inspected. It is a supporting
+analysis, not a member of the primary strategy-comparison family.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{llrrrrrr}
+    \toprule
+    Reader & Memory & C1 & C2 & C3 & C4 & $\chi^2(3)$ & Holm $p$ \\
+    \midrule
+    E2B & Full context    & 5 & 0 & 10 & 0 & 19.82 & 0.00018 \\
+    E2B & Graph triples   & 6 & 6 & 13 & 18 & 12.18 & 0.00548 \\
+    E2B & Graph + sources & 8 & 11 & 17 & 30 & 25.78 & $<0.0001$ \\
+    E2B & Vector RAG      & 16 & 9 & 16 & 31 & 22.40 & 0.00015 \\
+    E4B & Full context    & 6 & 0 & 15 & 0 & 32.08 & $<0.0001$ \\
+    E4B & Graph triples   & 6 & 9 & 16 & 24 & 19.34 & 0.00050 \\
+    E4B & Graph + sources & 8 & 8 & 18 & 31 & 32.52 & $<0.0001$ \\
+    E4B & Vector RAG      & 17 & 10 & 21 & 33 & 23.14 & 0.00015 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Omnibus question-family tests for the eight primary Gemma cells. C1 to C4
+  are the numbers correct out of 50 for multi-hop, temporal, open-domain and single-hop
+  respectively. The chi-square value is the observed separation statistic. Each
+  $p$-value comes from conversation-stratified randomization and is Holm-adjusted across
+  all eight rows.}
+  \label{tab:app_ch5_question_family}
+\end{table}
+
+Every adjusted value is below 0.05. The omnibus test establishes that correctness is
+associated with question family within each row. It does not identify which pairs of
+families differ and does not turn the adjacent percentages in Chapter~\ref{ch:memory_evaluation} into pairwise findings. The script and source table are:
+
+\begin{verbatim}
+python question_family_stats.py
+results/question_family_stats.csv
+\end{verbatim}
+
+\section{Phone energy replication}
+\label{app:ch5_energy_replication}
+
+Table~\ref{tab:app_ch5_energy_replicates} gives the repeated sitting values that are
+collapsed to means in Chapter~\ref{ch:on_device_memory}. The standard deviation describes
+variation between complete sittings. It is not a per-query error bar.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{llrrrrr}
+    \toprule
+    Reader & Memory & Sitting 1 & Sitting 2 & Sitting 3 & Mean & SD \\
+    \midrule
+    Qwen3.5 0.8B & Vector RAG   & 248.5 & 323.9 & 345.1 & 305.8 & 50.8 \\
+    Qwen3.5 2B   & Vector RAG   & 437.1 & 420.6 & 440.7 & 432.8 & 10.7 \\
+    Qwen3.5 4B   & Vector RAG   & 566.7 & 594.3 & 546.1 & 569.0 & 24.2 \\
+    Gemma 4 E2B  & Vector RAG   & 653.8 & 473.4 & 525.0 & 550.7 & 92.9 \\
+    Gemma 4 E2B  & Full context & 1515.6 & 1338.7 & 1331.9 & 1395.4 & 104.1 \\
+    Gemma 4 E4B  & Vector RAG   & 770.9 & 748.3 & 693.3 & 737.5 & 39.9 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Voltage-weighted joules per scored answer in cells with three complete
+  sittings. The other full-context cells have one complete sitting.}
+  \label{tab:app_ch5_energy_replicates}
+\end{table}
+
+Gemma E2B is the only strategy pair with three complete sittings on both sides. Its
+within-sitting Vector/full-context correct-per-kilojoule ratios are 23.18, 26.86 and
+25.37. Their mean is 25.14 and their standard deviation is 1.85. The second
+full-context sitting completed 19 answers, so its accuracy is calculated as $1/19$.
+The ratio generator now reads the exact scored labels rather than reusing the first
+sitting's 5\% accuracy. This is why the paired mean is not equal to the quotient of the
+rounded energy means in the main tables.
+
+Repeated sittings reduce the uncertainty in energy, not in accuracy: greedy decoding gives the
+same answers in every sitting, so the accuracy of each cell still rests on 20 questions. A
+question-level sensitivity analysis resampled the 20 observed paired questions with replacement
+20,000 times, with energy per answer held at its measured mean. The
+2.5th percentile of the vector-to-full-context ratio is 2.6$\times$ for Qwen3.5 2B, 5.7$\times$ for
+Qwen3.5 4B, 7.6$\times$ for Gemma E2B and 8.8$\times$ for Gemma E4B; for Qwen3.5 0.8B full context
+has no correct answer, so no finite ratio is reported. The range 2.6$\times$ to 8.8$\times$ summarizes
+four separate lower percentiles, not one interval for the whole experiment. These percentiles are
+conditional on fixed energy: they exclude between-sitting energy variation and charge-counter bias,
+and the question-level resampling does not account for dependence within a conversation.
+In all five readers, every question that full context answered correctly was also answered correctly
+by vector retrieval. This describes answer quality on the observed sample; it does not validate the
+energy measurements. Resampling these pairs cannot introduce full-context-only successes that were
+absent from that sample. The percentiles therefore are not guaranteed lower bounds for new workloads.
+The calculation is
+\texttt{python phone\_ratio\_bootstrap.py}, which writes \texttt{results/phone\_ratio\_bootstrap.json}.
+
+Accuracy intervals displayed in Figure~\ref{fig:ch5_phone_efficiency} are Wilson 95\%
+intervals for 20 binary outcomes. They describe uncertainty in each marginal accuracy
+estimate. They do not test whether the efficiency ratio differs across reader families.
+
+\section{Run-length observation}
+\label{app:ch5_run_length}
+
+The separate E2B Vector-RAG run over 100 phone questions consumed 29.76 kJ, scored 37
+of 100 answers correct and used 297.6 J per answer. The three 20-question sittings used
+550.7 J per answer on average. The observed ratio is 1.85. Splitting each run into its
+memory-building windows and its question stretches (\texttt{golden\_metric.phase\_split})
+accounts for most of it. Building the memory for six histories took 62\% and 60\% of the
+energy in the two 20-question sittings that did not start at full charge, against 32\% in the
+100-question run, which built ten histories (its first two, begun while the charge counter was
+paused at full charge, are left out of that share), while the questions themselves cost about 198~J per
+answer at 100 questions against 205 to 246~J at 20. The lower figure at 100 questions therefore
+comes mainly from spreading the memory build over more questions. It is still not a matched
+run-length intervention: the 100-question run used the task prefixes, and its question
+composition and execution time differ. No main-table value is rescaled by 1.85.
+
+This auxiliary cell is stored in \texttt{results/golden\_metric.json} and traced as
+\texttt{app\_ch5\_run\_length} in
+\texttt{results/thesis\_visuals/figure\_trace.yaml}. It can be regenerated with
+\texttt{python golden\_metric.py}.
+
+\section{Thermal peak detail}
+\label{app:ch5_thermal}
+
+The mean of the within-sitting maxima of the hottest thermal zone is higher for Vector RAG in
+all five reader pairs. Table~\ref{tab:app_ch5_thermal} reports the observation directly.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \begin{tabular}{lrrr}
+    \toprule
+    Reader & Full context ($^\circ$C) & Vector RAG ($^\circ$C) & Difference \\
+    \midrule
+    Qwen3.5 0.8B & 95.80 & 97.53 & 1.73 \\
+    Qwen3.5 2B   & 95.40 & 99.13 & 3.73 \\
+    Qwen3.5 4B   & 95.80 & 96.33 & 0.53 \\
+    Gemma 4 E2B  & 95.67 & 98.87 & 3.20 \\
+    Gemma 4 E4B  & 97.00 & 97.93 & 0.93 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Displayed means of per-sitting peaks of the hottest thermal zone. Vector RAG has three
+  sittings in every row. Full context has three for E2B and one for the other four
+  readers. These values are descriptive and are not battery temperatures.}
+  \label{tab:app_ch5_thermal}
+\end{table}
+
+The repeated 5-of-5 direction is worth reporting, but unequal replication makes its
+uncertainty asymmetric. Peak temperature also ignores exposure duration. The table
+therefore does not support a causal claim that retrieval runs hotter.
+
+\section{Long-context and routing sensitivities}
+\label{app:ch5_routing_sensitivity}
+
+Figure~\ref{fig:app_ch5_kv_wall} sets the KV-cache size of the two Gemma readers against the
+memory the phone had left. The curves are calculated from the layer shapes in the headers of the
+phone's own GGUF files, not measured at run time; the horizontal lines are measured. No context
+longer than the 8,192-token server context was run on the phone, so the figure describes how the
+cache would grow, not how long prompts would perform.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{results/thesis_visuals/fig16_kv_ram_wall.pdf}
+  \caption{Calculated f16 KV-cache size versus context length for Gemma~4 E2B and E4B, using the phone
+  GGUF layer shapes. Markers show the reserved 8,192-token cache (57 and 155~MB). Dotted lines
+  show measured free RAM at each model's highest system-memory peak (4.4 and 5.0~GB). The curves
+  describe cache growth alone; they do not establish total runtime memory or the feasibility of
+  longer-context inference.}
+  \label{fig:app_ch5_kv_wall}
+\end{figure}
+
+KV sharing and 512-token sliding windows leave only three E2B and four E4B layers whose
+cache grows with context. These counts agree with the Gemma~4 technical
+report~\citep{gemma4}. Its Table~3 gives int8 cache sizes of 0.05 and 0.14~GB at 32,768
+tokens, about half the f16 estimates here. The plotted estimates are conservative relative
+to those lower-precision footprints; they are not bounds on the runtime's other allocations.
+
+The exploratory routing grid combines the direct per-turn construction anchors with
+projected graph query energy and workstation accuracy. It now makes two like-for-like
+comparisons. Raw query tokens are compared with raw lifecycle energy, producing different
+choices in 38 of 40 history-length and query-count profiles. Query tokens per correct
+answer are compared with lifecycle energy per correct answer, producing different
+choices in 20 of 40 profiles. These are scenario counts, not statistical tests.
+Figure~\ref{fig:app_amortization_frontier} visualizes this dynamic break-even frontier as user query volume scales.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{results/thesis_visuals/fig17_amortization_frontier.pdf}
+  \caption{Illustrative amortization for Gemma~4 E2B over a 419-turn history. (A) Cumulative energy
+  including construction; markers show projected crossings with full context. (B) Energy per
+  expected correct answer, on a logarithmic scale. Construction and vector/full-context query
+  energies are phone measurements; graph query energy is estimated from prompt tokens.
+  Workstation accuracy is assumed to transfer despite the failed parity criterion. The phone
+  graph-build pilot and workstation graph-accuracy runs also use different configurations. These
+  curves describe a scenario, not measured on-device graph efficiency.}
+  \label{fig:app_amortization_frontier}
+\end{figure}
+
+The full-context and vector query-energy anchors average three sittings. Vector query
+energy excludes embedding windows, so construction is counted once. Graph query energy
+is scaled from vector query energy using workstation prompt tokens; accuracy uses the
+workstation $n=200$ record. The graph build is the early phone pilot, with 58 of 84 failed
+batches, whereas the workstation graphs had under 1\% failures. These mismatched inputs
+and the failed parity criterion limit the calculation to an illustrative scenario.
+
+Under these assumptions, GraphRAG v3 and v4 cross full context's cumulative energy after
+about 17 and 19 queries. Neither overtakes vector retrieval per expected correct answer
+over the plotted 1--100 queries: vector construction costs 0.85~kJ against the graph's
+21.9~kJ, and its assumed accuracy is higher. These are properties of the projection.
+
+The former 40-of-40 statement is retired because it compared raw prompt tokens with
+energy per correct answer. Introducing accuracy normalization changed the result. More
+importantly, no complete phone graph-QA cell exists. The only conclusion carried into
+the main chapter is that query-token counts omit memory construction. The complete
+exploratory calculation is in \texttt{results/routing\_divergence.md} and is regenerated
+by \texttt{python routing\_divergence.py}.
+
+\section{Energy and charge conventions}
+\label{app:ch5_energy_conventions}
+
+Phone energy integrates each positive charge-counter interval against the mean recorded
+battery voltage for that interval. The direct graph construction span is 21.898 kJ for
+419 turns, or 52.263 J per turn. Its charge-counter decrease is 1495.305 mAh, which
+implies an effective voltage of 4.068 V over that span.
+
+The battery readings provide two consistency checks. In every sitting, the charge-counter
+decrease matches the drop in reported battery level, at 47.47~mAh per percentage point, to within
+about one percentage point, which is the resolution of the level reading. Over the construction
+span, for example, the counter fell 1,495~mAh while the level fell from 91\% to 60\%, or about
+1,472~mAh. Integrating the logged instantaneous current against voltage
+agrees with the counter energy to within 10\% in every sitting longer than 50 minutes (median
+$+2\%$; 22.6 against 21.9~kJ for construction). The instantaneous current is used only for this
+check. Termux:API reports it in inconsistent units: values near $-1$ and near $-1{,}000$ describe
+the same draw of about one ampere. The logged \texttt{power\_w} column is therefore wrong on most
+rows and is not used anywhere in this thesis.
+
+The counter has two limits. It reports in steps of 0.1\% of capacity (4.747~mAh, about 68~J at
+4~V), updated about every 30~s, which is negligible over a whole sitting. It also holds its full
+value while the battery reads 100\%. Eleven sittings started at the highest possible charge,
+100\%. In nine of them the counter stayed flat for 161 to 380~s while
+the logged current averaged 0.9 to 1.5~A, and it did not catch up once it began to fall, so that
+energy is missing.
+Estimated from the logged current over the flat interval, the shortfall is about 2 to 5\% for the
+long sittings: E2B full context in its first and third sittings, Qwen3.5 4B full context, and the two
+$n=100$ runs. It is about 15 to 25\% for the short ones: E2B vector retrieval in its second sitting,
+Qwen3.5 0.8B vector retrieval in its first sitting, Qwen3.5 0.8B full context, and the $k=2$ run. The
+reported values are not corrected, because the estimate rests on the inconsistently scaled
+instantaneous current. With the estimate applied, the E2B vector-to-full-context ratio would move
+from 25.1$\times$ to about 24.5$\times$, and the Qwen3.5 0.8B energies would move the most. No
+direction reported in Chapter~\ref{ch:on_device_memory} changes.
+
+Correct answers per full-charge equivalent use measured mAh per answer and the phone's
+5,000 mAh capacity. They do not divide by a fixed energy-per-charge constant. The earlier
+3.88 V routing convention and its 73\% graph projection are therefore not used in the
+chapter. This separation keeps the energy and charge calculations internally consistent.

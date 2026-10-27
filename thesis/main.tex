@@ -1,0 +1,74 @@
+\documentclass[12pt,a4paper,oneside]{report}
+\usepackage[a4paper,margin=2.0cm]{geometry}
+\usepackage{array}
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\newfontfamily\greekfont{Linux Libertine O}
+\setmainlanguage{english}
+\setotherlanguage{greek}
+\usepackage{amsmath,amssymb,amsfonts,bm}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\graphicspath{{../results/thesis_visuals/}{../}{./}}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{verbatim}
+
+\usepackage[authoryear]{natbib}
+\usepackage{doi}
+\usepackage{url}
+
+\begin{document}
+
+\pagenumbering{roman}
+
+\begin{titlepage}
+  \centering
+  \IfFileExists{logo.png}{\includegraphics[width=13.5cm]{logo.png}\par}{}
+  \vspace*{3cm}
+  {\LARGE \textbf{Token- and Resource-Aware Long-Term Memory for Small On-Device Agents}\par}
+  \vspace{2.5cm}
+  {\Large \textbf{Ioannis Bouzas}\par}
+  \vspace{0.2cm}
+  {\large \textbf{Supervisor:} Konstantinos Skianis\par}
+  \vfill
+  {\large Undergraduate Thesis\par}
+  {\large Ioannina, October 2026\par}
+\end{titlepage}
+\cleardoublepage
+
+\selectlanguage{greek}
+\include{chapters/abstract_el}
+
+\selectlanguage{english}
+\include{chapters/abstract_en}
+\cleardoublepage
+
+\tableofcontents
+\cleardoublepage
+
+\pagenumbering{arabic}
+\include{chapters/ch1_introduction}
+\include{chapters/ch2_background_related_work}
+\include{chapters/ch3_methodology}
+\include{chapters/ch4_memory_strategy_evaluation}
+\include{chapters/ch5_on_device_resource_aware_memory}
+\include{chapters/ch6_graphrag_repair}
+\include{chapters/ch7_spe}
+\include{chapters/ch9_discussion}
+\include{chapters/ch10_conclusion}
+
+\appendix
+\include{chapters/appendix_on_device_statistics}
+\include{chapters/appendix_reproducibility}
+
+\cleardoublepage
+\bibliographystyle{plainnat}
+\bibliography{chapters/ch1_new_citations,chapters/ch2_new_citations,chapters/ch3_new_citations,chapters/ch4_new_citations,chapters/ch5_new_citations,chapters/ch6_new_citations,chapters/ch7_new_citations,chapters/ch10_new_citations}
+
+\end{document}

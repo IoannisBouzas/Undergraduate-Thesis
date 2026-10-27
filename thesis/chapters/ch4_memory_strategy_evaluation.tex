@@ -1,0 +1,960 @@
+
+\chapter{Memory Strategy Evaluation}
+\label{ch:memory_evaluation}
+
+This chapter compares three ways of presenting conversational memory to a small language model:
+truncated full context, vector retrieval, and an SLM-extracted graph. A source-restoration ablation
+also tests whether graph triples lose information that remains available in the original dialogue.
+The analysis then varies reader scale, benchmark, retrieval depth, and step-by-step reasoning. All
+headline comparisons use the workstation protocol from Chapter~\ref{ch:methodology}. Each memory
+condition answers the same questions and is scored by the same 70B judge.
+
+With the history cut to a 4,096-token window, vector retrieval has the highest accuracy point
+estimate in every LoCoMo model cell, and the same ordering appears on the category-balanced
+LongMemEval-S subset. Long-window full context, which holds the whole LoCoMo history, matches
+vector retrieval on LoCoMo and trails it on the much longer LongMemEval-S histories, at about 39 and
+48 times the prompt tokens. Reader scale improves several
+conditions, while retrieval depth produces larger but more expensive gains. Step-by-step reasoning
+is less consistent and often exhausts its generation budget.
+
+\paragraph{Contribution of this chapter.} Comparisons of plain retrieval with graph memory exist for
+larger readers~\citep{rag_vs_graphrag,ai_hippocampus}, and the ordering found here agrees with them.
+This chapter makes the comparison with five readers of 0.8 to 4 billion parameters from two
+families, on the same paired questions, with graphs that the reader model extracts itself. It also
+checks which labelled evidence turns each prompt contains, which shows why truncated full context
+fails, reruns full context with a long window for three readers, and measures on one pipeline how much accuracy changes with retrieval depth and how much
+with reader size.
+
+\section{Evaluation scope and statistical interpretation}
+\label{sec:ch4_scope}
+
+The primary LoCoMo analysis~\citep{locomo} uses 200 questions from ten conversations. Each reader
+answers the same 200 questions under every memory condition, so conditions are compared with
+McNemar's exact test, and Wilson 95\% intervals describe each accuracy. Gemma~4 is the primary reader
+family; the Qwen3.5 readers form a second, supporting family. Results are labelled primary,
+exploratory or descriptive as defined in Section~\ref{sec:validity}. A conversation-level bootstrap
+checks sensitivity to clustering within the ten dialogue histories. The sample contains 50 questions
+from each evaluated category, so its accuracy is an unweighted category mean. It does not estimate
+performance under LoCoMo's original category frequencies.
+
+Every accuracy in this chapter is a workstation measurement. Phone accuracy is reported in
+Chapter~\ref{ch:on_device_memory}.
+
+The graph results come from one SLM-extracted graph pipeline. Its primary condition gives the reader
+retrieved triples. A source-restoration ablation adds the original dialogue turns linked to those
+triples without building a different graph.
+
+The retrieval-depth and reasoning studies are exploratory. Their interpretation rests on effect
+sizes, coverage, token counts and failure rates.
+
+\section{LoCoMo strategy comparison}
+\label{sec:ch4_locomo_strategies}
+
+Table~\ref{tab:ch4_locomo_grid} reports the current-record LoCoMo grid. Vector retrieval leads all
+five rows, while full context ranks last despite filling the whole 4096-token window of the
+workstation server. Graph
+triples improve on full context for both Gemma readers and slightly improve the point estimate for
+the two smaller Qwen readers. Restoring source turns closes much of the graph-to-vector gap for the
+larger readers.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \setlength{\tabcolsep}{5pt}
+  \begin{tabular}{lrrrr}
+    \toprule
+    Reader & Full context & Graph triples & Graph + sources & Vector retrieval \\
+    \midrule
+    Qwen3.5 0.8B  & 4.5\%  & 6.0\%  & 9.0\%  & \textbf{22.0\%} \\
+    Qwen3.5 2B    & 7.0\%  & 9.5\%  & 9.0\%  & \textbf{32.5\%} \\
+    Qwen3.5 4B    & 6.5\%  & 23.5\% & 32.0\% & \textbf{39.0\%} \\
+    Gemma 4 E2B   & 7.5\%  & 21.5\% & 33.0\% & \textbf{36.0\%} \\
+    Gemma 4 E4B   & 10.5\% & 27.5\% & 32.5\% & \textbf{40.5\%} \\
+    \bottomrule
+  \end{tabular}
+  \caption{LoCoMo question-answering accuracy across five readers and four memory
+           representations ($n=200$ paired questions per cell). ``Graph triples'' is the
+           triple-only SLM-extracted graph. ``Graph + sources'' restores the verbatim dialogue
+           turns attached to the retrieved graph facts. Bold values mark the highest point estimate
+           within each reader. Full context is truncated to the 4,096-token window;
+           Section~\ref{sec:ch4_long_fc} reports long-window runs for three readers.}
+  \label{tab:ch4_locomo_grid}
+\end{table}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{results/thesis_visuals/fig01_strategy_landscape.pdf}
+  \caption{Memory-strategy accuracy on LoCoMo. Points are observed proportions and whiskers are
+           Wilson 95\% confidence intervals ($n=200$ per condition). With full context truncated to
+           the 4,096-token window, vector retrieval has the highest point estimate for every reader.
+           Overlapping marginal intervals do not replace
+           the paired McNemar tests reported in the text.}
+  \label{fig:ch4_strategy_landscape}
+\end{figure}
+
+\subsection{Vector retrieval versus truncated full context}
+\label{sec:ch4_vr_fc}
+
+Table~\ref{tab:ch4_vr_fc} collects the primary contrasts between vector retrieval and full context
+truncated to the 4,096-token window. The advantage ranges from 28.5 to 32.5 percentage points. Both
+Gemma cluster intervals exclude zero, and all three paired tests remain separated after Holm
+correction. Section~\ref{sec:ch4_long_fc} repeats the full-context condition with a long window.
+
+\begin{table}[htbp]
+  \centering
+  \scriptsize
+  \setlength{\tabcolsep}{3.5pt}
+  \resizebox{\textwidth}{!}{%
+  \begin{tabular}{lrrrrlll}
+    \toprule
+    Reader & Vector & Full & Difference & Vector/full wins & McNemar $p$ & Holm-adjusted $p$ & Cluster interval \\
+    \midrule
+    Gemma E2B & 36.0\% & 7.5\%  & +28.5 & 62/5 & $1.42\times10^{-13}$ & $9.94\times10^{-13}$ & 19.2 to 36.8 \\
+    Gemma E4B & 40.5\% & 10.5\% & +30.0 & 66/6 & $7.26\times10^{-14}$ & $5.81\times10^{-13}$ & 21.2 to 37.6 \\
+    Qwen 4B   & 39.0\% & 6.5\%  & +32.5 & 66/1 & $9.22\times10^{-19}$ & $8.29\times10^{-18}$ & not estimated \\
+    \bottomrule
+  \end{tabular}%
+  }
+  \caption{Primary LoCoMo comparisons between vector retrieval and truncated full context
+           ($n=200$ paired questions per row). Differences and cluster intervals are in percentage
+           points. ``Vector/full wins'' gives discordant questions answered only by vector retrieval
+           and only by full context. McNemar $p$ is the exact two-sided test on those discordant
+           questions; the Holm-adjusted value corrects it across the nine primary comparisons. Cluster
+           intervals resample the ten conversations and are reported for the Gemma comparisons.}
+  \label{tab:ch4_vr_fc}
+\end{table}
+
+Full context stops being complete when the conversation exceeds the input window. The prompt keeps
+the newest turns and drops the oldest until it fits. Vector retrieval uses fewer tokens but can
+select turns from anywhere in the stored conversation. Both conditions select evidence. One uses
+recency and the other uses semantic similarity to the question.
+
+Table~\ref{tab:ch4_main_coverage} measures the resulting coverage before the reader generates an
+answer. Full context contains at least one labelled evidence turn for 4.5\% of eligible questions.
+Vector retrieval raises this to 63.8\%. Complete evidence remains harder to retrieve, reaching
+44.2\% under vector retrieval.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \setlength{\tabcolsep}{8pt}
+  \begin{tabular}{lrrr}
+    \toprule
+    Prompt policy & Any evidence & Complete evidence & Turn-level recall \\
+    \midrule
+    Recent suffix (full context) & 4.5\% & 0.5\% (1/199) & 2.4\% \\
+    Semantic retrieval ($k=10$) & 63.8\% & 44.2\% & 42.1\% \\
+    \bottomrule
+  \end{tabular}
+  \caption{Evidence coverage for the main Gemma LoCoMo prompts. Coverage uses the 199 of 200
+           questions with a usable evidence annotation. All 200 questions remain in the accuracy
+           evaluation. E2B and E4B have identical coverage because prompt assembly is shared.}
+  \label{tab:ch4_main_coverage}
+\end{table}
+
+The retrieval arm is deliberately plain: turn-level embeddings, cosine similarity, no reranking, no
+query rewriting, and no component trained on either benchmark (Section~\ref{sec:vector_details}).
+Published comparisons suggest that plain retrieval of this kind is a strong baseline. On
+LongMemEval-S with a GPT-4o-mini reader, a plain vector store scored 0.600 against 0.602 for Mem0,
+which took about 330 times longer per question (Mem0 was run on a 10\% sample of the
+questions)~\citep{ai_hippocampus}. In the MemoRAG evaluation, dense retrieval averaged 29.7 against
+29.4 for GraphRAG global search over community summaries~\citep{memorag}. On LoCoMo, flat top-20
+retrieval scored 0.67 with an LLM judge, against 0.41 to 0.57 for six write-time
+memory-construction methods; only two query-time construction methods scored higher, at 0.68 and
+0.69~\citep{lazymem}.
+
+\subsection{Vector retrieval versus the triple-only graph}
+\label{sec:ch4_vr_graph}
+
+Graph triples use fewer prompt tokens but lose 14.5 points to vector retrieval for Gemma E2B and
+13.0 points for E4B. Both differences have Holm-adjusted $p=0.000327$ (exact McNemar
+$p=8.17\times10^{-5}$ for E2B and $1.06\times10^{-4}$ for E4B), and both conversation-cluster
+intervals exclude zero. Qwen 4B shows a similar 15.5-point gap (raw
+$p=1.64\times10^{-6}$, exploratory). The smaller Qwen graphs reach only 6.0\% at 0.8B and 9.5\%
+at 2B. Section~\ref{sec:ch4_scaling} links these weak cells to extraction failures.
+
+\subsection{What source restoration changes}
+\label{sec:ch4_source_restoration}
+
+For Gemma E2B, adding the source turns raises accuracy from 21.5\% to 33.0\%, an 11.5-point gain
+(McNemar $p=3.40\times10^{-5}$, Holm-adjusted $p=0.000170$). Vector retrieval reaches 36.0\%, leaving a three-point difference
+(raw $p=0.327$). Access to the underlying text therefore recovers much of the triple-only deficit.
+
+The direction repeats for Gemma E4B, from 27.5\% to 32.5\%, and Qwen 4B, from 23.5\% to 32.0\%.
+These comparisons are exploratory, with raw $p=0.0129$ and $p=0.000221$. Source restoration changes
+little for Qwen 0.8B and 2B because their graphs contain little useful material. The extractor must
+first identify a relevant fact and preserve its provenance.
+
+Source restoration raises any-evidence coverage to 48.7\% for E2B and 48.2\% for E4B,
+against 63.8\% for vector retrieval. Both methods start from the same ten retrieved turns;
+the graph then restricts which turns can supply text through its selected triples.
+Chapter~\ref{ch:graph_mechanisms} examines this selection loss and the information recovered
+by source restoration. A larger-model comparison reports the same ordering
+of triples, triples with source text, and flat retrieval under a different
+protocol~\citep{rag_vs_graphrag}.
+
+\subsection{Where the differences occur}
+\label{sec:ch4_locomo_categories}
+
+The balanced sample has 50 questions in each evaluated LoCoMo category: multi-hop, temporal
+reasoning, open-domain knowledge, and single-hop. The fifth category is excluded throughout under
+the common four-category convention described in
+Chapter~\ref{ch:methodology}.\footnote{The dataset's numeric category label does not follow the order
+in which the benchmark paper's prose enumerates the five types. The
+mapping used here was verified against the published category frequencies, against the evidence
+span of each category. Multi-hop items cite 2.68 distinct sessions on average and are 95.4\%
+multi-session, while single-hop items cite 1.00 and are 0.2\% multi-session. The questions were also
+inspected directly.} Table~\ref{tab:ch4_locomo_categories} gives the decomposition for the two
+Gemma readers. Each cell has five times the sample size of the LongMemEval category cells reported
+later.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \setlength{\tabcolsep}{5pt}
+  \begin{tabular}{llrrrrr}
+    \toprule
+    & & Multi-hop & Temporal & Open-domain & Single-hop & \\
+    Reader & Memory & (Cat.~1) & (Cat.~2) & (Cat.~3) & (Cat.~4) & Overall \\
+    \midrule
+    E2B & Full context     & 10.0\% & \textbf{0.0\%} & 20.0\% & \textbf{0.0\%} & 7.5\% \\
+    E2B & Graph triples    & 12.0\% & 12.0\% & 26.0\% & 36.0\% & 21.5\% \\
+    E2B & Graph + sources  & 16.0\% & 22.0\% & 34.0\% & 60.0\% & 33.0\% \\
+    E2B & Vector retrieval & 32.0\% & 18.0\% & 32.0\% & 62.0\% & 36.0\% \\
+    \midrule
+    E4B & Full context     & 12.0\% & \textbf{0.0\%} & 30.0\% & \textbf{0.0\%} & 10.5\% \\
+    E4B & Graph triples    & 12.0\% & 18.0\% & 32.0\% & 48.0\% & 27.5\% \\
+    E4B & Graph + sources  & 16.0\% & 16.0\% & 36.0\% & 62.0\% & 32.5\% \\
+    E4B & Vector retrieval & 34.0\% & 20.0\% & 42.0\% & 66.0\% & 40.5\% \\
+    \bottomrule
+  \end{tabular}
+  \caption{LoCoMo accuracy decomposed by question category ($n=50$ per cell, 200 per row).
+           Category names follow the benchmark. The dataset's numeric field is given in
+           parentheses because its ordering differs from the paper's prose. Bold marks the two
+           categories on which full context answers no question correctly under either reader.}
+  \label{tab:ch4_locomo_categories}
+\end{table}
+
+An omnibus supporting analysis tests whether these differences are larger than expected
+from conversation-level difficulty alone. Within each of the ten conversations, the
+analysis shuffled correct and incorrect labels across the four category labels 100,000
+times and recomputed Pearson's $4\times2$ chi-square statistic. Holm correction was then
+applied across the eight Gemma reader-memory cells in
+Table~\ref{tab:ch4_locomo_categories}. Question category remained associated with
+correctness in every cell; the largest adjusted $p$-value was 0.00548. For Vector RAG,
+the observed statistics were $\chi^2(3)=22.40$ at E2B and $\chi^2(3)=23.14$ at E4B,
+with adjusted $p=0.00015$ in both cases. This analysis was added after the category
+decomposition and is not part of the primary strategy-comparison family. It is an
+omnibus result, so it establishes that at least one category differs within each cell,
+not that every pair of category percentages is distinguishable. Appendix~\ref{app:on_device_statistics} gives the full table and reproduction command.
+
+The category table reveals four patterns.
+
+\begin{itemize}
+  \item Full context answers none of the 100 temporal and single-hop questions correctly under
+        either reader. A single-hop answer sits in one session, but truncation often removes that
+        session before inference.
+  \item Single-hop questions account for 15.5 of the 28.5 vector-over-full-context points at E2B
+        and 16.5 of the 30.0 points at E4B. Graph triples score 36\% and 48\% on this category.
+        Conditions that include source text reach 60\% to 66\%.
+  \item Temporal reasoning remains weak. Vector retrieval reaches 18\% and 20\%, and no condition
+        exceeds 22\%. LongMemEval-S shows the same 20\% result for both vector readers.
+  \item Multi-hop questions do not show the expected graph advantage. Vector retrieval reaches
+        32\% and 34\%. The source-restored graph reaches 16\%, and graph triples reach 12\%, under
+        both readers.
+\end{itemize}
+
+The first and last of these patterns are not confined to Gemma. Across all five readers of
+Table~\ref{tab:ch4_locomo_grid}, full context answers no temporal question correctly, and it reaches
+at most 2\% on single-hop questions. Vector retrieval also leads the source-restored graph on
+multi-hop questions in every reader: 14\% against 6\% at Qwen 0.8B, 22\% against 0\% at Qwen 2B, and
+36\% against 18\% at Qwen 4B, alongside the two Gemma pairs above. Each cell holds 50 questions, so
+individual values are coarse, but the direction repeats in five readers across two model families.
+
+The absence of a multi-hop advantage applies to the tested retrieval design. Versions 3
+and 4 select triples associated with retrieved turns; they do not traverse the graph.
+The earlier one-hop retrieval rule performed worse, but this does not test richer traversal
+methods such as Personalized PageRank~\citep{hipporag2024} or community
+summaries~\citep{graphrag_edge2024}. Chapter~\ref{ch:graph_mechanisms} examines the speaker-hub
+structure and a traced retrieval failure. Multi-hop evidence coverage was not measured
+separately, so these scores alone cannot distinguish missing evidence from difficulty using it.
+
+The vector lead reported for every reader cell is an aggregate result and does not hold in every
+category. At E2B the source-restored graph is nominally ahead on temporal reasoning, 22\% against
+18\%, and on open-domain knowledge, 34\% against 32\%. Those margins are two questions and one
+question respectively, well inside the sampling noise of a 50-question cell, and both reverse at
+E4B. They are recorded here so that the category table is not read as contradicting the aggregate
+ranking, not as evidence of a category-specific advantage.
+
+Equal category weighting differs from LoCoMo's natural question mix, in which single-hop
+questions form about 55\% of the answerable pool. Section~\ref{sec:ch4_robustness} reports
+the reweighted results. The balanced accuracies should not be compared directly with
+published scores that use the natural category frequencies.
+
+\section{Model scaling within each memory strategy}
+\label{sec:ch4_scaling}
+
+Reader size usually improves vector retrieval. Gemma rises from 36.0\% at E2B to 40.5\% at E4B, a
+4.5-point gain. The paired difference does not separate from zero (McNemar $p=0.108$, Holm-adjusted
+$p=0.115$), so it remains an effect-size estimate, not evidence that scaling has no effect. Qwen
+rises monotonically from 22.0\% at 0.8B to 32.5\% at 2B and 39.0\% at 4B.
+
+Full context has no comparable trend. Qwen scores 4.5\%, 7.0\%, and 6.5\% across 0.8B, 2B, and 4B.
+Gemma rises from 7.5\% to 10.5\%. Increasing reader size cannot recover turns removed during prompt
+construction.
+
+The triple-only graph has a different scaling curve. Qwen stays near the full-context floor at 0.8B
+and 2B, then rises to 23.5\% at 4B. The same model performs extraction and answering, so this jump
+combines a better graph with a stronger reader. It cannot be assigned to reader scale alone. The
+reader-extractor crossover in Chapter~\ref{ch:graph_mechanisms} separates those roles.
+
+Extraction failed on 79.0\% and 84.6\% of batches for Qwen 0.8B and 2B, compared with
+0.6--3.8\% for the other three extractors. The two smallest graphs therefore contain
+little material before retrieval begins. Table~\ref{tab:ch6_extraction} reports the
+failure counts and extraction-budget controls. Parse rate alone does not explain answer
+quality: increasing output volume did not reliably recover accuracy, and E4B built a
+sparser graph than E2B while scoring higher.
+
+Qwen 4B and Gemma E2B also have similar profiles: 39.0\% and 36.0\% for vector retrieval, 23.5\%
+and 21.5\% for graph triples, 32.0\% and 33.0\% after source restoration, and 6.5\% and 7.5\% for
+full context. This descriptive comparison is not a controlled architecture test. It shows only that
+the observed ordering appears in both families.
+
+Figure~\ref{fig:ch4_model_family_scaling} compares the scaling curves. Replacing full context
+with vector retrieval gains 17.5--32.5 points at a fixed reader. Within vector retrieval,
+doubling Gemma reader size gains 4.5 points; increasing Qwen size fivefold gains 17.0.
+The graph gains with Qwen scale combine changes in extraction and reading.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{results/thesis_visuals/fig19_model_family_scaling.pdf}
+  \caption{LoCoMo accuracy by reader scale and memory strategy ($n=200$ paired questions per condition).
+  Panels show (A) Qwen3.5 and (B) Gemma~4; whiskers are Wilson 95\% intervals. Markers are
+  offset for visibility. Graph conditions use the same model for extraction and answering, so
+  their scaling curves combine changes in graph construction and reader capability.}
+  \label{fig:ch4_model_family_scaling}
+\end{figure}
+
+The retrieval-depth experiment next measures larger changes, but on a different LoCoMo subset.
+
+\section{Retrieval-depth analysis}
+\label{sec:ch4_retrieval_depth}
+
+The vector-retrieval baseline uses the ten most similar turns. To test whether this setting hides a
+different accuracy-cost trade-off, retrieval depth $k$ was varied over 2, 5, 10, 20, and 50 on the
+same balanced set of 100 LoCoMo questions. The retrieved turns and prompt footprints are identical
+for E2B and E4B at each depth. Only the reader changes.
+
+Coverage is measured against the dataset's labelled evidence turns. ``Any'' counts
+questions with at least one such turn in the prompt; ``complete'' requires all labelled
+turns. Turn-level recall is the fraction of labelled turns retrieved, pooled over questions.
+These measures differ when a question requires several evidence turns.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \setlength{\tabcolsep}{5pt}
+  \begin{tabular}{rrrrrrrrrr}
+    \toprule
+    & \multicolumn{3}{c}{Evidence coverage} & & \multicolumn{5}{c}{Accuracy} \\
+    \cmidrule(lr){2-4} \cmidrule(lr){6-10}
+    & \multicolumn{3}{c}{} & & \multicolumn{3}{c}{Qwen3.5} & \multicolumn{2}{c}{Gemma 4} \\
+    \cmidrule(lr){6-8} \cmidrule(lr){9-10}
+    $k$ & Any & Complete & Turn level & Prompt tokens
+        & 0.8B & 2B & 4B & E2B & E4B \\
+    \midrule
+     2 & 26\% & 16\% & 15\% & 296   &  7\% & 17\% & 17\% & 18\% & 17\% \\
+     5 & 52\% & 36\% & 34\% & 488   & 18\% & 22\% & 29\% & 27\% & 30\% \\
+    10 & 62\% & 44\% & 44\% & 808   & 21\% & 28\% & 36\% & 30\% & 35\% \\
+    20 & 73\% & 56\% & 57\% & 1,438 & 22\% & 27\% & 36\% & 39\% & 38\% \\
+    50 & 85\% & 64\% & 69\% & 3,310 & 26\% & 32\% & 42\% & 42\% & 44\% \\
+    \midrule
+    \multicolumn{5}{r}{Gain, $k=2$ to $k=50$}
+        & $+19$ & $+15$ & $+25$ & $+24$ & $+27$ \\
+    \bottomrule
+  \end{tabular}
+  \caption{Retrieval-depth sweep on 100 paired LoCoMo questions. All five readers receive the same turns
+  at each depth from a shared embedding store. Coverage measures are defined in the text. Prompt
+  tokens are Gemma means; Qwen tokenizes the same text about 1.5\% shorter. Accuracy is judged
+  separately for each reader.}
+  \label{tab:ch4_topk}
+\end{table}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{results/thesis_visuals/fig02_retrieval_depth.pdf}
+  \caption{Prompt size, evidence coverage and accuracy across retrieval depths for Gemma~4 E2B and E4B
+  on the 100-question LoCoMo subset. Whiskers are Wilson 95\% accuracy intervals. ``Evidence
+  recall'', shared by both readers, denotes questions
+  with at least one labelled evidence turn in the prompt; complete-evidence and turn-level
+  recall appear in Table~\ref{tab:ch4_topk}. This subset differs from the 200-question strategy
+  grid.}
+  \label{fig:ch4_retrieval_depth}
+\end{figure}
+
+Increasing $k$ from 2 to 50 raises any-evidence coverage from 26\% to 85\%, complete
+coverage from 16\% to 64\%, and accuracy by 15--27 points across the five readers.
+Mean Gemma prompt length grows from 296 to 3,310 tokens; Qwen tokenizes the same text
+about 1.5\% shorter. Each depth reuses the same embeddings, so the additional work is
+at query time rather than ingestion.
+
+Over the tested range, retrieval depth changed accuracy more than the reader doublings that
+were tested. Doubling the reader from Gemma E2B to E4B and from Qwen 2B to 4B gained 4.5 and 6.5
+points on the main grid, and 5 and 8 points within this sweep at $k=10$. The comparison is
+limited in three ways. It sets the full range of one setting, a 25-fold change in depth, against
+a single twofold step in reader size. The depth gain also costs an elevenfold longer prompt.
+Finally, it covers readers of 0.8 to 4 billion parameters and a 4,096-token history budget, so
+it does not show that reader size matters less in general. Retrieval depth complements the
+method, reasoning and capacity choices considered in BudgetMem~\citep{budgetmem}. Its phone
+costs are examined in Chapter~\ref{ch:on_device_memory}.
+
+The intermediate changes differ by reader. E2B gains nine points from $k=10$ to $k=20$
+(raw $p=0.022$), while E4B and Qwen 4B change little over that interval. Qwen 2B drops
+one answer before recovering at $k=50$. Across the full sweep, the three Qwen gains have
+raw $p=2.10\times10^{-5}$, $0.00593$, and $4.65\times10^{-6}$ respectively; these tests
+are exploratory. The adjacent $k=5$ to 10 and $k=20$ to 50 comparisons do not separate
+on this sample. No universal retrieval depth follows from these curves.
+
+Table~\ref{tab:ch4_k50_completeness} separates complete, partial, and absent evidence at $k=50$.
+Complete evidence outperforms partial evidence in every reader, by between 4.2 and 26.1 points.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \setlength{\tabcolsep}{6pt}
+  \begin{tabular}{lrrrrrr}
+    \toprule
+    & & \multicolumn{3}{c}{Qwen3.5} & \multicolumn{2}{c}{Gemma 4} \\
+    \cmidrule(lr){3-5} \cmidrule(lr){6-7}
+    Evidence in prompt & Questions & 0.8B & 2B & 4B & E2B & E4B \\
+    \midrule
+    Complete & 64 & 31.2\% & 37.5\% & 51.6\% & 51.6\% & 54.7\% \\
+    Partial  & 21 & 19.0\% & 33.3\% & 38.1\% & 33.3\% & 28.6\% \\
+    None     & 15 & 13.3\% &  6.7\% &  6.7\% & 13.3\% & 20.0\% \\
+    \bottomrule
+  \end{tabular}
+  \caption{Accuracy by evidence completeness at $k=50$ on the shared 100-question LoCoMo subset.
+           The question counts are shared because all five readers received the same retrieved
+           turns, so the columns differ only in how each reader used them.}
+  \label{tab:ch4_k50_completeness}
+\end{table}
+
+Within each evidence group, all five readers receive the same prompts. On complete-evidence
+questions at $k=50$, accuracy ranges from 31.2\% to 54.7\%, showing that reader capability
+still matters when retrieval succeeds. Comparisons between evidence groups involve
+different questions and therefore mix evidence access with question difficulty.
+
+Complete-evidence accuracy changes relatively little across the sweep: E2B moves from
+50.0\% to 51.6\%, E4B from 50.0\% to 54.7\%, and Qwen 4B from 43.8\% to 51.6\%.
+This is consistent with aggregate gains coming mainly from more questions receiving
+complete evidence, although group membership changes with depth. Figure~\ref{fig:ch4_retrieval_outcomes}
+shows how any-evidence coverage and correctness change together for the Gemma readers.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{results/thesis_visuals/fig08_retrieval_outcomes.pdf}
+  \caption{Share of questions in each combination of evidence presence and answer correctness across retrieval depths for
+  Gemma~4 E2B and E4B ($n=100$ paired LoCoMo questions per cell). Evidence is present when at
+  least one labelled evidence turn reaches the prompt. Each question belongs to one of the four
+  combinations; evidence presence does not imply complete evidence.}
+  \label{fig:ch4_retrieval_outcomes}
+\end{figure}
+
+The shorter LongMemEval-S sweep follows the same broad pattern, as shown in
+Table~\ref{tab:ch4_lme_depth}.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \setlength{\tabcolsep}{8pt}
+  \begin{tabular}{rrrr}
+    \toprule
+    $k$ & Mean prompt tokens & E2B accuracy & E4B accuracy \\
+    \midrule
+     2 & 638   & 36.7\% & 36.7\% \\
+     5 & 1,338 & 48.3\% & 45.0\% \\
+    10 & 2,488 & 48.3\% & 56.7\% \\
+    \bottomrule
+  \end{tabular}
+  \caption{LongMemEval-S retrieval-depth sweep ($n=60$ paired questions per row). The comparisons
+           are descriptive.}
+  \label{tab:ch4_lme_depth}
+\end{table}
+
+E2B reaches its observed plateau by five turns, while E4B continues to improve at ten. The sample
+does not establish a universal optimum.
+
+Graph retrieval has a separate depth control. Increasing the limit from twelve to
+twenty-four facts adds 2.0--8.0 points for the three extractors with low failure rates,
+but only 0.5--1.0 points for the two smaller Qwen models. Chapter~\ref{ch:graph_mechanisms}
+reports the full control and prompt costs in Section~\ref{sec:ch6_depth}. More retrieved
+facts cannot recover information that never entered the graph.
+
+\section{Transfer from LoCoMo to LongMemEval-S}
+\label{sec:ch4_lme}
+
+LoCoMo contains multi-session conversations with comparatively short turns. LongMemEval-S has much
+longer histories and six labelled question types: single-session user, assistant, and preference
+questions, multi-session, knowledge-update, and temporal-reasoning~\citep{longmemeval}. Some items
+are abstention variants of these types. The transfer evaluation uses a stratified subset of 60
+questions, ten from each labelled type. It replaces the earlier 50-question slice, which contained
+only single-session-user questions.
+
+The two benchmarks handle abstention differently. LongMemEval marks abstention in the question
+identifier while retaining the item's original type. Its reference answer is a refusal such as
+``the information provided is not enough.'' Three of the 60 sampled questions have this marker and
+are scored under the benchmark's standard protocol. LoCoMo follows the separate four-category QA
+convention described in Chapter~\ref{ch:methodology}.
+
+The three abstention questions are the only group in which the ranking reverses. A strategy that
+finds no relevant evidence is more likely to refuse and receive credit. E2B full context answers two
+of the three correctly, while vector retrieval answers none. Removing these items widens the
+vector-over-full-context gap from 38.3 to 43.9 points for E2B and from 51.7 to 52.6 points for E4B.
+They remain in the 60-question result. Three cases are too few for a separate
+abstention analysis.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \setlength{\tabcolsep}{5pt}
+  \begin{tabular}{lrrrr}
+    \toprule
+    Reader & Full context & Graph triples & Graph + sources & Vector retrieval \\
+    \midrule
+    Qwen3.5 0.8B & 1.7\%  & ---    & ---    & \textbf{26.7\%} \\
+    Qwen3.5 2B   & 0.0\%  & ---    & ---    & \textbf{38.3\%} \\
+    Qwen3.5 4B   & 5.0\%  & ---    & ---    & \textbf{50.0\%} \\
+    Gemma 4 E2B  & 10.0\% & 25.0\% & 41.7\% & \textbf{48.3\%} \\
+    Gemma 4 E4B  & 5.0\%  & 23.3\% & 33.3\% & \textbf{56.7\%} \\
+    \bottomrule
+  \end{tabular}
+  \caption{Accuracy on the category-balanced LongMemEval-S subset ($n=60$, ten questions per type).
+  Retrieval uses corrected embedding prefixes; Gemma graph cells use the repaired pipeline, with
+  v4 adding source turns. All five vector readers share one embedding store. Dashes mark Qwen
+  graph conditions that were not evaluated. Full context is truncated to the 4,096-token window;
+  Section~\ref{sec:ch4_long_fc} reports long-window runs for three readers.}
+  \label{tab:ch4_lme}
+\end{table}
+
+Vector retrieval reaches 48.3\% for E2B, 38.3 points above truncated full context (McNemar
+$p=1.52\times10^{-5}$, Holm-adjusted $p=9.14\times10^{-5}$). E4B reaches 56.7\%, with 32 vector-only wins and one full-context-only win
+against the 5.0\% full-context result (raw $p=7.92\times10^{-9}$, exploratory). The graph sits
+between the two, as it does on LoCoMo: triples alone reach 25.0\% for E2B and 23.3\% for E4B, and
+restoring the source turns raises them to 41.7\% and 33.3\%.
+
+The three Qwen cells extend the comparison to the full reader ladder. No full-context cell in any reader clears 10\%, and Qwen 2B answers
+none of the 60 questions correctly under full context. Vector retrieval meanwhile tracks reader
+capacity closely across the Qwen ladder, at 26.7\%, 38.3\% and 50.0\%. The vector-over-full-context
+difference is between 25.0 and 51.7 points in every reader, with raw $p=4.63\times10^{-7}$ at Qwen
+4B and comparable values at the smaller tiers.
+
+The two arms behave differently as the reader grows, and that contrast is the clearest form of this
+chapter's argument. Truncated full context stays near zero at every scale: on histories this long, truncation
+leaves the labelled evidence in only about one prompt in thirty for the Gemma readers, so reading
+capacity has little to work with. Vector retrieval rises with scale, consistent with a larger reader
+making more use of the evidence that retrieval supplies. Even the smallest reader converts retrieved evidence into 26.7\%, against 1.7\% on
+the same questions without it.
+
+The graph repair transfers to this benchmark. The first LongMemEval graph cells were built with the
+pre-repair pipeline: 79 to 81\% of their extraction batches failed on these long histories, and
+triple-only accuracy was 8.3\% for E2B and 10.0\% for E4B. Rebuilt with the repaired pipeline and
+task prefixes, the same histories lose 24.5\% and 31.0\% of their batches, and triple-only accuracy
+rises to 25.0\% and 23.3\% (11 against 1 and 10 against 2 discordant questions, exact McNemar raw
+$p=0.0063$ and $p=0.039$). Both repaired graphs also exceed full context (raw $p=0.012$ for E2B and
+$p=0.001$ for E4B). The failure rate remains far above the roughly 1\% measured on LoCoMo
+(Chapter~\ref{ch:graph_mechanisms}) because LongMemEval turns are longer: 81\% of the failed E2B
+batches and nearly all failed E4B batches end mid-output at the 512-token extraction limit, and
+the turns in a failed batch contribute no triples.
+
+Source restoration repeats its LoCoMo pattern. For E2B it adds 16.7 points (11 against 1, raw
+$p=0.0063$) and leaves vector retrieval 6.7 points ahead, a difference the paired test cannot
+separate at $n=60$ (9 against 5, raw $p=0.42$). For E4B it adds 10.0 points (9 against 3, raw
+$p=0.15$), and vector retrieval stays 23.3 points ahead (16 against 2, raw $p=0.0013$). The graph
+prompts are the shorter ones, at about 620 tokens with triples alone and 1,600 with sources against
+about 2,490 for vector retrieval. All of these LongMemEval graph comparisons are exploratory.
+
+The poor full-context result has a direct structural explanation. LongMemEval histories can be far
+longer than the reader's context window, so suffix truncation discards most of the session. The
+graph avoids the prompt-length wall and, once repaired, recovers part of the evidence, but only from
+the turns its extractor processed successfully. Vector retrieval indexes every stored turn and
+returns source text within the input budget. Section~\ref{sec:ch4_long_fc} tests this explanation
+by removing the truncation.
+
+Table~\ref{tab:ch4_lme_categories} shows where vector retrieval succeeds and where errors remain.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \setlength{\tabcolsep}{7pt}
+  \begin{tabular}{lrrrrr}
+    \toprule
+    & \multicolumn{3}{c}{Qwen3.5} & \multicolumn{2}{c}{Gemma 4} \\
+    \cmidrule(lr){2-4} \cmidrule(lr){5-6}
+    LongMemEval-S type & 0.8B & 2B & 4B & E2B & E4B \\
+    \midrule
+    Single-session user       & 60\% & 80\% & 90\% & 80\% & 90\% \\
+    Single-session assistant  & 30\% & 70\% & 90\% & 90\% & 90\% \\
+    Single-session preference &  0\% &  0\% &  0\% & 20\% & 10\% \\
+    Multi-session             &  0\% & 10\% & 30\% & 10\% & 50\% \\
+    Knowledge-update          & 60\% & 70\% & 80\% & 70\% & 80\% \\
+    Temporal-reasoning        & 10\% &  0\% & 10\% & 20\% & 20\% \\
+    \bottomrule
+  \end{tabular}
+  \caption{Vector-retrieval accuracy by LongMemEval-S question type. Each cell contains ten
+           questions, so differences between adjacent values are descriptive.}
+  \label{tab:ch4_lme_categories}
+\end{table}
+
+The vector-retrieval profiles share broad strengths and weaknesses. Single-session and
+knowledge-update scores reach 90\% in the larger readers. Preference and temporal-reasoning
+scores remain at or below 20\% for all five readers, while multi-session scores reach at
+most 50\%. Larger readers improve several categories without resolving these weaknesses.
+Figure~\ref{fig:ch4_lme_transfer} compares memory strategies overall and by category for Gemma.
+The overall ordering has category exceptions: on preference questions, E4B graph triples
+score 40\%, above vector retrieval's 10\% for E4B and 20\% for E2B; with ten questions
+per cell, this is a descriptive exception rather than an established advantage.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{results/thesis_visuals/fig04_longmemeval_transfer.pdf}
+  \caption{LongMemEval-S results for the two Gemma readers ($n=60$, ten questions per type). Top: overall
+  accuracy by memory strategy, with Wilson 95\% intervals. Bottom: descriptive accuracy by question
+  type ($n=10$ per cell). Retrieval cells use the prefixed record configurations of
+  Table~\ref{tab:ch4_lme}; Qwen results appear in Tables~\ref{tab:ch4_lme}
+  and~\ref{tab:ch4_lme_categories}.}
+  \label{fig:ch4_lme_transfer}
+\end{figure}
+
+The strong overall vector baseline is consistent with the LongMemEval-S comparison of
+\citet{ai_hippocampus}, although reader, sample, prompt and scoring differences prevent
+direct numerical comparison.
+
+Absolute accuracy is not comparable across LoCoMo and LongMemEval because their history lengths,
+question composition, and sample sizes differ. The transfer claim concerns the ordering within each
+benchmark: vector retrieval leads truncated full context and graph triples in both.
+
+Figure~\ref{fig:ch4_accuracy_cost_frontiers} illustrates the resulting within-benchmark trade-offs
+by plotting 70B-judge accuracy against mean prompt tokens across both populations.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{results/thesis_visuals/fig07_accuracy_cost_frontiers.pdf}
+  \caption{Accuracy against mean prompt tokens on LoCoMo ($n=200$, top) and LongMemEval-S ($n=60$,
+  bottom). Gemma readers appear on the left and Qwen3.5 on the right. Each point is one reader under
+  one strategy: Vector RAG points carry the reader's name, and graph and full-context points carry
+  a short reader tag (several tags on one label list the readers from top to bottom). Readers that
+  receive the same retrieved context share a prompt length, so their points stack vertically; the
+  LoCoMo values are also given in Table~\ref{tab:ch4_locomo_grid}. Whiskers are Wilson 95\% intervals. LongMemEval graph points use the repaired
+  Gemma runs; Qwen graph conditions were not evaluated there. Solid squares are full context cut to
+  the 4,096-token window; hollow squares are long-window full context
+  (Section~\ref{sec:ch4_long_fc}), joined by a dotted arrow to the same reader's truncated point.
+  The two Gemma long-window points share one prompt length and are offset horizontally for
+  legibility. Rows represent different populations. Prompt tokens exclude memory-construction work.}
+  \label{fig:ch4_accuracy_cost_frontiers}
+\end{figure}
+
+\section{Full context with a long window}
+\label{sec:ch4_long_fc}
+
+Every full-context cell above cuts the history to fit the workstation's 4,096-token window, so it
+measures what a small window leaves for the reader rather than what the reader can do with the whole
+conversation. To separate the two, the full-context condition was rerun for Gemma~4 E2B, E4B and
+Qwen3.5 4B with the server window raised to 131,072 tokens (262,144 for Qwen3.5 4B on
+LongMemEval-S). Everything else matched the record runs: the same questions, prompt, greedy
+decoding, 64-token answer cap and 70B judge. No prompt reached the server window. The harness still
+applies its own history budget, the window less 192 tokens, counted as characters divided by four.
+Every LoCoMo prompt and every Qwen3.5 4B LongMemEval-S prompt held the complete history. In each
+Gemma LongMemEval-S run, the budget dropped the oldest 2 to 4 of about 500 turns from four of the 60
+questions, and every other prompt held the complete history. Mean prompts were 31,605 to 32,089 tokens
+for LoCoMo and about 118,000 for LongMemEval-S. These runs are exploratory. Their tests are reported unadjusted and lie outside the
+Holm family of nine primary comparisons. Table~\ref{tab:ch4_long_fc} sets them against the
+truncated and vector cells for the same readers.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \setlength{\tabcolsep}{4pt}
+  \resizebox{\textwidth}{!}{%
+  \begin{tabular}{llrrrrlr}
+    \toprule
+    Benchmark & Reader & Truncated & Long-window & Vector & Long/vector wins & McNemar $p$
+      & Prompt tokens \\
+    \midrule
+    LoCoMo        & Gemma E2B & 7.5\%  & \textbf{44.0\%} & 36.0\% & 27/11 & 0.014 & 32,089 / 824 \\
+                  & Gemma E4B & 10.5\% & \textbf{42.0\%} & 40.5\% & 17/14 & 0.72  & 32,089 / 824 \\
+                  & Qwen 4B   & 6.5\%  & \textbf{41.5\%} & 39.0\% & 24/19 & 0.54  & 31,605 / 812 \\
+    \midrule
+    LongMemEval-S & Gemma E2B & 10.0\% & 40.0\% & \textbf{48.3\%} & 3/8 & 0.23 & 118,324 / 2,488 \\
+                  & Gemma E4B & 5.0\%  & 48.3\% & \textbf{56.7\%} & 3/8 & 0.23 & 118,324 / 2,488 \\
+                  & Qwen 4B   & 5.0\%  & 45.0\% & \textbf{50.0\%} & 3/6 & 0.51 & 118,178 / 2,483 \\
+    \bottomrule
+  \end{tabular}%
+  }
+  \caption{Truncated and long-window full context against vector retrieval ($n=200$ paired
+  LoCoMo and $n=60$ paired LongMemEval-S questions per row). ``Truncated'' is the record cell cut to
+  the 4,096-token window; ``Long-window'' raises the window to 131,072 tokens (262,144 for Qwen 4B on
+  LongMemEval-S), and no prompt reached it; four of the 60 Gemma LongMemEval-S prompts lost their oldest
+  2 to 4 turns to the harness budget, and all other prompts hold the complete history. ``Long/vector wins'' gives discordant questions
+  answered only by long-window full context and only by vector retrieval; McNemar $p$ is the exact
+  two-sided test on them, unadjusted. Prompt tokens are means, long-window full context against
+  vector retrieval. Bold values mark the higher of the long-window and vector point estimates.}
+  \label{tab:ch4_long_fc}
+\end{table}
+
+On LoCoMo, raising the window lifts full context from 6.5--10.5\% to 41.5--44.0\%, with 68 to 77
+questions gained and 2 to 5 lost per reader. Long-window full context then has a higher point
+estimate than vector retrieval for all three readers. The difference is separated for E2B only, 44.0
+against 36.0\% (27 against 11 discordant questions, raw $p=0.014$); for E4B and Qwen3.5 4B the two
+are 1.5 and 2.5 points apart, and the paired test cannot separate them. Long-window full context
+also exceeds the graph with restored sources for all three readers (raw $p\le0.0054$).
+
+On LongMemEval-S, where the histories are nearly four times longer, the order reverses. Long-window
+full context again rises far above its truncated result, to 40.0--48.3\% (23 to 26 questions gained
+and 0 to 5 lost), but vector retrieval keeps the higher point estimate for all three readers, by 8.3,
+8.3 and 5.0 points. Most questions are answered the same way under both conditions: only 9 to 11 of
+60 are discordant, split 3 against 8, 3 against 8 and 3 against 6, which 60 questions cannot
+separate (raw $p=0.23$ to $0.51$). Against the Gemma graphs with restored sources, long-window full
+context is level for E2B (40.0 against 41.7\%, 9 against 10) and ahead for E4B (48.3 against 33.3\%,
+13 against 4, raw $p=0.049$).
+
+Two conclusions follow. First, the low truncated full-context scores in this chapter measure the
+4,096-token budget, not the reader: given the whole LoCoMo conversation, each of the three readers
+answered at least as many questions as it did with ten retrieved turns. The vector advantage of
+Section~\ref{sec:ch4_vr_fc} therefore holds under a small context budget, the setting this thesis
+targets; it does not show that retrieval beats reading the whole history.
+Second, retrieval kept most of that accuracy with a small fraction of the prompt. On LoCoMo it
+stayed within 1.5 to 8.0 points of the whole history with about 2.6\% of the prompt tokens (824 against 32,089 for the
+Gemma readers), and on LongMemEval-S it kept the higher point estimate with about 2.1\% (2,488
+against 118,324).
+
+These runs were made on the workstation only. The phone's server context was 8,192 tokens (16,384
+for its long-window sittings), and no prompt of this length was run there. A rough extrapolation
+gives the scale. The phone's full-context sittings processed 11.0 to 11.9 prompt tokens per second
+of total query time (Section~\ref{sec:ch5_prefill_decode_memory}). Prefill and decode were not
+timed separately, so this rate includes the short answers. At that rate, a 32,089-token LoCoMo
+prompt would take about 45 to 49 minutes per question, and a LongMemEval-S prompt about three
+hours. The extrapolation assumes the rate holds at prompts several times longer than any run on the
+phone. It indicates only the scale of the cost and is not a measured time.
+
+\section{Reasoning experiments}
+\label{sec:ch4_reasoning}
+
+The baseline readers produce short answers using a 64-token generation cap. The reasoning
+experiment enables the model's step-by-step mode and raises the cap to 768 tokens. This intervention
+tests whether additional inference can compensate for weak memory access or difficult evidence
+integration. Table~\ref{tab:ch4_thinking} reports the all-question result, which keeps unfinished
+answers in the denominator and scores them as incorrect.
+
+Vector and graph rows use their 64-token baselines because raising the cap alone leaves those
+conditions effectively unchanged. Full context needs a budget-matched baseline. Reserving 768 tokens
+for the answer shortens the dialogue history, moving E2B from 7.5\% to 9.0\% and E4B from 10.5\% to
+6.5\%. The E4B shift has raw $p=0.03857$. Reasoning is compared with these 9.0\% and 6.5\%
+controls.
+
+\begin{table}[htbp]
+  \centering
+  \scriptsize
+  \setlength{\tabcolsep}{3.5pt}
+  \resizebox{\textwidth}{!}{%
+  \begin{tabular}{llrrrrr}
+    \toprule
+    Benchmark & Reader and memory & Base & Reasoning & Change & Truncated & Mean tokens \\
+    \midrule
+    LoCoMo & E2B vector & 36.0\% & 41.5\% & +5.5 & 18.0\% & 535.1 \\
+    LoCoMo & E4B vector & 40.5\% & 43.5\% & +3.0 & 18.5\% & 565.6 \\
+    LoCoMo & E2B graph triples & 21.5\% & 23.5\% & +2.0 & 19.5\% & 590.7 \\
+    LoCoMo & E4B graph triples & 27.5\% & 23.5\% & $-4.0$ & 34.5\% & 631.0 \\
+    LoCoMo & E2B full context & 9.0\% & 4.5\% & $-4.5$ & 12.0\% & 223.1 \\
+    LoCoMo & E4B full context & 6.5\% & 6.0\% & $-0.5$ & 3.5\% & 204.6 \\
+    LongMemEval-S & E2B vector & 48.3\% & 58.3\% & +10.0 & 15.0\% & 500.3 \\
+    LongMemEval-S & E4B vector & 56.7\% & 60.0\% & +3.3 & 13.3\% & 522.1 \\
+    \bottomrule
+  \end{tabular}%
+  }
+  \caption{Accuracy with reasoning disabled and enabled. ``Truncated'' is the proportion of
+           reasoning runs that exhausted the 768-token generation budget without producing a
+           parseable final answer. Mean tokens counts completion tokens in the reasoning run. The
+           full-context rows use the budget-matched controls described in the text.}
+  \label{tab:ch4_thinking}
+\end{table}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{results/thesis_visuals/fig09_thinking_tradeoff.pdf}
+  \caption{Accuracy, completion length and unfinished-output rates with reasoning enabled. Whiskers are
+  Wilson 95\% accuracy intervals; unfinished answers at the 768-token cap count as incorrect.
+  Asterisks mark full-context rows, whose baseline uses the same 768-token answer cap. Other
+  rows use the 64-token baseline. VR denotes vector retrieval. Right-panel labels give the
+  ratio of reasoning to baseline completion tokens and the truncated share.}
+  \label{fig:ch4_reasoning}
+\end{figure}
+
+The vector condition gains 5.5 and 3.0 points on LoCoMo, then 10.0 and 3.3 points on LongMemEval-S.
+Raw $p$-values range from 0.080 to 0.727, and none belongs to the primary family. The measured
+benefit is possible but variable.
+
+Graph triples gain 2.0 points for E2B and lose 4.0 for E4B once unfinished answers are counted. Full
+context also declines, from 9.0\% to 4.5\% for E2B and from 6.5\% to 6.0\% for E4B. Extra inference
+cannot reconstruct omitted evidence and may spend the available budget on an under-specified prompt.
+
+The cap-only control moves E2B vector retrieval from 36.0\% to 35.5\% on one discordant question.
+E2B graph triples are identical question by question. The larger cap does not explain the reasoning
+deltas in those rows. Full context is the exception because answer and history tokens share one
+window. On the workstation that window was already full: the prompt plus the reasoning exceeded
+4,096 tokens in 200 of 200 E2B and 199 of 200 E4B full-context reasoning questions, so the server
+had to discard context while the model reasoned. The full-context reasoning rows therefore mix the
+effect of reasoning with the effect of that overflow.
+
+Reasoning expands the LoCoMo vector completions from 12.2 to 535.1 tokens for E2B and from 11.5 to
+565.6 for E4B. Across source-bearing and graph conditions, 13.3\% to 34.5\% of outputs reach the
+768-token cap without a parseable final answer. Baseline accuracy is much lower on these truncated
+cases, indicating that difficult questions also tend to consume the most tokens.
+
+Among completed vector outputs, the gains are 7.9 and 7.4 points on LoCoMo and 13.7 and 7.7 points
+on LongMemEval-S. This sensitivity analysis is selective because reasoning affects whether an output
+finishes. It shows the effect of budget exhaustion, while the all-question result remains the
+deployment measure under a fixed cap.
+
+The experiment does not support reasoning as a substitute for retrieval. Its best results occur in
+the vector condition, but the gains vary and completion length rises by roughly 40 to 60 times.
+
+\section{Robustness checks}
+\label{sec:ch4_robustness}
+
+The two prompts wrap the same retrieved context and differ only in their instructions. LoCoMo's
+official prompt names the two speakers, states that each session begins with its date, and asks for a
+short phrase using exact words from the context. Our curated prompt (Section~\ref{sec:config}) replaces this with seven rules: answer in
+as few words as possible; give dates only, resolving relative terms such as ``yesterday'' from the
+timestamp of the turn; give names only; answer yes/no questions with ``Yes'' or ``No''; do not explain;
+do not repeat the question; and place the answer between \texttt{\textless answer\textgreater} tags. The official prompt
+has no answer tags, so its first non-empty output line is taken as the answer. The comparison tests the prompt
+as a whole; the rules were not ablated one at a time, so the contribution of each rule is not measured.
+
+Replacing our answer prompt with LoCoMo's official prompt lowered accuracy by
+3--6 points across the Gemma conditions, while preserving the ordering of vector retrieval,
+graph triples and full context (Figure~\ref{fig:ch4_prompt_robustness}). Only the full-context
+drop separated statistically in this exploratory grid. Prompt wording affects absolute
+accuracy but did not reverse the strategy ranking in this check.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{results/thesis_visuals/fig18_prompt_robustness.pdf}
+  \caption{Accuracy with our answer prompt and with LoCoMo's official answer prompt, given the same retrieved context
+           ($n=200$ stratified LoCoMo questions, Gemma~4~E2B and E4B). The official prompt lowers accuracy in every
+           condition, and the order of the three memory strategies is unchanged for both readers.
+           Whiskers indicate Wilson 95\% confidence intervals.}
+  \label{fig:ch4_prompt_robustness}
+\end{figure}
+
+Reweighting the same answers to LoCoMo's answerable category frequencies preserves the ordering in
+Table~\ref{tab:ch4_reweighted}.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \setlength{\tabcolsep}{7pt}
+  \begin{tabular}{lrrrr}
+    \toprule
+    Reader & Full context & Graph triples & Graph + sources & Vector retrieval \\
+    \midrule
+    Gemma E2B & 3.1\% & 26.0\% & 42.40\% & 45.5\% \\
+    Gemma E4B & 4.1\% & 34.2\% & 42.37\% & 49.1\% \\
+    \bottomrule
+  \end{tabular}
+  \caption{LoCoMo accuracy reweighted to the category frequencies of the answerable pool. The two
+           source-restored values are reported to two decimals because they coincide at one decimal,
+           but they are separate reader measurements.}
+  \label{tab:ch4_reweighted}
+\end{table}
+
+The full-context-to-vector gap widens to 42.4 points for E2B and 45.0 points for E4B. Reweighting
+increases the influence of single-hop questions, which form about 55\% of the answerable pool. Full
+context scores zero on this category and retrieval performs best there. The balanced results remain
+the headline because equal category weight was the sampling design.
+
+The same prompt was deliberately used on LoCoMo and LongMemEval-S to preserve cross-benchmark
+comparability. LongMemEval's official answer prompt was not evaluated, so its absolute accuracy
+values remain prompt contingent. The shared-prompt ordering still holds, but the study does not show
+how high each strategy might score with benchmark-specific prompt engineering.
+
+The primary LoCoMo comparisons were also checked by resampling entire conversations. The
+cluster intervals retain the direction of the vector advantage for both Gemma readers. With only ten
+conversation clusters, these intervals are coarse and can underestimate uncertainty. The paired
+McNemar tests remain the primary inference. The Qwen grid and most ablations are descriptive
+replications outside the primary family.
+
+\section{Experimental limitations}
+\label{sec:ch4_limitations}
+
+The conclusions are bounded by the experimental design. LoCoMo evaluation covers conversational
+question answering under the common four-category protocol. It excludes event summarization and
+multimodal dialogue. The 200 questions come from ten conversations, so outcomes are not independent.
+Paired tests and the cluster sensitivity analysis preserve the direction of the main comparison.
+
+The supporting analyses are descriptive and have three measurement limits.
+
+\begin{itemize}
+  \item Each LoCoMo category contains only 50 questions. At 30--50\% accuracy, the 95\% Wilson interval
+        of a 50-question cell spans about $\pm$12 to 13 percentage points, so differences of a few
+        points between categories are within this sampling uncertainty.
+  \item Evidence coverage uses lexical matching. A turn counts only when its normalized text appears
+        verbatim in the prompt, so paraphrases and mid-turn truncation are misses. The figures are
+        lower bounds. Dataset labels identify sufficient evidence, not uniquely necessary evidence,
+        and answers may use unlabelled context.
+  \item Extraction counters come from the evaluation harness. A parseable batch may still contain
+        unusable triples, so these counters are not an independent graph-quality audit.
+\end{itemize}
+
+These measurements describe the prompts and extraction process. They do not change the reported
+accuracy values.
+
+LongMemEval-S uses a stratified sample of 60 questions, not the complete 500-question benchmark.
+Each question type contains ten examples, which is enough to reveal large descriptive differences
+but not to support fine-grained category claims. Three of those 60 are abstention items, retained
+because they belong to that benchmark's evaluation set. They slightly reduce the reported retrieval
+advantage and are too few to analyse separately. The LongMemEval full-context and vector conditions
+were run for all five readers, but no LongMemEval graph cell exists for any Qwen reader,
+because that would require a cold extraction pass the transfer claim does not rest on. Neither
+benchmark was run across the complete reader ladder in every condition, so this remains an
+incomplete benchmark-by-family factorial study, not a full one. The long-window full-context runs
+cover three readers and were made on the workstation only; their comparisons with vector retrieval
+are exploratory, and on LongMemEval-S they rest on 9 to 11 discordant questions per reader. Four
+of the 60 Gemma LongMemEval-S prompts lost their oldest 2 to 4 turns. For each Gemma reader, full
+context answered three of the four wrongly, and vector retrieval answered one of those three
+correctly. In the hypothetical best case for full context, all three would become correct with the
+complete history; the split would then be 5 against 7, which is still not separated (exact $p=0.77$).
+
+The judge's limits, including the single-annotator human audit, are stated in
+Section~\ref{sec:judge} and Section~\ref{sec:ch9_threats}. Retrieval coverage is measured against
+dataset-labelled evidence and judge correctness against generated answers. Their association
+should not be read as a causal diagnosis of every error.
+
+The graph retrieval takes the triples extracted from the retrieved turns and does not traverse
+the graph. Multi-hop graph walks were not implemented; in these graphs most edges run through the
+two speakers, so the edges adjacent to the retrieved facts' entities already cover most of the
+graph (Section~\ref{sec:graph_topology}). The reasoning experiment uses the two Gemma readers and
+one 768-token cap, so it does not establish cross-family reasoning behaviour. Its truncation rates
+show what happened under an on-device-feasible budget, not the maximum accuracy attainable with
+unbounded inference.
+
+\section{Summary}
+\label{sec:ch4_summary}
+
+Under a 4,096-token history budget, vector retrieval has the highest LoCoMo accuracy point
+estimate for all five readers; the ordering also holds on the evaluated LongMemEval-S subset.
+Truncated full context often excludes the required evidence. Long-window full context, which holds
+the whole LoCoMo history, matches or exceeds vector retrieval on LoCoMo (separated for one of three
+readers) and stays behind it on LongMemEval-S without separating, at about 39 and 48 times the
+prompt tokens. Source restoration recovers part of the triple-only
+graph deficit, while the detailed graph controls in Chapter~\ref{ch:graph_mechanisms}
+distinguish extraction, selection and representation limits.
+
+Increasing vector depth from two to fifty turns raises accuracy by 15--27 points and
+complete-evidence coverage from 16\% to 64\%, with an elevenfold increase in prompt length.
+Over the tested range this changes accuracy more than the reader doublings that were tested.
+Temporal and preference questions remain difficult.
+
+Step-by-step reasoning gives inconsistent gains and uses roughly 40--60 times more
+completion tokens in the vector conditions. Between 13.3\% and 34.5\% of retrieval-condition
+outputs remain unfinished at the tested cap. Chapter~\ref{ch:on_device_memory} turns from these
+workstation results to measured phone resources.

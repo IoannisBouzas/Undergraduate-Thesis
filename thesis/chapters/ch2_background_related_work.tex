@@ -1,0 +1,559 @@
+
+\chapter{Background and related work}
+\label{ch:background}
+
+A conversational memory system determines which parts of an interaction history remain
+available to a language model and in what form. Keeping the original dialogue, retrieving
+selected passages and constructing a graph make different demands on the model and on the
+device running it. This chapter separates the information an application stores from the
+resources needed to use it, introduces the memory mechanisms evaluated in the thesis, and
+reviews the work most relevant to their accuracy and resource costs on small models and
+smartphones.
+
+Much of the closest work is recent and was available only as an arXiv preprint when this chapter
+was written. This includes the two on-device systems SmartRAG and MobileRAG, the source-expansion
+system LeanMem, and the memory systems LazyMem, MemFlow, MemoryCPT, RippleMem and
+MOSAIC~\citep{smartrag,mobilerag_energy,leanmem,lazymem,memflow,memorycpt,ripplemem,mosaic}.
+Preprints have not been peer reviewed. They are cited here for the designs and measurements their
+authors report. They give context for the thesis's results but are not evidence for them. Every reference
+was checked against its arXiv or publisher record. Where a preprint has since
+appeared at a conference or in a journal, the bibliography cites that version.
+
+\section{Small language models and local inference}
+\label{sec:ch2_slms}
+
+\subsection{The model within an agent}
+
+A language model predicts tokens conditioned on the sequence supplied to it. An agent
+places that model inside a system that can receive observations, call tools, maintain
+state and act on its environment. Memory is one component of this system: it supplies
+information from earlier interactions that is relevant to a current decision. The survey
+by \citet{memory_survey2024} distinguishes the model's capabilities from the mechanisms
+that store, retrieve and process its interaction history.
+
+The argument for using small language models (SLMs) in agents rests partly on this division
+of work. An application may repeatedly need a restricted operation, such as classifying a
+request or answering from supplied evidence. \citet{slm_agentic} argue that compact models
+can serve such operations economically and that agent systems can combine models of
+different sizes. This is a design argument for selecting models by their assigned task;
+it does not establish that a small model can perform every memory operation reliably.
+Extracting relations, resolving conflicting statements and answering from retrieved text
+remain distinct capabilities that require evaluation.
+
+There is no single parameter threshold that determines whether a model is practical on a
+phone. Architecture, weight precision, context length and runtime support also affect its
+resource requirements. The on-device review by \citet{ondevice_lm_review} therefore treats
+model design, compression and hardware execution together. In an empirical study of
+compact models, \citet{slm_edge_deployment} likewise find that model size alone does not
+explain capability or execution speed. This thesis uses SLM to describe its evaluated
+compact readers; Chapter~\ref{ch:methodology} specifies their identities and parameter
+scales. As in Chapter~\ref{ch:introduction}, the reader is the model that receives the
+selected evidence and generates the answer. When another model prepares the memory, its
+role and cost must be specified separately.
+
+\subsection{Context windows and persistent memory}
+
+Three meanings of memory need to be distinguished. \emph{Parametric memory} refers to
+information encoded in model weights through training. The \emph{context window} contains
+the tokens available to a particular inference call. \emph{External memory} is information
+stored by the surrounding application and made available to later calls. Retrieval-augmented
+generation connects an external store to a language model without requiring each
+new fact to be incorporated into its weights~\citep{rag_lewis}. MemGPT makes the distinction
+between limited in-context working space and longer-term external storage explicit through
+a hierarchy of memory tiers~\citep{memgpt}.
+
+Appending an interaction to a prompt does not, by itself, update the model's weights. If
+that interaction is omitted from a later call, the application needs another mechanism to
+recover it. A large context window postpones the point at which history must be selected
+or compressed, but it does not specify how a growing history should be managed. Moreover,
+input capacity and effective use of evidence are different properties. \citet{lost_in_middle}
+show that answer quality can depend on where relevant information appears within a long
+input, including for models designed to accept long contexts. Their result motivates
+testing context use rather than treating the advertised context length as a guarantee of
+recall.
+
+In a bounded full-context baseline, the reader receives as much of the history as the
+configured input limit permits. Once that limit is exceeded, a truncation policy determines
+which material remains visible. Such a baseline is a useful reference for the cost of
+reading dialogue directly, but its name must not imply that every historical turn is
+present. Retrieval addresses a different selection problem: it chooses evidence according
+to the current query instead of relying only on the portion of the history that fits.
+
+\subsection{Prefill, decoding and quantization}
+
+Autoregressive inference has two stages with different resource demands. During
+\emph{prefill}, the model processes the input tokens and prepares the internal state used
+for generation. During \emph{decoding}, it generates subsequent tokens sequentially. For
+attention layers, cached key and value tensors allow the model to reuse representations of
+earlier tokens. This \emph{KV cache} occupies runtime memory in addition to the model
+weights. Its size depends on the retained sequence length and the attention architecture,
+so a model whose weights fit in RAM can still become impractical with a large
+context~\citep{ondevice_lm_review,slm_edge_deployment}.
+
+Weight quantization reduces the precision used to represent model parameters. It can
+reduce storage and memory-bandwidth demand, but its benefits depend on the implementation and
+hardware. Weight precision also does not determine the precision or size of every runtime
+buffer. In their edge measurements, \citet{slm_edge_deployment} distinguish the predominantly
+compute-bound prefill stage from the predominantly memory-bandwidth-bound decode stage and
+show that quantization affects them differently. The relevant bottleneck can therefore
+change when a memory strategy replaces a long input with additional generated summaries
+or extraction outputs.
+
+This distinction matters for cost accounting. Reader input tokens, reader output tokens
+and tokens generated while constructing memory perform different jobs. Counting them is
+useful, but adding them into one total conceals the operations responsible for that cost.
+A resource study must record both the work performed and the device resources consumed.
+
+\section{Representations of long-term conversational memory}
+\label{sec:ch2_memory}
+
+\subsection{The memory life cycle}
+
+External memory involves decisions at several points in an interaction. At ingestion, the
+system chooses what to retain and may transform raw observations into summaries, facts or
+structured records. During maintenance, it may merge related entries, revise outdated
+information or remove material. At query time, retrieval selects candidate evidence and
+context assembly decides how to present it to the reader. The agent-memory and graph-memory
+surveys organize these operations as connected parts of a memory life
+cycle~\citep{memory_survey2024,graph_memory_survey2026}.
+
+Conversational information also differs in how it changes. A stable preference may be
+useful across many sessions, while an appointment has a date and a decision may later be
+reversed. Preserving only the latest statement can lose the evidence needed to answer a
+historical question. THEANINE addresses this issue by linking memories through temporal
+and causal relations and retrieving timelines, retaining earlier information that helps
+explain a change~\citep{theanine}. Its design illustrates why forgetting and updating
+policies must be chosen in relation to the task.
+
+Table~\ref{tab:ch2_memory_representations} summarizes four recurring representation choices.
+These are overlapping design families. A graph can retain pointers to raw turns, and a
+vector index can store summaries instead of verbatim text. The three experimental arms
+in this thesis select particular configurations from this broader space;
+Figure~\ref{fig:ch3_lookup_methods} in Chapter~\ref{ch:methodology} shows how each of the three
+looks up evidence.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \begin{tabular}{p{0.18\textwidth}p{0.34\textwidth}p{0.36\textwidth}}
+    \toprule
+    Representation & Information supplied to the reader & Main trade-off \\
+    \midrule
+    Full context & Original history within an input limit & Preserves included wording;
+    input grows with history and truncation can remove evidence. \\
+    Vector retrieval & Text records selected by embedding similarity & Limits reader input;
+    retrieval may miss supporting records or return redundant text. \\
+    Compressed memory & Summaries or selected factual records & Reduces repeated text;
+    construction costs work and may discard future query details. \\
+    Graph memory & Retrieved entities, relations, events or linked source passages & Supports
+    associative access; usefulness depends on construction, traversal and representation. \\
+    \bottomrule
+  \end{tabular}
+  \caption{Memory representation choices, synthesized from the reviewed literature
+  \citep{memory_survey2024,rag_lewis,comedy,graph_memory_survey2026}. The trade-offs describe
+  design considerations, not a measured ranking.}
+  \label{tab:ch2_memory_representations}
+\end{table}
+
+\subsection{Dense retrieval over dialogue}
+
+Dense retrieval represents a query and stored text as numerical vectors. DPR establishes
+a dual-encoder approach in which questions and passages are mapped into a shared space
+and ranked using a similarity score~\citep{dpr}. Contriever demonstrates that contrastive
+training can produce useful dense retrieval without supervised relevance labels for each
+target dataset~\citep{contriever}. These methods provide foundations for indexing dialogue
+with an existing embedding model, although performance on conversational histories still
+depends on the encoder and the way records are formed.
+
+For a query $q$ and stored record $d_i$, a common score is cosine similarity:
+\begin{equation}
+  s(q,d_i)=\frac{f(q)^{\mathsf T}g(d_i)}{\lVert f(q)\rVert\,\lVert g(d_i)\rVert},
+  \label{eq:ch2_similarity}
+\end{equation}
+where $f$ and $g$ denote the query and record encodings. The top-$k$ records are candidates
+for the reader's context. This notation describes the retrieval operation used in the
+thesis; dense retrievers can use other scoring functions, including the unnormalized
+inner product used by DPR.
+
+The retrieval unit affects what a successful match contains. A short turn can isolate one
+fact but leave a pronoun unresolved. A longer passage can retain its surrounding exchange
+while also introducing irrelevant content. Speaker identifiers and timestamps can be
+necessary for interpreting the retrieved words. These are representation choices before
+the reader sees the evidence, not properties of the reader itself.
+
+Increasing $k$ can bring more supporting material into the candidate set, but it also
+increases the amount of text that must be selected, ordered and read. Chain-of-Memory
+examines the resulting separation between retrieving relevant evidence and answering
+correctly from it~\citep{chain_of_memory}. Consequently, retrieval coverage and answer
+accuracy are complementary evaluation targets. High coverage identifies available
+evidence; it does not establish that the context assembled from that evidence is useful
+to a particular reader.
+
+\subsection{Compression, hierarchy and memory management}
+
+These systems share one decision: how much interpretation to perform before the future
+question is known. Some compress what is stored. COMEDY maintains a compressive memory in
+place of a retrieval database~\citep{comedy}, RAPTOR recursively clusters and summarizes text
+into a tree of abstraction levels~\citep{raptor}, and MemoRAG uses a global memory of the input
+to generate retrieval clues~\citep{memorag}. Others manage records as they arrive. MemGPT lets
+the model move information between in-context and external storage~\citep{memgpt}, Mem0
+extracts and updates salient facts, with a graph variant for relations~\citep{mem0}, and A-MEM
+links notes and lets new memories revise existing ones~\citep{amem}. Hierarchical designs add
+structure on top: \citet{hmem_yu2026} pair a temporal and semantic tree with a knowledge graph
+of the entities it mentions, and the H-MEM system of \citet{hmem_sun2025} routes retrieval
+between levels of semantic abstraction, with LoCoMo scores that belong to its own reader and
+protocol.
+
+Early compression can reduce later reader work, but it commits to a view of what is worth
+preserving. Retaining raw dialogue keeps more information available and moves selection work
+to query time, and systems that keep source pointers beside compact records partly defer the
+decision. This thesis approaches the same question from the other side: what a triple loses
+when the text behind it is not shown.
+
+\section{Graph retrieval and preservation of evidence}
+\label{sec:ch2_graphs}
+
+\subsection{What the graph represents}
+
+A knowledge graph represents entities and relations between them. A subject--relation--object
+triple, such as $(\text{person},\text{works at},\text{organization})$, is one possible unit.
+Conversational systems may attach timestamps, confidence values and source references to
+that unit. Other graph memories connect complete events or text passages instead of
+individual entities. The graph-memory taxonomy of \citet{graph_memory_survey2026} covers
+these different representations and the operations used to construct and retrieve them.
+
+GraphRAG is therefore a family label as well as the name of a specific system. The
+approach of \citet{graphrag_edge2024} builds an entity graph, forms communities and generates
+community summaries for query-focused summarization over a corpus. HippoRAG combines
+knowledge-graph construction with Personalized PageRank to retrieve information through
+associative connections~\citep{hipporag2024}. LightRAG uses graph and vector representations
+with retrieval at both detailed entity and broader thematic levels~\citep{light_rag}.
+Different choices of graph nodes, edges and retrieval procedures lead to different
+evidence being shown to the reader.
+
+The graph arm of this thesis uses SLM-extracted triples from dialogue and retrieves
+evidence from that store. It is a particular graph-memory pipeline, described in
+Chapter~\ref{ch:methodology}. Its behavior cannot stand for every system bearing the
+GraphRAG name. In particular, a community-summary system and a graph linking intact
+episodes preserve and expose information differently from a triple-only prompt.
+
+\subsection{Construction, retrieval and reader limitations}
+
+Graph construction can introduce errors before retrieval begins. The extractor must
+identify the relevant entities and relations, preserve their meaning and produce an
+output that the storage pipeline can interpret. Valid syntax alone does not establish
+that a fact was extracted correctly. A missing relation and a relation that has lost a
+qualification are different errors, and both can affect later answering. The loss can be
+large when a small model performs the extraction. In a multi-hop kinship-reasoning task,
+\citet{kelesis2026} report that an RGCN model reaches 60.69\% accuracy on ground-truth
+facts but 24.88\% on facts extracted by a 4B Gemma model.
+
+The controlled comparison by \citet{rag_vs_graphrag} shows that graph results depend on the
+construction model, the retrieval design and the form of evidence supplied to the reader,
+including triples alone and triples with source text. Giving plain retrieval the same token
+budget as community-based graph retrieval on MultiHop-RAG removes most of the graph's
+advantage: with a 70B reader, token-matched retrieval reaches 71.01\% against 71.17\% for the
+graph, compared with 65.77\% under the default budget, although the graph stays ahead on temporal
+and comparison questions. Representation and context volume are therefore necessary controls in a
+graph comparison. Preparation cost also differs: the same study reports 135 seconds to build its
+RAG index against 5,560 to 7,702 seconds for its graph variants.
+
+Conversational systems with richer graphs show that graph memory can work well. RippleMem
+connects event-centred memory units through participants, locations and time, retrieving
+anchors and expanding through their associations~\citep{ripplemem}. MOSAIC stores entity-typed
+nodes, checks new items for contradictions at save time, and replaces an LLM classification step
+with locality-sensitive hashing at negligible accuracy cost~\citep{mosaic}. Both build richer
+memory units than triples emitted by a local small model, and their reported LoCoMo results
+reflect those designs. A graph result is therefore a property of the whole construction and
+retrieval design, and the expensive part of that design need not be an additional language-model
+call.
+
+\subsection{Provenance and source-text expansion}
+
+\emph{Provenance} records where a memory item came from. A pointer from a triple or summary
+to the original dialogue can support inspection and allow the reader to recover details
+that the compact representation omitted. For example, a statement about a former employer
+and a statement about a current employer can collapse into the same undated relation if
+temporal wording is discarded. A source pointer makes the original distinction available
+without requiring it to be reproduced in every compact record.
+
+SEEM combines an episodic event layer with a graph layer and connects both to their source
+passages. Its Reverse Provenance Expansion retrieves original passages through the
+provenance links of recalled event frames~\citep{seem}. LeanMem distinguishes stable profile
+memory, evolving event memory and detail-preserving record memory. Its records retain
+pointers to original dialogue spans, which can be expanded when a query requires detailed
+evidence~\citep{leanmem}. Both systems explicitly address the loss of information when
+interaction history is condensed.
+
+SEEM and LeanMem are therefore the closest related work for the Selective Provenance
+Expansion (SPE) study in Chapter~\ref{ch:spe}. The specific question examined there is how
+to choose among omitting a retrieved fact, retaining its triple and supplying its source
+turn under a fixed retrieval-context budget. The study evaluates a loss-aware selection
+rule with compact readers; its scope is the behavior of that rule and its implementation.
+
+\section{Efficient construction and budget-aware memory use}
+\label{sec:ch2_budgets}
+
+\subsection{When to construct memory}
+
+An efficient memory design must account for work performed before a question is asked. The AI
+Hippocampus finds on LongMemEval-S that a simple vector store can be competitive with more
+elaborate memory systems while needing much less processing time~\citep{ai_hippocampus}, so the
+benefit of construction must be measured against a plain retrieval baseline. Other systems change
+when and how processing happens. Chain-of-Memory keeps preparation light and organizes retrieved
+fragments into memory chains at query time~\citep{chain_of_memory}. LazyMem and DeferMem retrieve a
+broad candidate pool and use a trained lightweight model to compress or rewrite it into
+query-conditioned evidence~\citep{lazymem,defermem}. MemoryCPT instead distils the construction
+pipeline into one compact model and scores systems by quality per unit of inference cost, measured
+as a dollar price over language-model tokens~\citep{memorycpt}; a distilled construction model is
+one way to reduce the phone construction energy measured in Chapter~\ref{ch:on_device_memory}.
+
+Deferral changes the cost distribution. It reduces eager, query-independent construction but adds
+processing to every query, while storing or indexing observations still costs work. An amortization
+calculation for a graph built once and reused across many questions therefore does not describe
+every memory architecture; a query-time construction system needs its own measurement boundary,
+including any training or offline preparation relevant to the deployment.
+
+\subsection{Routing and selective processing}
+
+Budget-aware memory systems decide how much work a query warrants. BudgetMem offers
+memory-processing modules at low, medium and high budget tiers, varying implementation
+complexity, reasoning effort or model capacity, and trains a compact router among
+them~\citep{budgetmem}; Chapter~\ref{ch:memory_evaluation} places the retrieval-depth sweep
+relative to these axes. MemFlow addresses compact readers directly: intent routing chooses among
+profile lookup, targeted retrieval and deeper reasoning, evidence is assembled under a tiered
+token budget, and a validator can escalate to a heavier path~\citep{memflow}. MemSkill learns
+which memory-processing skills to apply and revises them from difficult cases~\citep{memskill}.
+Outside memory, Selective Context removes less informative input before
+inference~\citep{selective_context}, and TALE conditions reasoning on a token
+budget~\citep{tale}.
+
+These systems measure cost in tokens, calls, latency or price, and separate execution cost from
+the offline work used to obtain a policy. The reviewed evaluations do not convert their decisions
+into measured phone energy, so their savings cannot be read as energy saved on a particular
+handset.
+
+\section{On-device memory and physical resource costs}
+\label{sec:ch2_device}
+
+\subsection{The closest mobile studies}
+
+On-device execution brings memory design into contact with shared RAM, battery capacity,
+processor scheduling and heat dissipation. \citet{slm_edge_deployment} evaluate compact
+models on edge hardware and smartphones and observe differences in prompt processing,
+decoding and thermal behavior. Their study supports treating runtime and hardware as part
+of the experimental condition. The on-device survey by \citet{ondevice_lm_review} also
+describes hardware acceleration and model compression as complementary approaches to
+deployment.
+
+\citet{mobile_memory_architectures} compare raw buffers, tiered memory, vector retrieval
+and structured graphs on short- and long-term mobile-agent applications. Their findings
+show that the preferred architecture depends on the application and model capacity, with
+structured memory remaining competitive in their tested settings. This is a close
+conceptual comparison because it varies memory architecture with compact models. Its
+latency measurements use an M2 Pro laptop, and its graph construction uses deterministic
+rules. These choices differ from phone execution with an SLM extractor. Its MemGUI-Bench
+and FingerTip tasks also differ from the conversational-QA benchmarks used here. The
+authors list real-phone latency and device-level cost measurement as future work;
+Chapter~\ref{ch:on_device_memory} reports both for conversational memory.
+
+MemLoRA targets the memory operations themselves. It distills specialized adapters for
+extraction, updating and response generation into compact models and evaluates their use
+in a conversational memory system~\citep{memlora}. This provides an alternative to relying
+on an unadapted small extractor: memory-specific training can change the quality of the
+intermediate representation. The paper's throughput measurements, however, do not provide
+a physical smartphone energy comparison. It addresses memory capability and computational
+efficiency under its reported execution setup.
+
+Two further systems treat memory as part of a phone-native agent runtime. MOBIMEM reports
+CPU-only experiments on a Snapdragon 8 Elite platform and finds that action reuse can
+reduce latency by factors of 1.6$\times$ to 9$\times$, without reporting handset
+energy~\citep{mobimem}. ClawMobile treats token budgets, inference placement and persistent
+memory as smartphone-runtime concerns, but its preliminary agent uses remote model
+inference~\citep{clawmobile}.
+
+MobileRAG provides direct device-energy evidence for document retrieval. It combines
+EcoVector, a vector search design that partially loads index data, with Selective Content
+Reduction to reduce the text passed to the reader. Its evaluation on a Galaxy S24 includes
+energy per query for document-QA workloads~\citep{mobilerag_energy}. Its focus is document
+indexing and query processing rather than representations of long-term conversation history.
+
+SmartRAG is the closest reviewed on-device graph system. It combines a distilled,
+continually adaptable entity recognizer and relation extraction with a provenance-preserving
+graph, hybrid retrieval and a compact answer model. It runs on two OnePlus handsets with
+1.7B and 4B backbones and reports memory use and average power during extraction and
+QA~\citep{smartrag}. These measurements show that a graph-based retrieval system can be
+deployed on a phone when its components are designed for that setting.
+
+Two boundaries distinguish its evidence from the comparison needed here. SmartRAG's QA
+benchmarks use document corpora, not long-term dialogue histories. In addition,
+Appendix~C states that its competing retrieval systems run in a cloud-side simulation;
+they are not profiled as complete real-phone deployments. Its average-power measurements
+therefore characterize the proposed system rather than establish a matched per-answer
+energy comparison across memory strategies~\citep{smartrag}.
+
+\subsection{Tokens, time, power and energy}
+
+Cost measures answer different questions. Token counts describe the volume of model input
+and output. Latency describes the elapsed time for an operation. Power, measured in watts,
+is the rate of energy use; energy, measured in joules, accumulates over the operation's
+duration. For a measurement interval of length $T$,
+\begin{equation}
+  E=\int_0^T P(t)\,\mathrm{d}t.
+  \label{eq:ch2_energy}
+\end{equation}
+An average-power value can be converted to energy only with the duration for the same
+measurement interval. A lower power draw can coexist with higher task energy when an
+operation takes sufficiently longer.
+
+The difference between MobileRAG's per-query energy and SmartRAG's average power illustrates
+why units and boundaries must remain explicit~\citep{mobilerag_energy,smartrag}. Similarly,
+tokens generated by an extractor and tokens read by an answer model cannot be assigned a
+universal energy coefficient. Prefill and decoding have different bottlenecks, and model
+architecture and hardware affect their execution~\citep{slm_edge_deployment}. Token counts
+can be informative predictors within a measured configuration, but the relationship must
+be established for that configuration.
+
+Memory construction also changes the time horizon of an efficiency claim. For a fixed
+store used by $N$ queries, one accounting model is
+\begin{equation}
+  \overline{E}(N)=\frac{E_{\mathrm{build}}+E_{\mathrm{maint}}}{N}
+  +\frac{1}{N}\sum_{j=1}^{N}E_{\mathrm{query},j},
+  \label{eq:ch2_amortization}
+\end{equation}
+where $E_{\mathrm{build}}$ is construction energy, $E_{\mathrm{maint}}$ is maintenance
+energy over the same period, and each query term includes the operations inside the chosen
+service boundary. This is an accounting identity for the stated workload, not a claim
+that costs stay constant as a store grows. Query-time construction, as in LazyMem or
+DeferMem, belongs in the query term~\citep{lazymem,defermem}.
+
+Accuracy and energy per query describe answer quality and device cost separately; a combined
+measure asks how much correct output the energy buys. \citet{intelligence_per_watt} compare local
+inference configurations by accuracy per watt and accuracy per joule. Because power omits
+duration (Equation~\ref{eq:ch2_energy}), only the per-joule form separates a strategy that answers
+in one minute from one that needs several minutes at a similar draw. Correct answers per
+kilojoule, used in this thesis, is the per-workload form of accuracy per joule. It describes a
+device workload only when its correctness labels come from the answers that workload produced, and
+it complements rather than replaces accuracy, energy, latency, RAM and thermal measurements.
+Chapter~\ref{ch:methodology} gives its operational definition.
+
+\section{Evaluating conversational memory}
+\label{sec:ch2_evaluation}
+
+\subsection{LoCoMo and LongMemEval}
+
+LoCoMo evaluates memory over long, multi-session conversations. The published benchmark
+includes question answering, event summarization and multimodal dialogue generation,
+with conversations averaging approximately 600 turns and 16,000 tokens and spanning up to
+32 sessions~\citep{locomo}. Its QA component includes questions requiring individual
+facts, evidence across turns, temporal interpretation and open-domain knowledge, together
+with an adversarial category. This thesis evaluates the QA component using the specified
+first-four-category convention. Its results do not assess the benchmark's summarization
+or multimodal-generation tasks.
+
+LongMemEval tests information extraction, multi-session reasoning, temporal reasoning,
+knowledge updates and abstention through 500 curated questions embedded in interaction
+histories~\citep{longmemeval}. These abilities separate recalling an isolated fact from
+combining sessions, identifying the relevant point in time or recognizing that the history
+does not support an answer. Its inclusion provides a second conversational-memory setting
+for the thesis. The actual subset and evaluation configuration are defined in
+Chapter~\ref{ch:methodology}.
+
+The benchmarks are related but are not interchangeable. In particular, abstention is an
+explicit LongMemEval ability, while the thesis's primary LoCoMo analysis excludes its
+adversarial category under the stated convention. Coverage of one question type cannot
+be inferred from success on another. Both benchmarks also assess memory through specified
+tasks; performance on their QA questions is evidence about memory-dependent answering,
+not a direct measure of tool use or complete mobile-agent workflows.
+
+\subsection{Automatic judging and comparison boundaries}
+
+Short-answer metrics based on lexical overlap can miss semantically correct paraphrases
+or respond to differences in answer wording. An LLM judge can instead assess a candidate
+answer against the question and reference answer using a fixed rubric. This makes the
+judge part of the measurement procedure. MT-Bench and Chatbot Arena study model-based
+judging and document biases, including sensitivity to answer position and verbosity,
+alongside agreement with human preferences in their setting~\citep{mtbench}. Agreement
+reported for those tasks cannot calibrate a different judge on conversational-memory QA.
+
+Repeatability and validity must consequently be evaluated separately. Repeated agreement
+by one judge indicates stability under the tested procedure. Human review addresses
+whether its labels are appropriate for the task. A reference-guided, single-answer
+protocol also differs from pairwise preference judging, so biases established for one
+format should not be assumed to transfer unchanged. LongMemEval already uses the
+reference-guided format: it scores answers with an expert-written correctness prompt and
+reports more than 97\% agreement between its GPT-4o judge and human
+experts~\citep{longmemeval}. That figure validates the prompt with that judge model; it does
+not transfer automatically to a different model applying the same rubric, which is the
+arrangement used in this thesis. The methodology chapter specifies
+the judging procedure and the limits of the available validation.
+
+The same care is needed when comparing published systems. Two studies using LoCoMo may
+use different conversations, exclude different question categories, train on part of the
+corpus, allow different answer lengths, or use different readers and judges. DeferMem,
+for example, separately reports LoCoMo evaluation excluding the conversation used to
+train its distiller~\citep{defermem}. That result belongs to a different evaluation set
+from a study that retains all conversations. The benchmark name alone is insufficient
+to establish a matched comparison.
+
+For this reason, the related work is compared by method, task and measurement boundary.
+Published accuracy values establish what a system achieved under its own protocol.
+The thesis's controlled comparisons use paired questions and a common scoring procedure
+within the experimental conditions described in Chapter~\ref{ch:methodology}.
+
+\section{Synthesis and position of the thesis}
+\label{sec:ch2_position}
+
+The reviewed work establishes several viable approaches to long-term memory. Dense
+retrieval preserves access to original text, while compression and graph construction
+change how information is organized and exposed. Recent systems improve the use of
+retrieved evidence, defer construction until the query is known, or restore source text
+through provenance. Their results make memory design a question of representation,
+processing and evaluation conditions rather than a fixed ordering of architectures.
+
+Table~\ref{tab:ch2_related_position} summarizes the closest connections. It records the
+type of evidence supplied by each group of studies, keeping system feasibility, proxy
+efficiency and physical energy measurements distinct.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \begin{tabular}{p{0.23\textwidth}p{0.30\textwidth}p{0.35\textwidth}}
+    \toprule
+    Related work & Relevant contribution & Relation to this thesis \\
+    \midrule
+    MobileRAG~\citep{mobilerag_energy} & Smartphone document RAG with per-query energy &
+    Direct energy precedent; different stored content and comparison scope. \\
+    SmartRAG~\citep{smartrag} & On-phone graph retrieval with power and memory profiles &
+    Graph feasibility precedent; competing systems lack matched phone profiles. \\
+    Mobile memory benchmark~\citep{mobile_memory_architectures} & Architecture comparison
+    for compact mobile agents & Different tasks; laptop latency measurements and
+    rule-based graph construction. \\
+    MemLoRA~\citep{memlora} & Distilled adapters for small-model memory operations &
+    Alternative construction design; no matched handset-energy study. \\
+    RippleMem; Chain-of-Memory~\citep{ripplemem,chain_of_memory} & Associative retrieval
+    and deliberate evidence assembly & Richer memory units performing well; limits how far a
+    triple-pipeline result generalizes. \\
+    LazyMem; DeferMem~\citep{lazymem,defermem} & Query-conditioned construction after broad
+    retrieval & Alternative distribution of preparation and query costs. \\
+    BudgetMem; MemFlow~\citep{budgetmem,memflow} & Query-aware choice of memory processing
+    and budgets & Established routing approaches; phone energy remains a separate measure. \\
+    LeanMem; SEEM~\citep{leanmem,seem} & Compact memory connected to original source text &
+    Direct related work for the budgeted provenance-selection study. \\
+    \bottomrule
+  \end{tabular}
+  \caption{Closest related work and its measurement boundaries. Entries summarize
+  the versions reviewed for this chapter and do not form a cross-paper leaderboard.}
+  \label{tab:ch2_related_position}
+\end{table}
+
+Read across its rows, the table separates three kinds of evidence: feasibility on a phone,
+efficiency measured by proxies such as tokens, latency or price, and physical energy. Among the
+studies reviewed here, per-query phone energy is reported for document
+retrieval~\citep{mobilerag_energy}, and average phone power for one graph system whose baselines
+ran off the phone~\citep{smartrag}. The closest comparison of memory architectures for compact
+mobile agents reports latency on a laptop and leaves real-phone cost measurement to future
+work~\citep{mobile_memory_architectures}. These studies do not compare memory representations for
+conversational histories by answer quality and energy measured on the same handset. This thesis
+makes that comparison for the tested memory choices and analyses where its graph pipeline loses
+evidence; the following chapter defines the experimental controls needed to interpret it.

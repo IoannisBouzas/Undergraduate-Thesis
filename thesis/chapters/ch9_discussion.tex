@@ -1,0 +1,319 @@
+
+\chapter{Discussion}
+\label{ch:discussion}
+
+This chapter reads the measurements of Chapters~\ref{ch:memory_evaluation} to~\ref{ch:spe} as
+answers to the three research questions, then states what those answers do not cover. Phone and
+workstation results stay separate throughout: the phone gives accuracy and device cost on one
+handset, and the workstation tests the same memory modules on more questions, readers and
+benchmarks, including the graph repairs and SPE.
+
+Tables~\ref{tab:ch9_claims} and~\ref{tab:ch9_claims_b} list the main claims of
+Chapters~\ref{ch:memory_evaluation} to~\ref{ch:spe}, each with its sample size, its test and its
+status under the labels defined in Section~\ref{sec:validity}.
+
+\begin{table}[htbp]
+  \centering
+  \footnotesize
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}X
+      >{\raggedright\arraybackslash}p{0.16\textwidth}
+      >{\raggedright\arraybackslash}p{0.15\textwidth}
+      >{\raggedright\arraybackslash}p{0.12\textwidth}l@{}}
+    \toprule
+    Claim & Sample & Test & Status & Section \\
+    \midrule
+    \multicolumn{5}{@{}l}{\textit{Measurement}} \\
+    The automatic judge agrees with a blind human annotator
+      & 100 judged answers, 86 questions; 83 decisive labels & Agreement 82/83; Cohen's $\kappa=0.976$
+      & Descriptive & \ref{sec:judge} \\
+    \midrule
+    \multicolumn{5}{@{}l}{\textit{Answer quality on the workstation (RQ1)}} \\
+    Vector retrieval beats truncated full context on LoCoMo
+      & 200 paired; Gemma E2B, E4B, Qwen 4B & McNemar, Holm; cluster bootstrap
+      & Primary & \ref{sec:ch4_vr_fc} \\
+    Vector retrieval beats triple-only graph memory (GraphRAG v3)
+      & 200 paired; Gemma E2B, E4B & McNemar, Holm & Primary & \ref{sec:ch4_vr_graph} \\
+    GraphRAG v3 $\to$ v4 (source turns restored) raises E2B from 21.5\% to 33.0\%
+      & 200 paired & McNemar, Holm & Primary & \ref{sec:ch4_source_restoration} \\
+    E2B to E4B reader under vector retrieval: +4.5 points, not separated
+      & 200 paired & McNemar, Holm & Primary & \ref{sec:ch4_scaling} \\
+    Vector retrieval beats truncated full context on LongMemEval-S
+      & 60 paired; Gemma E2B & McNemar, Holm & Primary & \ref{sec:ch4_lme} \\
+    The same ordering holds for the other readers and the LongMemEval-S graph cells
+      & 60--200 paired per reader & McNemar, unadjusted & Exploratory & \ref{sec:ch4_lme} \\
+    Long-window full context matches or exceeds vector retrieval on LoCoMo; separated for E2B only
+      & 200 paired; Gemma E2B, E4B, Qwen 4B & McNemar, unadjusted & Exploratory
+      & \ref{sec:ch4_long_fc} \\
+    Vector retrieval stays 5--8 points ahead of long-window full context on LongMemEval-S, not separated
+      & 60 paired; same three readers & McNemar, unadjusted & Exploratory
+      & \ref{sec:ch4_long_fc} \\
+    Retrieval depth $k=2\to50$ adds 15--27 points, more than the tested reader doublings
+      & 100 paired; five readers & McNemar, unadjusted; magnitudes not tested
+      & Exploratory & \ref{sec:ch4_retrieval_depth} \\
+    Question category is associated with correctness
+      & Eight Gemma cells of 200 & Permutation $\chi^2$ within conversations, Holm over eight
+      & Exploratory & \ref{sec:ch4_locomo_categories} \\
+    Reasoning mode gives variable gains; 13--35\% of retrieval-condition outputs unfinished
+      & 200 (LoCoMo), 60 (LongMemEval-S) & McNemar, unadjusted & Exploratory
+      & \ref{sec:ch4_reasoning} \\
+    The official LoCoMo prompt lowers accuracy without changing the ordering
+      & 200 paired; Gemma E2B, E4B & McNemar, unadjusted & Exploratory
+      & \ref{sec:ch4_robustness} \\
+    \bottomrule
+  \end{tabularx}
+  \caption{Main claims with their evidence: measurement and workstation answer quality (RQ1).
+  \emph{Pre-registered}: the criterion was fixed before the run that tests it; only these rows are
+  confirmatory. \emph{Primary}: one of the nine paired comparisons Holm-corrected as a family that
+  was designated during the analysis. \emph{Exploratory}: a test reported with its unadjusted
+  $p$-value. \emph{Descriptive}: a measurement reported without a test. McNemar tests are exact and
+  two-sided.}
+  \label{tab:ch9_claims}
+\end{table}
+
+\begin{table}[htbp]
+  \centering
+  \footnotesize
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}X
+      >{\raggedright\arraybackslash}p{0.16\textwidth}
+      >{\raggedright\arraybackslash}p{0.15\textwidth}
+      >{\raggedright\arraybackslash}p{0.12\textwidth}l@{}}
+    \toprule
+    Claim & Sample & Test & Status & Section \\
+    \midrule
+    \multicolumn{5}{@{}l}{\textit{Phone resources (RQ2)}} \\
+    Embedding prefixes have no detectable effect on phone vector accuracy (E2B 10$\to$8, E4B 8$\to$10)
+      & 20 paired; Gemma E2B, E4B & McNemar, unadjusted & Exploratory & \ref{sec:retrieval} \\
+    Workstation accuracy cannot stand in for phone accuracy (83\% agreement, threshold 90\%)
+      & 100 paired; Gemma E2B vector & Agreement threshold; $\kappa$; McNemar
+      & Pre-registered & \ref{sec:ch5_parity} \\
+    Vector retrieval has higher accuracy, lower energy per answer and shorter query time than full
+      context in all five readers
+      & 20 questions per cell; 3 vector sittings per reader; 1--3 full-context sittings & None
+      & Descriptive & \ref{sec:ch5_phone_comparison} \\
+    5.8--26.9$\times$ more correct answers per kilojoule
+      & As above; ratios within matched sittings & Resampling sensitivity: lower end 2.6--8.8$\times$
+      & Descriptive & \ref{sec:ch5_charge} \\
+    Peak RAM and temperature do not follow the energy ordering
+      & As above & None & Descriptive & \ref{sec:ch5_resources} \\
+    The early phone graph build (256-token limit, 58/84 batches failed) cost about 26$\times$ more
+      energy per turn than vector ingestion
+      & One graph build against three vector sittings & None; range 22--28$\times$ by sitting
+      & Descriptive & \ref{sec:ch5_graph_boundary} \\
+    \midrule
+    \multicolumn{5}{@{}l}{\textit{Graph memory and SPE (RQ3)}} \\
+    Small Qwen extractors fail on 79--85\% of batches; more retrieved facts recover 1--2 answers
+      & 1,179 batches; 200 paired & McNemar, unadjusted & Exploratory & \ref{sec:ch6_extractors} \\
+    The graph producer, more than the reader, sets GraphRAG v3 accuracy
+      & Four cells of 200 & None & Descriptive & \ref{sec:ch6_extractors} \\
+    SPE misses Criterion~1 and stays below GraphRAG v4
+      & 200 paired; E2B (E4B addendum) & Registered thresholds; McNemar, Holm vs v4
+      & Pre-registered & \ref{sec:spe_results} \\
+    SPE passes Criterion~2 numerically, without a gain separable from GraphRAG v3
+      & 200 paired; E2B & Registered thresholds; McNemar vs v3
+      & Pre-registered & \ref{sec:spe_results} \\
+    SPE-2 selects no source turn
+      & 800 prompts & Count & Descriptive & \ref{sec:spe_why_triples} \\
+    A per-question choice between GraphRAG v3 and v4 has headroom (oracle)
+      & 200; uses judged labels & None; post hoc bound & Descriptive & \ref{sec:spe_discussion} \\
+    \bottomrule
+  \end{tabularx}
+  \caption{Main claims with their evidence: phone resources (RQ2) and graph memory and SPE (RQ3).
+  Status labels as in Table~\ref{tab:ch9_claims}. Phone rows use phone-measured accuracy only.}
+  \label{tab:ch9_claims_b}
+\end{table}
+
+\section{RQ1: how memory strategy affects answer quality}
+\label{sec:ch9_rq1}
+
+Under a 4,096-token history budget, the strategy ordering was stable across every reader tested. On
+the phone, vector retrieval
+answered 20\% to 50\% of the 20 LoCoMo questions correctly, against 0\% to 10\% for full context.
+On the workstation's 200-question LoCoMo set it had the highest accuracy point estimate for all
+five readers, 28.5 to 32.5 points above truncated full context in the primary comparisons.
+Triple-only graph memory sat between the two, trailing vector retrieval by 13.0 to 15.5 points
+where extraction worked. LongMemEval-S repeated the ordering: vector retrieval scored 26.7\% to
+56.7\%, no truncated full-context cell exceeded 10\%, and the repaired Gemma graphs again sat between the two
+(Section~\ref{sec:ch4_lme}).
+
+For a system designer, the sizes of the two settings behind that ordering are also informative.
+Raising retrieval depth from two to fifty turns raised complete-evidence coverage from 16\% to 64\%
+and accuracy by 15 to 27 points in every reader. The tested reader doublings were worth 4.5 points
+from Gemma~4~E2B to E4B and 6.5 points from Qwen~3.5~2B to 4B. For readers of 0.8 to 4 billion
+parameters under a 4,096-token history budget, what the memory system put in front of the reader
+therefore moved accuracy more than the tested increases in reader size. The comparison sets a
+25-fold range of depth against one doubling of the reader, and the larger depths cost longer
+prompts. It does not rank the two settings in general, and it does not apply to readers that can
+hold the entire history.
+
+Two qualifications belong with this answer. First, full context scores low because the history
+does not fit: the workstation truncated LoCoMo histories to a 4,096-token window, and the phone kept
+only the most recent turns (79 of 419 in the conversation of
+Figure~\ref{fig:ch3_benchmark_anatomy}). With a long workstation window, full context rose to
+41.5--44.0\% for the three readers tested on LoCoMo, where it held the whole history, at or above
+vector retrieval, and to 40.0--48.3\% on LongMemEval-S, where vector retrieval kept a 5- to 8-point
+lead that 60 questions could not separate (Section~\ref{sec:ch4_long_fc}). Those long-window
+prompts were about 39 and 48 times longer than the retrieval prompts. The vector advantage is
+therefore an advantage in evidence per prompt token under a small context budget; on LoCoMo, a
+reader with a long enough window matched or passed it. On the phone that window is the constraint: a rough extrapolation from
+the measured query time per prompt token puts a whole LoCoMo history at about 45 minutes per
+question, a length never run there. Second, the ordering holds for overall
+accuracy, not in every category: temporal questions never exceeded 26\% in the main LoCoMo grid,
+and none of the tested memory designs reliably repaired that weakness.
+
+\section{RQ2: what memory strategy costs on a phone}
+\label{sec:ch9_rq2}
+
+On the Galaxy S23 Ultra, the quality and cost orderings agreed. Vector retrieval had a higher
+accuracy point estimate, lower energy per answer and shorter query time than truncated full
+context in all five reader pairs, and 5.8 to 26.9 times more correct answers per kilojoule where
+that ratio is finite. On this slice, every question that full context answered correctly was also answered correctly by
+vector retrieval. Bounded retrieval was therefore not a compromise between quality and cost on this
+device: it was better on both.
+
+That result is whole-workload efficiency: each vector sitting's energy includes building its
+memory, about 60\% of an E2B vector sitting. Construction is also where the strategies separate
+most sharply. In the phone pilot, extracting a graph cost about 26 times more energy per dialogue
+turn than embedding (Table~\ref{tab:ch5_construction}). This cost is paid before the first question
+and is invisible to prompt-token accounting. Server-side evaluations of memory frameworks likewise find ingestion and
+retrieval dominating processing time~\citep{ai_hippocampus}. Device comparisons should therefore price construction
+separately from each query, as the ledger in Chapter~\ref{ch:on_device_memory} does.
+
+The resource results do not collapse into one ordering. Peak system RAM and peak hottest-zone
+temperature did not follow energy and latency, so a policy that optimizes only joules can still
+violate a memory or thermal limit. This is why the individual traces are reported alongside the
+joint measure.
+
+Two boundaries limit how far these results travel. The workstation-to-phone parity gate failed at
+83\% agreement against a 90\% threshold, so every phone claim rests on the 20-question phone
+cells. The graph strategy appears on the phone only as one early construction pilot, with 58 of 84
+extraction batches failing, so this thesis makes no claim about the accuracy of a repaired
+on-device graph.
+
+\section{RQ3: what graph memory can and cannot do here}
+\label{sec:ch9_rq3}
+
+Here the mechanism, rather than the ranking, is the contribution. The repair sequence separated
+four places where evidence is lost: facts that never entered the graph because extraction failed or
+omitted them, stored facts excluded by the retrieval rule or triple budget, selected triples missing
+detail from their source turn, and evidence in the prompt that the reader did not use. Restoring the
+source text behind the selected triples raised Gemma~4~E2B from 21.5\% to 33.0\% ($p=0.000170$ after
+the thesis's Holm correction) and E4B from 27.5\% to 32.5\%.
+
+Both conditions started from the same ten retrieved turns, so the E2B gain points to the triple
+representation rather than retrieval as the main place the loss arises. For E4B, restoration
+recovered 5 of the 13 points that separated triples from vector retrieval.
+
+SEEM and LeanMem also return from a compact memory unit to its source text
+(Section~\ref{sec:ch2_graphs}): SEEM for every retrieved event frame~\citep{seem}, and LeanMem when a
+planner judges that a question needs detail~\citep{leanmem}. Neither reports energy. This thesis
+measures how much that return is worth for small readers under a small budget, and the device cost of
+building the compact unit in the first place.
+
+SPE tried to keep the restoration gain while controlling its token cost. Criterion~1 failed, and
+Criterion~2 cleared its numerical thresholds without a distinguishable improvement over version~3;
+none of the 800 pre-specified SPE-2 prompts selected a source turn. Under per-token scoring, an
+upgrade to source text had to earn roughly four times what a competing triple offered, and the
+budget ran out on triples first (Section~\ref{sec:spe_why_triples}). The utilities were not logged,
+so this explanation follows from the rule and the measured costs rather than from a logged trace. A post hoc
+oracle choosing between v3 and v4 per question with judged labels reaches 35.0\% for E2B and 33.5\%
+for E4B at about 560 total prompt tokens. It is an upper bound, not an implementable policy, but it
+shows headroom at the question level, so the negative result applies to the tested per-fact rule
+rather than to selective expansion in general.
+
+The extraction floor sets the outer limit. The smaller Qwen extractors failed on roughly four batches
+in five and the phone pilot on 58 of 84, so for those configurations the question is less which
+retrieval rule to use than how much of the history extraction captures. Where extraction worked,
+raising the graph retrieval budget from twelve to twenty-four facts was worth 2.0 to 8.0 points;
+where it had failed, the same change moved one or two questions out of 200.
+
+\section{What it took to make these measurements trustworthy}
+\label{sec:ch9_method}
+
+Three lessons from the measurement procedure apply beyond this study.
+
+\paragraph{Device accuracy has to be measured on the device.}
+The pre-registered parity check failed, so phone accuracy comes only from phone answers and is never
+substituted from the workstation. The smaller phone cells are the price of that separation.
+
+\paragraph{A budgeted selection rule needs a defined tie-break.}
+The first graph retrieval rule gave most edges of a matched speaker hub the same score, so the facts
+that filled the budget depended on the process's hash seed; 164 of 200 version-1 questions had such a
+tie at the cutoff. The vector-first retrieval used from version~2 onward returned identical contexts
+under different seeds, so the record results are unaffected.
+
+\paragraph{The energy measurement is simple and cross-checked, with one known gap.}
+Energy comes from the phone's charge counter, weighted by the measured voltage. It agrees with the
+reported battery-level drop, and with integrated current to within 10\% on sittings longer than 50
+minutes. These are consistency checks, not independent instruments. Sittings that started at the
+highest possible charge (100\%) under-count because the counter pauses at full charge; Appendix~\ref{app:on_device_statistics}
+quantifies the effect, and no comparison changes direction.
+
+\section{Threats to validity and what the results do not show}
+\label{sec:ch9_threats}
+\label{sec:ch9_not_shown}
+
+The chapter-level threat sections state the specific limits; the consolidated ones are these.
+
+\paragraph{Sample and independence.}
+The 200 LoCoMo questions come from ten conversations and the 60 LongMemEval-S questions from a
+stratified sample of one benchmark, so question-level observations are not independent. Paired tests
+and cluster sensitivity checks preserve the direction of the main comparisons, and category cells of
+50 or 10 questions support only coarse statements.
+
+\paragraph{Judging.}
+All reported accuracies come from one automatic judge. Re-judging identical predictions changed no
+verdict within one judging session and one verdict in 100 across sessions. A blind human audit of
+100 judged answers agreed with the judge on 82 of the 83 decisive labels (Cohen's $\kappa=0.976$),
+with no correct answer marked wrong; 17 answers were too ambiguous to label, and counting them all as
+disagreements would lower agreement to 82 of 100 (Section~\ref{sec:judge}). The audit had one
+annotator, so it does not measure agreement between humans, and no second judge model was compared.
+The primary strategy gaps are far larger than the variation from re-judging. The audit counts only
+decisive labels from a sample drawn across conditions, so it does not bound judge bias within any
+single strategy comparison.
+
+\paragraph{One device, one runtime, uneven replication.}
+All device measurements come from one Galaxy S23 Ultra, one Android build and a CPU-oriented
+llama.cpp configuration, with three sittings for each vector cell and complete full-context
+replication only for Gemma~4~E2B. Each phone cell has 20 questions, so the efficiency multipliers
+are uncertain: resampling the question pairs puts their lower end at 2.6 to 8.8$\times$
+(Section~\ref{sec:ch5_charge}). A different SoC, an accelerator path or a different thread and
+governor configuration may change the ordering.
+
+\paragraph{Cross-study comparison.}
+External accuracy numbers in this thesis are context, not comparators. Readers, judges, retrieval
+units, context limits and question populations differ across the cited studies, so their effect sizes
+are not pooled with those measured here.
+
+Four statements are excluded deliberately, because the evidence in this thesis does not support them.
+
+\begin{enumerate}
+  \item \textbf{That knowledge graphs fail for conversational memory.} The evidence concerns graphs
+        extracted by small local models under a small generation budget and queried by turn-anchored
+        triple selection, without multi-hop traversal; in these speaker-centred graphs most edges already
+        lie next to the retrieved facts' entities. Community-summary designs, much larger extractors
+        and curated knowledge graphs were not evaluated. SmartRAG demonstrates a graph-based mobile
+        memory system built with a distilled extractor~\citep{smartrag}, and the token-matched
+        comparison of \citet{rag_vs_graphrag} retains a temporal-accuracy advantage for graph
+        retrieval at server scale.
+  \item \textbf{That selective expansion cannot work.} The tested per-fact rule failed, and the
+        oracle shows that a question-level choice had headroom on the same cells. A query-level
+        policy of the kind LeanMem applies~\citep{leanmem} was not tested here.
+  \item \textbf{That the device draws a fixed power.} The pilot's average of about 4~W is the
+        quotient of one workload's energy and its duration. The frequency and temperature traces are
+        consistent with thermal or power throttling; they do not identify a governor policy or
+        establish an invariant power figure.
+  \item \textbf{That prefill dominates the measured query time.} The phone logs record total query
+        time, and prefill and decode were not timed separately. The relationship between prompt
+        length and query time is consistent with prompt processing dominating, which is weaker than
+        a measured phase split.
+\end{enumerate}
+
+Stated positively, for conversational question answering with small local readers under a small
+context budget, retrieving a bounded amount of source text was the strongest quality-cost point
+measured, and on the workstation it stayed within 1.5 to 8 points of reading the whole history on
+LoCoMo, and ahead of long-window full context on LongMemEval-S, with 2 to 3\% of the prompt tokens; the compact graph representation lost evidence that its own source spans still contained;
+restoring that text recovered part of the loss at workstation scale; the tested rule for spending a
+token budget on that restoration did not work; and building the compact representation carries a
+device cost that prompt-level accounting does not show.
