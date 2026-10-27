@@ -1,0 +1,135 @@
+{
+  "run_id": "lap_locomo100_q35_08b_vr_prefix_k50",
+  "dataset": "locomo",
+  "mode": "vectorrag",
+  "model": "qwen3.5:0.8b",
+  "n": 100,
+  "f1_mean": 0.2539949124949125,
+  "em_mean": 0.14,
+  "contains_mean": 0.15,
+  "ingest_seconds_mean": 0.0,
+  "generate_seconds_mean": 0.97547,
+  "prompt_tokens_mean": 3257.1,
+  "completion_tokens_mean": 7.51,
+  "total_tokens_mean": 3264.61,
+  "by_category": {
+    "1": {
+      "n": 25,
+      "f1_mean": 0.22126007326007324,
+      "em_mean": 0.08,
+      "contains_mean": 0.08
+    },
+    "2": {
+      "n": 25,
+      "f1_mean": 0.15266666666666664,
+      "em_mean": 0.04,
+      "contains_mean": 0.04
+    },
+    "3": {
+      "n": 25,
+      "f1_mean": 0.12666666666666665,
+      "em_mean": 0.08,
+      "contains_mean": 0.12
+    },
+    "4": {
+      "n": 25,
+      "f1_mean": 0.5153862433862434,
+      "em_mean": 0.36,
+      "contains_mean": 0.36
+    }
+  },
+  "by_conversation": {
+    "conv-26": {
+      "n": 12,
+      "f1_mean": 0.2222222222222222,
+      "em_mean": 0.16666666666666666,
+      "contains_mean": 0.16666666666666666
+    },
+    "conv-30": {
+      "n": 9,
+      "f1_mean": 0.1810699588477366,
+      "em_mean": 0.1111111111111111,
+      "contains_mean": 0.1111111111111111
+    },
+    "conv-41": {
+      "n": 12,
+      "f1_mean": 0.3712522045855379,
+      "em_mean": 0.08333333333333333,
+      "contains_mean": 0.08333333333333333
+    },
+    "conv-42": {
+      "n": 12,
+      "f1_mean": 0.19325396825396823,
+      "em_mean": 0.08333333333333333,
+      "contains_mean": 0.08333333333333333
+    },
+    "conv-43": {
+      "n": 12,
+      "f1_mean": 0.32722832722832723,
+      "em_mean": 0.25,
+      "contains_mean": 0.25
+    },
+    "conv-44": {
+      "n": 9,
+      "f1_mean": 0.16666666666666666,
+      "em_mean": 0.1111111111111111,
+      "contains_mean": 0.2222222222222222
+    },
+    "conv-47": {
+      "n": 9,
+      "f1_mean": 0.19470899470899472,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "conv-48": {
+      "n": 9,
+      "f1_mean": 0.15555555555555556,
+      "em_mean": 0.1111111111111111,
+      "contains_mean": 0.1111111111111111
+    },
+    "conv-49": {
+      "n": 8,
+      "f1_mean": 0.5,
+      "em_mean": 0.375,
+      "contains_mean": 0.375
+    },
+    "conv-50": {
+      "n": 8,
+      "f1_mean": 0.21875,
+      "em_mean": 0.125,
+      "contains_mean": 0.125
+    }
+  },
+  "config": {
+    "run_id": "lap_locomo100_q35_08b_vr_prefix_k50",
+    "output_dir": "results\\lap_locomo100_q35_08b_vr_prefix_k50",
+    "backend": "ollama",
+    "model": "qwen3.5:0.8b",
+    "extraction_model": "qwen3.5:0.8b",
+    "embed_model": "nomic-embed-text",
+    "embed_prefix": "nomic",
+    "host": "http://localhost:18080/api",
+    "num_ctx": 4096,
+    "temperature": 0.0,
+    "max_answer_tokens": 64,
+    "thinking": false,
+    "mode": "vectorrag",
+    "prompt_version": "qa_short_answer_v3",
+    "prompt_style": "v3",
+    "graph_extraction_prompt_version": "triple_json_v2",
+    "decay_rate": 1.0,
+    "graph_budget_tokens": 700,
+    "prune_threshold": 0.15,
+    "max_triples": 12,
+    "query_ner": "heuristic",
+    "top_k": 50,
+    "graphrag_batch_size": 5,
+    "extraction_max_tokens": 256,
+    "limit": 100,
+    "cache_policy": "enabled",
+    "examples_hash": "d6d300e8f204f4dee1faf88926a95a10be665a4119e698e30ea8a8a16442042a",
+    "excluded_locomo_categories": [
+      "5"
+    ]
+  }
+}
