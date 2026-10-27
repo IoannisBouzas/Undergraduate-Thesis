@@ -1,0 +1,131 @@
+{
+  "run_id": "lap_locomo200_e4b_vr_think",
+  "dataset": "locomo",
+  "mode": "vectorrag",
+  "model": "gemma4:e4b",
+  "n": 200,
+  "f1_mean": 0.321087648648015,
+  "em_mean": 0.16,
+  "contains_mean": 0.17,
+  "ingest_seconds_mean": 0.0,
+  "generate_seconds_mean": 3.93065,
+  "prompt_tokens_mean": 730.655,
+  "completion_tokens_mean": 554.92,
+  "total_tokens_mean": 1285.575,
+  "by_category": {
+    "1": {
+      "n": 50,
+      "f1_mean": 0.3348334619189169,
+      "em_mean": 0.12,
+      "contains_mean": 0.12
+    },
+    "2": {
+      "n": 50,
+      "f1_mean": 0.3022197802197802,
+      "em_mean": 0.12,
+      "contains_mean": 0.16
+    },
+    "3": {
+      "n": 50,
+      "f1_mean": 0.16899278120761493,
+      "em_mean": 0.1,
+      "contains_mean": 0.1
+    },
+    "4": {
+      "n": 50,
+      "f1_mean": 0.47830457124574777,
+      "em_mean": 0.3,
+      "contains_mean": 0.3
+    }
+  },
+  "by_conversation": {
+    "conv-26": {
+      "n": 21,
+      "f1_mean": 0.3046014831729118,
+      "em_mean": 0.14285714285714285,
+      "contains_mean": 0.14285714285714285
+    },
+    "conv-30": {
+      "n": 15,
+      "f1_mean": 0.572702562506484,
+      "em_mean": 0.4,
+      "contains_mean": 0.4666666666666667
+    },
+    "conv-41": {
+      "n": 21,
+      "f1_mean": 0.41313562462021836,
+      "em_mean": 0.2857142857142857,
+      "contains_mean": 0.2857142857142857
+    },
+    "conv-42": {
+      "n": 21,
+      "f1_mean": 0.11589054301269622,
+      "em_mean": 0.0,
+      "contains_mean": 0.047619047619047616
+    },
+    "conv-43": {
+      "n": 21,
+      "f1_mean": 0.25088079676314967,
+      "em_mean": 0.14285714285714285,
+      "contains_mean": 0.14285714285714285
+    },
+    "conv-44": {
+      "n": 21,
+      "f1_mean": 0.2647026552556507,
+      "em_mean": 0.14285714285714285,
+      "contains_mean": 0.14285714285714285
+    },
+    "conv-47": {
+      "n": 20,
+      "f1_mean": 0.27703296703296704,
+      "em_mean": 0.15,
+      "contains_mean": 0.15
+    },
+    "conv-48": {
+      "n": 20,
+      "f1_mean": 0.40089466089466086,
+      "em_mean": 0.1,
+      "contains_mean": 0.1
+    },
+    "conv-49": {
+      "n": 20,
+      "f1_mean": 0.29416666666666663,
+      "em_mean": 0.15,
+      "contains_mean": 0.15
+    },
+    "conv-50": {
+      "n": 20,
+      "f1_mean": 0.39258361204013376,
+      "em_mean": 0.15,
+      "contains_mean": 0.15
+    }
+  },
+  "config": {
+    "run_id": "lap_locomo200_e4b_vr_think",
+    "output_dir": "results\\lap_locomo200_e4b_vr_think",
+    "backend": "ollama",
+    "model": "gemma4:e4b",
+    "extraction_model": "gemma4:e4b",
+    "embed_model": "nomic-embed-text",
+    "host": "http://localhost:18080/api",
+    "num_ctx": 4096,
+    "temperature": 0.0,
+    "max_answer_tokens": 768,
+    "thinking": true,
+    "mode": "vectorrag",
+    "prompt_version": "qa_short_answer_v3",
+    "graph_extraction_prompt_version": "triple_json_v2",
+    "decay_rate": 1.0,
+    "prune_threshold": 0.15,
+    "max_triples": 12,
+    "query_ner": "heuristic",
+    "top_k": 10,
+    "graphrag_batch_size": 5,
+    "limit": 200,
+    "cache_policy": "enabled",
+    "examples_hash": "8f7200d571bd63911e0905d583666c6c129b33d2f41ed25dccecd96c63194adf",
+    "excluded_locomo_categories": [
+      "5"
+    ]
+  }
+}
