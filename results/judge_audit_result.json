@@ -1,0 +1,28 @@
+{
+ "filled_sheet": "results/judge_audit_sheet_filled.csv",
+ "n_decisive": 83,
+ "n_ambiguous": 17,
+ "agree": 82,
+ "agreement": 0.9879518072289156,
+ "cohen_kappa": 0.9758510328775094,
+ "judge_false_pos": 1,
+ "judge_false_neg": 0,
+ "judge_model": "llama3.1:70b-instruct-q4_K_M",
+ "annotators": 1,
+ "n_items": 100,
+ "n_distinct_questions": 86,
+ "one_answer_per_question": {
+  "n_decisive": 74,
+  "agree": 73
+ },
+ "ambiguous_judge_split": {
+  "judged_correct": 14,
+  "judged_incorrect": 3
+ },
+ "ambiguous_by_benchmark": {
+  "lap": 13,
+  "lme": 4
+ },
+ "worst_case_agreement_if_all_ambiguous_disagree": 0.82,
+ "sampling": "stratified by run and judge verdict, ~13 answers from each of 8 runs (build_audit_sheet.py, seed 42)"
+}

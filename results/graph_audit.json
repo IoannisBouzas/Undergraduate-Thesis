@@ -1,0 +1,416 @@
+{
+ "structure": {
+  "e2b": {
+   "conversations": 10,
+   "nodes": 676.6,
+   "edges": 745.8,
+   "mean_degree": 1.962800253606581,
+   "components": 36.5,
+   "largest_component_node_share": 0.8606433860725312,
+   "speaker_edge_share": 0.827573942789487,
+   "distinct_relations": 479.4,
+   "questions_with_evidence_triples": 199,
+   "hop_edge_share": {
+    "0": 0.07814354940650058,
+    "1": 0.8666680802420408,
+    "2": 0.9266691441080702,
+    "1_no_speaker": 0.11436641098499331,
+    "2_no_speaker": 0.12029606992097881
+   },
+   "hop_reaches_evidence_triple": {
+    "0": 159,
+    "1": 199,
+    "2": 199,
+    "1_no_speaker": 171,
+    "2_no_speaker": 171
+   }
+  },
+  "e4b": {
+   "conversations": 10,
+   "nodes": 588.2,
+   "edges": 622.8,
+   "mean_degree": 1.968107270664518,
+   "components": 24.3,
+   "largest_component_node_share": 0.8972176295015366,
+   "speaker_edge_share": 0.8991385167252981,
+   "distinct_relations": 470.5,
+   "questions_with_evidence_triples": 196,
+   "hop_edge_share": {
+    "0": 0.07925230751679868,
+    "1": 0.9163076960740278,
+    "2": 0.9450558572094846,
+    "1_no_speaker": 0.10069842312744615,
+    "2_no_speaker": 0.10305748857260685
+   },
+   "hop_reaches_evidence_triple": {
+    "0": 155,
+    "1": 196,
+    "2": 196,
+    "1_no_speaker": 167,
+    "2_no_speaker": 167
+   }
+  },
+  "q35_08b": {
+   "conversations": 10,
+   "nodes": 136.3,
+   "edges": 167.8,
+   "mean_degree": 2.2609263643997575,
+   "components": 1.6,
+   "largest_component_node_share": 0.9917245178427243,
+   "speaker_edge_share": 0.9876916494799416,
+   "distinct_relations": 67,
+   "questions_with_evidence_triples": 77,
+   "hop_edge_share": {
+    "0": 0.07103324533917053,
+    "1": 0.7962497999312383,
+    "2": 0.8167436224002219,
+    "1_no_speaker": 0.07287451339478836,
+    "2_no_speaker": 0.07299607932885428
+   },
+   "hop_reaches_evidence_triple": {
+    "0": 51,
+    "1": 67,
+    "2": 67,
+    "1_no_speaker": 52,
+    "2_no_speaker": 52
+   }
+  },
+  "q35_2b": {
+   "conversations": 10,
+   "nodes": 161.5,
+   "edges": 185.3,
+   "mean_degree": 2.070747863635532,
+   "components": 1.7,
+   "largest_component_node_share": 0.9842958860759494,
+   "speaker_edge_share": 0.983103432797944,
+   "distinct_relations": 88.4,
+   "questions_with_evidence_triples": 36,
+   "hop_edge_share": {
+    "0": 0.05836043111709599,
+    "1": 0.6215935224586626,
+    "2": 0.626657616892911,
+    "1_no_speaker": 0.05750228358037118,
+    "2_no_speaker": 0.05750228358037118
+   },
+   "hop_reaches_evidence_triple": {
+    "0": 21,
+    "1": 31,
+    "2": 31,
+    "1_no_speaker": 22,
+    "2_no_speaker": 22
+   }
+  },
+  "q35_4b": {
+   "conversations": 10,
+   "nodes": 623.9,
+   "edges": 729.2,
+   "mean_degree": 2.0534950136165966,
+   "components": 13.3,
+   "largest_component_node_share": 0.9443902469392182,
+   "speaker_edge_share": 0.9058782455410526,
+   "distinct_relations": 408.1,
+   "questions_with_evidence_triples": 190,
+   "hop_edge_share": {
+    "0": 0.07763565611546602,
+    "1": 0.92029757056643,
+    "2": 0.9652644509869627,
+    "1_no_speaker": 0.10547309579120945,
+    "2_no_speaker": 0.11080133739463195
+   },
+   "hop_reaches_evidence_triple": {
+    "0": 155,
+    "1": 190,
+    "2": 190,
+    "1_no_speaker": 166,
+    "2_no_speaker": 166
+   }
+  }
+ },
+ "behaviour": {
+  "lap_locomo200_e2b_fullcontext": {
+   "n": 200,
+   "correct": 15,
+   "abstain": 99,
+   "wrong_supported": 40,
+   "wrong_partly": 17,
+   "wrong_unsupported": 3,
+   "wrong_yesno": 13,
+   "wrong_number": 13,
+   "unsupported_examples": [
+    {
+     "question": "What pets does Jolene have?",
+     "pred": "Jolie",
+     "gold": "snakes"
+    },
+    {
+     "question": "Which outdoor gear company likely signed up John for an endorsement deal?",
+     "pred": "Nike",
+     "gold": "Under Armour"
+    },
+    {
+     "question": "Which city was John in before traveling to Chicago?",
+     "pred": "Chicago",
+     "gold": "Seattle"
+    }
+   ]
+  },
+  "lap_locomo200_e2b_graphrag": {
+   "n": 200,
+   "correct": 30,
+   "abstain": 27,
+   "wrong_supported": 106,
+   "wrong_partly": 2,
+   "wrong_unsupported": 3,
+   "wrong_yesno": 29,
+   "wrong_number": 3,
+   "unsupported_examples": [
+    {
+     "question": "What can Andrew potentially do to improve his stress and accomodate his living situation with his dogs?",
+     "pred": "Go for walks.",
+     "gold": "Change to a hybrid or remote job so he can move away from the city to the suburbs to have a larger living space and be closer to nature."
+    },
+    {
+     "question": "Who is Anthony?",
+     "pred": "Anthony",
+     "gold": "likely John's friend, colleague or family"
+    },
+    {
+     "question": "What is something that Andrew could do to make birdwatching hobby to fit in his city schedule?",
+     "pred": "Visit a local park or nature reserve.",
+     "gold": "Install a bird feeder outside where he can see the birds without going outdoors."
+    }
+   ]
+  },
+  "lap_locomo200_e2b_graphrag_v3_prefix": {
+   "n": 200,
+   "correct": 43,
+   "abstain": 13,
+   "wrong_supported": 119,
+   "wrong_partly": 4,
+   "wrong_unsupported": 1,
+   "wrong_yesno": 16,
+   "wrong_number": 4,
+   "unsupported_examples": [
+    {
+     "question": "What fields would Caroline be likely to pursue in her educaton?",
+     "pred": "Arts, social work, or related fields",
+     "gold": "Psychology, counseling certification"
+    }
+   ]
+  },
+  "lap_locomo200_e2b_graphrag_v4_prefix": {
+   "n": 200,
+   "correct": 66,
+   "abstain": 14,
+   "wrong_supported": 105,
+   "wrong_partly": 1,
+   "wrong_unsupported": 0,
+   "wrong_yesno": 11,
+   "wrong_number": 3,
+   "unsupported_examples": []
+  },
+  "lap_locomo200_e2b_vr_prefix": {
+   "n": 200,
+   "correct": 72,
+   "abstain": 12,
+   "wrong_supported": 100,
+   "wrong_partly": 2,
+   "wrong_unsupported": 1,
+   "wrong_yesno": 9,
+   "wrong_number": 4,
+   "unsupported_examples": [
+    {
+     "question": "What is Caroline's relationship status?",
+     "pred": "In a relationship",
+     "gold": "Single"
+    }
+   ]
+  },
+  "lap_locomo200_e2b_spe2fix_gap_b370": {
+   "n": 200,
+   "correct": 54,
+   "abstain": 7,
+   "wrong_supported": 122,
+   "wrong_partly": 0,
+   "wrong_unsupported": 0,
+   "wrong_yesno": 15,
+   "wrong_number": 2,
+   "unsupported_examples": []
+  },
+  "lap_locomo200_e4b_fullcontext": {
+   "n": 200,
+   "correct": 21,
+   "abstain": 110,
+   "wrong_supported": 34,
+   "wrong_partly": 4,
+   "wrong_unsupported": 10,
+   "wrong_yesno": 15,
+   "wrong_number": 6,
+   "unsupported_examples": [
+    {
+     "question": "Which of Deborah`s family and friends have passed away?",
+     "pred": "Her mother",
+     "gold": "mother, father, her friend Karlie"
+    },
+    {
+     "question": "What pets does Jolene have?",
+     "pred": "Chloe",
+     "gold": "snakes"
+    },
+    {
+     "question": "Based on Tim's collections, what is a shop that he would enjoy visiting in New York city?",
+     "pred": "Bookstore",
+     "gold": "House of MinaLima"
+    },
+    {
+     "question": "What are the names of Jolene's snakes?",
+     "pred": "Luna",
+     "gold": "Susie, Seraphim"
+    },
+    {
+     "question": "What underlying condition might Joanna have based on her allergies?",
+     "pred": "Allergy",
+     "gold": "asthma"
+    },
+    {
+     "question": "Why did Gina decide to start her own clothing store?",
+     "pred": "She was inspired to start it.",
+     "gold": "She always loved fashion trends and finding unique pieces and she lost her job so decided it was time to start her own business."
+    },
+    {
+     "question": "What is Joanna allergic to?",
+     "pred": "pollen",
+     "gold": "Most reptiles,animals with fur,cockroaches, dairy"
+    },
+    {
+     "question": "What outdoor activities has Andrew done other than hiking in nature?",
+     "pred": "swimming",
+     "gold": "rock climbing, fishing, camping"
+    },
+    {
+     "question": "What is a prominent charity organization that John might want to work with and why?",
+     "pred": "Animal shelter",
+     "gold": "Good Sports, because they work with Nike, Gatorade, and Under Armour and they aim toprovide youth sports opportunities for kids ages 3-18 in high-need communities."
+    },
+    {
+     "question": "In what country was Jolene during summer 2022?",
+     "pred": "India",
+     "gold": "Colombia"
+    }
+   ]
+  },
+  "lap_locomo200_e4b_graphrag": {
+   "n": 200,
+   "correct": 36,
+   "abstain": 55,
+   "wrong_supported": 76,
+   "wrong_partly": 0,
+   "wrong_unsupported": 1,
+   "wrong_yesno": 30,
+   "wrong_number": 2,
+   "unsupported_examples": [
+    {
+     "question": "What did Andrew express missing about exploring nature trails with his family's dog?",
+     "pred": "Nothing specific",
+     "gold": "The peaceful moments"
+    }
+   ]
+  },
+  "lap_locomo200_e4b_graphrag_v3_prefix": {
+   "n": 200,
+   "correct": 55,
+   "abstain": 28,
+   "wrong_supported": 89,
+   "wrong_partly": 1,
+   "wrong_unsupported": 0,
+   "wrong_yesno": 24,
+   "wrong_number": 3,
+   "unsupported_examples": []
+  },
+  "lap_locomo200_e4b_graphrag_v4_prefix": {
+   "n": 200,
+   "correct": 65,
+   "abstain": 32,
+   "wrong_supported": 81,
+   "wrong_partly": 1,
+   "wrong_unsupported": 0,
+   "wrong_yesno": 19,
+   "wrong_number": 2,
+   "unsupported_examples": []
+  },
+  "lap_locomo200_e4b_vr_prefix": {
+   "n": 200,
+   "correct": 81,
+   "abstain": 25,
+   "wrong_supported": 76,
+   "wrong_partly": 1,
+   "wrong_unsupported": 0,
+   "wrong_yesno": 14,
+   "wrong_number": 3,
+   "unsupported_examples": []
+  },
+  "lap_locomo200_e4b_spe2fix_gap_b370": {
+   "n": 200,
+   "correct": 50,
+   "abstain": 25,
+   "wrong_supported": 101,
+   "wrong_partly": 0,
+   "wrong_unsupported": 0,
+   "wrong_yesno": 21,
+   "wrong_number": 3,
+   "unsupported_examples": []
+  }
+ },
+ "funnel": {
+  "e2b": {
+   "identical_retrieval": 200,
+   "n": 200,
+   "n_with_evidence_labels": 199,
+   "groups": {
+    "evidence kept by the graph": {
+     "n": 97,
+     "vr_prefix": 44,
+     "graphrag_v3_prefix": 26,
+     "graphrag_v4_prefix": 44
+    },
+    "retrieved, dropped by the graph": {
+     "n": 30,
+     "vr_prefix": 10,
+     "graphrag_v3_prefix": 4,
+     "graphrag_v4_prefix": 6
+    },
+    "evidence not retrieved": {
+     "n": 72,
+     "vr_prefix": 17,
+     "graphrag_v3_prefix": 12,
+     "graphrag_v4_prefix": 15
+    }
+   }
+  },
+  "e4b": {
+   "identical_retrieval": 200,
+   "n": 200,
+   "n_with_evidence_labels": 199,
+   "groups": {
+    "evidence kept by the graph": {
+     "n": 96,
+     "vr_prefix": 46,
+     "graphrag_v3_prefix": 35,
+     "graphrag_v4_prefix": 43
+    },
+    "retrieved, dropped by the graph": {
+     "n": 31,
+     "vr_prefix": 16,
+     "graphrag_v3_prefix": 6,
+     "graphrag_v4_prefix": 6
+    },
+    "evidence not retrieved": {
+     "n": 72,
+     "vr_prefix": 18,
+     "graphrag_v3_prefix": 13,
+     "graphrag_v4_prefix": 15
+    }
+   }
+  }
+ }
+}

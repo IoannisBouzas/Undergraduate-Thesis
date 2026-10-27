@@ -1,0 +1,37 @@
+{
+  "dataset": "locomo",
+  "mode": "fullcontext",
+  "model": "gemma4:e4b",
+  "n": 100,
+  "f1_mean": 0.08776084877043956,
+  "em_mean": 0.02,
+  "contains_mean": 0.02,
+  "ingest_seconds_mean": 0.0,
+  "generate_seconds_mean": 1.1220899999999998,
+  "by_category": {
+    "1": {
+      "n": 25,
+      "f1_mean": 0.09754752493882927,
+      "em_mean": 0.04,
+      "contains_mean": 0.04
+    },
+    "2": {
+      "n": 25,
+      "f1_mean": 0.024761904761904763,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "3": {
+      "n": 25,
+      "f1_mean": 0.17028341593047475,
+      "em_mean": 0.04,
+      "contains_mean": 0.04
+    },
+    "4": {
+      "n": 25,
+      "f1_mean": 0.058450549450549436,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    }
+  }
+}

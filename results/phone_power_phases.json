@@ -1,0 +1,127 @@
+{
+  "Qwen3.5 0.8B | Vector RAG": {
+    "run": "phone_locomo20_q35_08b_vectorrag",
+    "build": {
+      "minutes": 13.907009184360504,
+      "energy_j": 3067.126893,
+      "mean_w": 3.675756654240725,
+      "units": 1984.0
+    },
+    "query": {
+      "minutes": 4.303312861919403,
+      "energy_j": 801.398034,
+      "mean_w": 3.1038026582251685,
+      "units": 18.0
+    },
+    "query_median_max_core_mhz": 1843.2,
+    "stretches_left_out_paused_counter": 5
+  },
+  "Qwen3.5 0.8B | Full context": {
+    "run": "phone_locomo20_q35_08b_fullcontext",
+    "build": null,
+    "query": null,
+    "query_median_max_core_mhz": 1843.2,
+    "stretches_left_out_paused_counter": 1
+  },
+  "Qwen3.5 2B | Vector RAG": {
+    "run": "phone_locomo20_q35_2b_vectorrag",
+    "build": {
+      "minutes": 25.31897438764572,
+      "energy_j": 6294.1403412,
+      "mean_w": 4.143230188312312,
+      "units": 3435.0
+    },
+    "query": {
+      "minutes": 11.42399420340856,
+      "energy_j": 2229.9526188,
+      "mean_w": 3.2533172127232763,
+      "units": 20.0
+    },
+    "query_median_max_core_mhz": 1843.2,
+    "stretches_left_out_paused_counter": 0
+  },
+  "Qwen3.5 2B | Full context": {
+    "run": "phone_locomo20_q35_2b_fullcontext",
+    "build": null,
+    "query": null,
+    "query_median_max_core_mhz": 1843.2,
+    "stretches_left_out_paused_counter": 1
+  },
+  "Qwen3.5 4B | Vector RAG": {
+    "run": "phone_locomo20_q35_4b_vectorrag",
+    "build": {
+      "minutes": 24.414506638050078,
+      "energy_j": 4944.3926022000005,
+      "mean_w": 3.375310613140516,
+      "units": 3435.0
+    },
+    "query": {
+      "minutes": 30.51898438533147,
+      "energy_j": 6315.638554799998,
+      "mean_w": 3.4490218039690745,
+      "units": 20.0
+    },
+    "query_median_max_core_mhz": 1708.8,
+    "stretches_left_out_paused_counter": 0
+  },
+  "Qwen3.5 4B | Full context": {
+    "run": "phone_locomo20_q35_4b_fullcontext",
+    "build": null,
+    "query": null,
+    "query_median_max_core_mhz": 1843.2,
+    "stretches_left_out_paused_counter": 1
+  },
+  "Gemma 4 E2B | Vector RAG": {
+    "run": "phone_locomo20_e2b_vectorrag",
+    "build": {
+      "minutes": 31.69729708035787,
+      "energy_j": 8153.7614514,
+      "mean_w": 4.287306385950865,
+      "units": 3435.0
+    },
+    "query": {
+      "minutes": 21.35271406173706,
+      "energy_j": 4921.8946704,
+      "mean_w": 3.8417400993064517,
+      "units": 20.0
+    },
+    "query_median_max_core_mhz": 1593.6,
+    "stretches_left_out_paused_counter": 0
+  },
+  "Gemma 4 E2B | Full context": {
+    "run": "phone_locomo20_e2b_fullcontext",
+    "build": null,
+    "query": null,
+    "query_median_max_core_mhz": 1843.2,
+    "stretches_left_out_paused_counter": 1
+  },
+  "Gemma 4 E4B | Vector RAG": {
+    "run": "phone_locomo20_e4b_vectorrag",
+    "build": {
+      "minutes": 19.997893885771433,
+      "energy_j": 6062.786751599999,
+      "mean_w": 5.05285438742601,
+      "units": 3016.0
+    },
+    "query": {
+      "minutes": 31.765106678009033,
+      "energy_j": 8406.8097804,
+      "mean_w": 4.4109247848678095,
+      "units": 20.0
+    },
+    "query_median_max_core_mhz": 1977.6,
+    "stretches_left_out_paused_counter": 1
+  },
+  "Gemma 4 E4B | Full context": {
+    "run": "phone_locomo20_e4b_fullcontext",
+    "build": null,
+    "query": {
+      "minutes": 247.2734027226766,
+      "energy_j": 51783.24097619995,
+      "mean_w": 3.4902824435102557,
+      "units": 20.0
+    },
+    "query_median_max_core_mhz": 1843.2,
+    "stretches_left_out_paused_counter": 0
+  }
+}

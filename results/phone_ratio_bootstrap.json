@@ -1,0 +1,51 @@
+{
+ "draws": 20000,
+ "seed": 0,
+ "cells": {
+  "Q35-0.8B": {
+   "n": 20,
+   "vector_correct": 4,
+   "fullcontext_correct": 0,
+   "fullcontext_only_correct": 0,
+   "energy_ratio_fc_over_vr": 1.078945052366004,
+   "ratio_p2_5": Infinity,
+   "ratio_median": Infinity
+  },
+  "Q35-2B": {
+   "n": 20,
+   "vector_correct": 6,
+   "fullcontext_correct": 2,
+   "fullcontext_only_correct": 0,
+   "energy_ratio_fc_over_vr": 1.9650521562215482,
+   "ratio_p2_5": 2.6200695416287307,
+   "ratio_median": 5.895156468664645
+  },
+  "Q35-4B": {
+   "n": 20,
+   "vector_correct": 7,
+   "fullcontext_correct": 2,
+   "fullcontext_only_correct": 0,
+   "energy_ratio_fc_over_vr": 3.8059817588040668,
+   "ratio_p2_5": 5.708972638206101,
+   "ratio_median": 13.320936155814234
+  },
+  "E2B": {
+   "n": 20,
+   "vector_correct": 10,
+   "fullcontext_correct": 1,
+   "fullcontext_only_correct": 0,
+   "energy_ratio_fc_over_vr": 2.5336988952437984,
+   "ratio_p2_5": 7.601096685731395,
+   "ratio_median": 27.870687847681783
+  },
+  "E4B": {
+   "n": 20,
+   "vector_correct": 8,
+   "fullcontext_correct": 1,
+   "fullcontext_only_correct": 0,
+   "energy_ratio_fc_over_vr": 3.5107514953149184,
+   "ratio_p2_5": 8.776878738287296,
+   "ratio_median": 31.596763457834264
+  }
+ }
+}

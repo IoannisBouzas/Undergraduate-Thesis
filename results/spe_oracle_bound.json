@@ -1,0 +1,58 @@
+{
+  "e2b": {
+    "n": 200,
+    "v3_acc": 0.215,
+    "v4_acc": 0.33,
+    "v3_tokens": 519.61,
+    "v4_tokens": 812.665,
+    "v4_only_correct": 27,
+    "v3_only_correct": 4,
+    "oracle_acc": 0.35,
+    "oracle_tokens": 560.3,
+    "oracle_token_reduction_vs_v4": 0.3105400134126608,
+    "random_router_acc": 0.230525,
+    "random_router_tokens": 559.172425
+  },
+  "e4b": {
+    "n": 200,
+    "v3_acc": 0.275,
+    "v4_acc": 0.325,
+    "v3_tokens": 538.75,
+    "v4_tokens": 790.565,
+    "v4_only_correct": 12,
+    "v3_only_correct": 2,
+    "oracle_acc": 0.335,
+    "oracle_tokens": 555.57,
+    "oracle_token_reduction_vs_v4": 0.29724943553028527,
+    "random_router_acc": 0.278,
+    "random_router_tokens": 553.8589
+  },
+  "lme_e2b": {
+    "n": 60,
+    "v3_acc": 0.25,
+    "v4_acc": 0.4166666666666667,
+    "v3_tokens": 618.9833333333333,
+    "v4_tokens": 1614.55,
+    "v4_only_correct": 11,
+    "v3_only_correct": 1,
+    "oracle_acc": 0.43333333333333335,
+    "oracle_tokens": 838.7,
+    "oracle_token_reduction_vs_v4": 0.4805363723638165,
+    "random_router_acc": 0.28055555555555556,
+    "random_router_tokens": 801.5038888888888
+  },
+  "lme_e4b": {
+    "n": 60,
+    "v3_acc": 0.23333333333333334,
+    "v4_acc": 0.3333333333333333,
+    "v3_tokens": 617.9,
+    "v4_tokens": 1586.5333333333333,
+    "v4_only_correct": 9,
+    "v3_only_correct": 3,
+    "oracle_acc": 0.38333333333333336,
+    "oracle_tokens": 780.0166666666667,
+    "oracle_token_reduction_vs_v4": 0.5083515421463989,
+    "random_router_acc": 0.24833333333333332,
+    "random_router_tokens": 763.1949999999999
+  }
+}

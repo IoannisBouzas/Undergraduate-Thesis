@@ -1,0 +1,50 @@
+{
+  "judge_model": "llama3.1:70b-instruct-q4_K_M",
+  "reps": 3,
+  "runs": {
+    "lap_locomo200_e2b_vr_prefix": {
+      "n_rows": 200,
+      "n_unstable": 0,
+      "flip_rate_pct": 0.0,
+      "acc_per_rep": [
+        36.0,
+        36.0,
+        36.0
+      ],
+      "acc_range_pts": 0.0,
+      "acc_sd_pts": 0.0,
+      "unstable_qids": []
+    },
+    "lap_locomo200_e2b_graphrag_v3_prefix": {
+      "n_rows": 200,
+      "n_unstable": 0,
+      "flip_rate_pct": 0.0,
+      "acc_per_rep": [
+        21.5,
+        21.5,
+        21.5
+      ],
+      "acc_range_pts": 0.0,
+      "acc_sd_pts": 0.0,
+      "unstable_qids": []
+    },
+    "lap_locomo100_e2b_vr_prefix_k10": {
+      "n_rows": 100,
+      "n_unstable": 0,
+      "flip_rate_pct": 0.0,
+      "acc_per_rep": [
+        30.0,
+        30.0,
+        30.0
+      ],
+      "acc_range_pts": 0.0,
+      "acc_sd_pts": 0.0,
+      "unstable_qids": []
+    }
+  },
+  "summary": {
+    "mean_flip_rate_pct": 0.0,
+    "max_acc_range_pts": 0.0,
+    "interpretation": "Accuracy differences at or below max_acc_range_pts are within judge reproducibility and must not be interpreted, regardless of McNemar p on a single judging pass. Paired tests remain valid when both arms are scored in the same pass."
+  }
+}

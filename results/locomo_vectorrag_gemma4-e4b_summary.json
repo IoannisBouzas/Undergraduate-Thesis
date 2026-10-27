@@ -1,0 +1,37 @@
+{
+  "dataset": "locomo",
+  "mode": "vectorrag",
+  "model": "gemma4:e4b",
+  "n": 100,
+  "f1_mean": 0.4177712468397053,
+  "em_mean": 0.17,
+  "contains_mean": 0.22,
+  "ingest_seconds_mean": 3.3678,
+  "generate_seconds_mean": 3.7855499999999993,
+  "by_category": {
+    "1": {
+      "n": 25,
+      "f1_mean": 0.3370595879216569,
+      "em_mean": 0.08,
+      "contains_mean": 0.08
+    },
+    "2": {
+      "n": 25,
+      "f1_mean": 0.5674751131221719,
+      "em_mean": 0.24,
+      "contains_mean": 0.32
+    },
+    "3": {
+      "n": 25,
+      "f1_mean": 0.21599770164476048,
+      "em_mean": 0.08,
+      "contains_mean": 0.08
+    },
+    "4": {
+      "n": 25,
+      "f1_mean": 0.5505525846702316,
+      "em_mean": 0.28,
+      "contains_mean": 0.4
+    }
+  }
+}

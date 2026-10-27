@@ -1,0 +1,442 @@
+STATS REPORT — judge = llama3.1:70b-instruct-q4_K_M, paired by qid
+Family split locked 2026-08-13: Holm applies to the CONFIRMATORY family only.
+==============================================================================
+
+==============================================================================
+CONFIRMATORY FAMILY — Holm-corrected across these tests only
+==============================================================================
+
+lap_locomo200_e2b_vr_prefix  vs  lap_locomo200_e2b_fullcontext   (n=200 paired)
+  A:  36.0%  [29.7, 42.9]   B:   7.5%  [4.6, 12.0]
+  discordant A+/B- = 62, A-/B+ = 5   McNemar exact p = 1.42e-13   Holm-adj p = 9.937e-13   Cohen's g = +0.43
+  cluster (10 conversations): diff +0.285   95% [+0.192, +0.368] excludes 0   design effect 1.59
+
+lap_locomo200_e4b_vr_prefix  vs  lap_locomo200_e4b_fullcontext   (n=200 paired)
+  A:  40.5%  [33.9, 47.4]   B:  10.5%  [7.0, 15.5]
+  discordant A+/B- = 66, A-/B+ = 6   McNemar exact p = 7.256e-14   Holm-adj p = 5.805e-13   Cohen's g = +0.42
+  cluster (10 conversations): diff +0.300   95% [+0.212, +0.376] excludes 0   design effect 1.38
+
+lap_locomo200_e2b_vr_prefix  vs  lap_locomo200_e2b_graphrag_v3_prefix   (n=200 paired)
+  A:  36.0%  [29.7, 42.9]   B:  21.5%  [16.4, 27.7]
+  discordant A+/B- = 41, A-/B+ = 12   McNemar exact p = 8.171e-05   Holm-adj p = 0.0003269   Cohen's g = +0.27
+  cluster (10 conversations): diff +0.145   95% [+0.077, +0.211] excludes 0   design effect 0.96
+    ^ deff < 1: cluster interval is TIGHTER than item-level (low between-conversation variance in the difference, plus known downward bias of a cluster bootstrap at G=10). Primary inference stays the Holm-adjusted McNemar above; do NOT read this interval as upgrading a non-significant pair.
+
+lap_locomo200_e4b_vr_prefix  vs  lap_locomo200_e4b_graphrag_v3_prefix   (n=200 paired)
+  A:  40.5%  [33.9, 47.4]   B:  27.5%  [21.8, 34.1]
+  discordant A+/B- = 35, A-/B+ = 9   McNemar exact p = 0.000106   Holm-adj p = 0.0003269   Cohen's g = +0.30
+  cluster (10 conversations): diff +0.130   95% [+0.085, +0.181] excludes 0   design effect 0.61
+    ^ deff < 1: cluster interval is TIGHTER than item-level (low between-conversation variance in the difference, plus known downward bias of a cluster bootstrap at G=10). Primary inference stays the Holm-adjusted McNemar above; do NOT read this interval as upgrading a non-significant pair.
+
+lap_locomo200_e4b_vr_prefix  vs  lap_locomo200_e2b_vr_prefix   (n=200 paired)
+  A:  40.5%  [33.9, 47.4]   B:  36.0%  [29.7, 42.9]
+  discordant A+/B- = 17, A-/B+ = 8   McNemar exact p = 0.1078   Holm-adj p = 0.1152   Cohen's g = +0.18
+  cluster (10 conversations): diff +0.045   95% [+0.005, +0.086] excludes 0   design effect 0.71
+    ^ deff < 1: cluster interval is TIGHTER than item-level (low between-conversation variance in the difference, plus known downward bias of a cluster bootstrap at G=10). Primary inference stays the Holm-adjusted McNemar above; do NOT read this interval as upgrading a non-significant pair.
+  !! READ AS EFFECT SIZE, NOT AS A NULL. Doubling parameters buys +4.5 pts and does not separate from zero after correction; the k=2->k=10 retrieval lever buys +11 to +14 pts on the same benchmark and pipeline. 'Strategy beats scale' compares two measured magnitudes — do NOT write 'scale does not help'.
+
+lap_locomo200_e2b_graphrag_v4_prefix  vs  lap_locomo200_e2b_graphrag_v3_prefix   (n=200 paired)
+  A:  33.0%  [26.9, 39.8]   B:  21.5%  [16.4, 27.7]
+  discordant A+/B- = 27, A-/B+ = 4   McNemar exact p = 3.395e-05   Holm-adj p = 0.0001698   Cohen's g = +0.37
+  cluster (10 conversations): diff +0.115   95% [+0.068, +0.160] excludes 0   design effect 0.81
+    ^ deff < 1: cluster interval is TIGHTER than item-level (low between-conversation variance in the difference, plus known downward bias of a cluster bootstrap at G=10). Primary inference stays the Holm-adjusted McNemar above; do NOT read this interval as upgrading a non-significant pair.
+
+lap_locomo200_e2b_spe2fix_gap_b370  vs  lap_locomo200_e2b_graphrag_v4_prefix   (n=200 paired)
+  A:  27.0%  [21.3, 33.5]   B:  33.0%  [26.9, 39.8]
+  discordant A+/B- = 11, A-/B+ = 23   McNemar exact p = 0.05761   Holm-adj p = 0.1152   Cohen's g = -0.18
+  cluster (10 conversations): diff -0.060   95% [-0.112, -0.005] excludes 0   design effect 0.87
+    ^ deff < 1: cluster interval is TIGHTER than item-level (low between-conversation variance in the difference, plus known downward bias of a cluster bootstrap at G=10). Primary inference stays the Holm-adjusted McNemar above; do NOT read this interval as upgrading a non-significant pair.
+  !! FAILED PRE-REGISTERED PREDICTION, NOT AN EQUIVALENCE. SPE-2 is 6.0 pts WORSE than v4 (27.0 vs 33.0), i.e. the point estimate moves against its own hypothesis. Report as 'SPE did not improve over v4 and trended worse' — do NOT write 'SPE is equivalent to v4'.
+
+lme_strat60_e2b_vr_prefix  vs  lme_strat60_e2b_fc   (n=60 paired)
+  A:  48.3%  [36.2, 60.7]   B:  10.0%  [4.7, 20.1]
+  discordant A+/B- = 26, A-/B+ = 3   McNemar exact p = 1.524e-05   Holm-adj p = 9.142e-05   Cohen's g = +0.40
+  cluster: n/a — 1 question per session, item-level CI already correct
+
+lap_locomo200_q35_4b_vr_prefix  vs  lap_locomo200_q35_4b_fullcontext   (n=200 paired)
+  A:  39.0%  [32.5, 45.9]   B:   6.5%  [3.8, 10.8]
+  discordant A+/B- = 66, A-/B+ = 1   McNemar exact p = 9.216e-19   Holm-adj p = 8.294e-18   Cohen's g = +0.49
+  cluster (10 conversations): diff +0.325   95% [+0.240, +0.419] excludes 0   design effect 1.79
+
+[10th confirmatory test — box<->phone parity gate (parity_check.py, 2026-08-04)]
+  agreement 83/100 = 83.0% (kappa 0.621), box 30.0% vs phone 37.0%, discordant 5/12, McNemar exact p = 0.1435 -> FAIL (agreement half)
+  source: results/parity_check_2026-08-04.md
+  Excluded from the Holm correction by design: this is an equivalence-style gate
+  where a large p is the desired outcome, so correcting it would loosen the gate.
+
+==============================================================================
+EXPLORATORY — raw p only, NOT corrected, NOT confirmatory evidence
+==============================================================================
+
+lap_locomo200_e2b_vr_prefix  vs  lap_locomo200_e2b_vectorrag   (n=200 paired)
+  A:  36.0%  [29.7, 42.9]   B:  32.5%  [26.4, 39.3]
+  discordant A+/B- = 17, A-/B+ = 10   McNemar exact p = 0.2478 (raw)   Cohen's g = +0.13
+
+lap_locomo200_e4b_vr_prefix  vs  lap_locomo200_e4b_vectorrag   (n=200 paired)
+  A:  40.5%  [33.9, 47.4]   B:  34.5%  [28.3, 41.3]
+  discordant A+/B- = 18, A-/B+ = 6   McNemar exact p = 0.02266 (raw)   Cohen's g = +0.25
+
+lap_locomo200_e2b_graphrag_v3_prefix  vs  lap_locomo200_e2b_graphrag_v3   (n=200 paired)
+  A:  21.5%  [16.4, 27.7]   B:  22.0%  [16.8, 28.2]
+  discordant A+/B- = 8, A-/B+ = 9   McNemar exact p = 1 (raw)   Cohen's g = -0.03
+
+lap_locomo200_e2b_graphrag_v4_prefix  vs  lap_locomo200_e2b_graphrag_v4   (n=200 paired)
+  A:  33.0%  [26.9, 39.8]   B:  30.0%  [24.1, 36.7]
+  discordant A+/B- = 15, A-/B+ = 9   McNemar exact p = 0.3075 (raw)   Cohen's g = +0.12
+
+lap_locomo200_e4b_graphrag_v3_prefix  vs  lap_locomo200_e4b_graphrag_v3   (n=200 paired)
+  A:  27.5%  [21.8, 34.1]   B:  27.5%  [21.8, 34.1]
+  discordant A+/B- = 6, A-/B+ = 6   McNemar exact p = 1 (raw)   Cohen's g = +0.00
+
+lap_locomo200_e4b_graphrag_v4_prefix  vs  lap_locomo200_e4b_graphrag_v4   (n=200 paired)
+  A:  32.5%  [26.4, 39.3]   B:  31.0%  [25.0, 37.7]
+  discordant A+/B- = 10, A-/B+ = 7   McNemar exact p = 0.6291 (raw)   Cohen's g = +0.09
+
+lme_strat60_e2b_vr_prefix  vs  lme_strat60_e2b_vr   (n=60 paired)
+  A:  48.3%  [36.2, 60.7]   B:  51.7%  [39.3, 63.8]
+  discordant A+/B- = 1, A-/B+ = 3   McNemar exact p = 0.625 (raw)   Cohen's g = -0.25
+
+lme_strat60_e4b_vr_prefix  vs  lme_strat60_e4b_vr   (n=60 paired)
+  A:  56.7%  [44.1, 68.4]   B:  55.0%  [42.5, 66.9]
+  discordant A+/B- = 4, A-/B+ = 3   McNemar exact p = 1 (raw)   Cohen's g = +0.07
+
+lme_strat60_e4b_vr_prefix  vs  lme_strat60_e4b_fc   (n=60 paired)
+  A:  56.7%  [44.1, 68.4]   B:   5.0%  [1.7, 13.7]
+  discordant A+/B- = 32, A-/B+ = 1   McNemar exact p = 7.916e-09 (raw)   Cohen's g = +0.47
+
+lap_locomo200_e2b_vr_prefix  vs  lap_locomo200_e2b_graphrag_v4_prefix   (n=200 paired)
+  A:  36.0%  [29.7, 42.9]   B:  33.0%  [26.9, 39.8]
+  discordant A+/B- = 16, A-/B+ = 10   McNemar exact p = 0.3269 (raw)   Cohen's g = +0.12
+
+lap_locomo200_e4b_vr_prefix  vs  lap_locomo200_e4b_graphrag_v4_prefix   (n=200 paired)
+  A:  40.5%  [33.9, 47.4]   B:  32.5%  [26.4, 39.3]
+  discordant A+/B- = 24, A-/B+ = 8   McNemar exact p = 0.007 (raw)   Cohen's g = +0.25
+
+lap_locomo200_e2b_graphrag_v3_prefix  vs  lap_locomo200_e2b_graphrag_v2_prefix   (n=200 paired)
+  A:  21.5%  [16.4, 27.7]   B:  18.5%  [13.7, 24.5]
+  discordant A+/B- = 15, A-/B+ = 9   McNemar exact p = 0.3075 (raw)   Cohen's g = +0.12
+
+lap_locomo200_e4b_graphrag_v4_prefix  vs  lap_locomo200_e4b_graphrag_v3_prefix   (n=200 paired)
+  A:  32.5%  [26.4, 39.3]   B:  27.5%  [21.8, 34.1]
+  discordant A+/B- = 12, A-/B+ = 2   McNemar exact p = 0.01294 (raw)   Cohen's g = +0.36
+
+lap_locomo200_e2b_spe2fix_gap_b370  vs  lap_locomo200_e2b_spe2_gap_b370   (n=200 paired)
+  A:  27.0%  [21.3, 33.5]   B:  26.0%  [20.4, 32.5]
+  discordant A+/B- = 11, A-/B+ = 9   McNemar exact p = 0.8238 (raw)   Cohen's g = +0.05
+
+lap_locomo200_e4b_spe2fix_gap_b370  vs  lap_locomo200_e4b_spe2_gap_b370   (n=200 paired)
+  A:  25.0%  [19.5, 31.4]   B:  27.0%  [21.3, 33.5]
+  discordant A+/B- = 7, A-/B+ = 11   McNemar exact p = 0.4807 (raw)   Cohen's g = -0.11
+
+lap_locomo200_e4b_spe2fix_gap_b370  vs  lap_locomo200_e4b_graphrag_v4_prefix   (n=200 paired)
+  A:  25.0%  [19.5, 31.4]   B:  32.5%  [26.4, 39.3]
+  discordant A+/B- = 10, A-/B+ = 25   McNemar exact p = 0.01667 (raw)   Cohen's g = -0.21
+
+lap_locomo200_e2b_spe2fix_gap_b240  vs  lap_locomo200_e2b_graphrag_v3_prefix   (n=200 paired)
+  A:  23.0%  [17.7, 29.3]   B:  21.5%  [16.4, 27.7]
+  discordant A+/B- = 16, A-/B+ = 13   McNemar exact p = 0.7111 (raw)   Cohen's g = +0.05
+  !! PRE-REGISTERED CRITERION 2: NUMERICAL THRESHOLD MET, GAIN INCONCLUSIVE. 23.0% > 22.0% at 545.7 < 600 prompt tokens, but the +1.5 pts over triple-only is not distinguishable from zero and the same comparison is nominally NEGATIVE at E4B (25.5 vs 27.5). Report as 'passed numerically but statistically inconclusive' — do NOT write 'SPE beats v3 at low budget'.
+
+lap_locomo200_e4b_spe2fix_gap_b240  vs  lap_locomo200_e4b_graphrag_v3_prefix   (n=200 paired)
+  A:  25.5%  [20.0, 32.0]   B:  27.5%  [21.8, 34.1]
+  discordant A+/B- = 10, A-/B+ = 14   McNemar exact p = 0.5413 (raw)   Cohen's g = -0.08
+
+lap_locomo200_e2b_spe_b370  vs  lap_locomo200_e2b_graphrag_v4   (n=200 paired)
+  A:  21.5%  [16.4, 27.7]   B:  30.0%  [24.1, 36.7]
+  discordant A+/B- = 10, A-/B+ = 27   McNemar exact p = 0.007632 (raw)   Cohen's g = -0.23
+
+lap_locomo200_e2b_spe2_gap_b370  vs  lap_locomo200_e2b_graphrag_v4   (n=200 paired)
+  A:  26.0%  [20.4, 32.5]   B:  30.0%  [24.1, 36.7]
+  discordant A+/B- = 14, A-/B+ = 22   McNemar exact p = 0.243 (raw)   Cohen's g = -0.11
+
+lap_locomo200_e4b_spe2_gap_b370  vs  lap_locomo200_e4b_graphrag_v4   (n=200 paired)
+  A:  27.0%  [21.3, 33.5]   B:  31.0%  [25.0, 37.7]
+  discordant A+/B- = 14, A-/B+ = 22   McNemar exact p = 0.243 (raw)   Cohen's g = -0.11
+
+lap_locomo200_e2b_spe_b240  vs  lap_locomo200_e2b_graphrag_v3   (n=200 paired)
+  A:  19.0%  [14.2, 25.0]   B:  22.0%  [16.8, 28.2]
+  discordant A+/B- = 13, A-/B+ = 19   McNemar exact p = 0.3771 (raw)   Cohen's g = -0.09
+
+lap_locomo200_e2b_spe2_gap_b240  vs  lap_locomo200_e2b_graphrag_v3   (n=200 paired)
+  A:  24.0%  [18.6, 30.4]   B:  22.0%  [16.8, 28.2]
+  discordant A+/B- = 18, A-/B+ = 14   McNemar exact p = 0.5966 (raw)   Cohen's g = +0.06
+
+lap_locomo200_e4b_spe2_gap_b240  vs  lap_locomo200_e4b_graphrag_v3   (n=200 paired)
+  A:  24.5%  [19.1, 30.9]   B:  27.5%  [21.8, 34.1]
+  discordant A+/B- = 9, A-/B+ = 15   McNemar exact p = 0.3075 (raw)   Cohen's g = -0.12
+
+lap_locomo200_e2b_spe2_gap_b370  vs  lap_locomo200_e2b_spe_b370   (n=200 paired)
+  A:  26.0%  [20.4, 32.5]   B:  21.5%  [16.4, 27.7]
+  discordant A+/B- = 15, A-/B+ = 6   McNemar exact p = 0.07835 (raw)   Cohen's g = +0.21
+
+lap_locomo200_e2b_spe2_gap_b240  vs  lap_locomo200_e2b_spe_b240   (n=200 paired)
+  A:  24.0%  [18.6, 30.4]   B:  19.0%  [14.2, 25.0]
+  discordant A+/B- = 15, A-/B+ = 5   McNemar exact p = 0.04139 (raw)   Cohen's g = +0.25
+
+lap_locomo200_e2bread_e4bgraph_v3_prefix  vs  lap_locomo200_e2b_graphrag_v3_prefix   (n=200 paired)
+  A:  26.0%  [20.4, 32.5]   B:  21.5%  [16.4, 27.7]
+  discordant A+/B- = 16, A-/B+ = 7   McNemar exact p = 0.09314 (raw)   Cohen's g = +0.20
+
+lap_locomo200_e4b_graphrag_v3_prefix  vs  lap_locomo200_e4bread_e2bgraph_v3_prefix   (n=200 paired)
+  A:  27.5%  [21.8, 34.1]   B:  22.0%  [16.8, 28.2]
+  discordant A+/B- = 16, A-/B+ = 5   McNemar exact p = 0.0266 (raw)   Cohen's g = +0.26
+
+lap_locomo200_e4bread_e2bgraph_v3_prefix  vs  lap_locomo200_e2b_graphrag_v3_prefix   (n=200 paired)
+  A:  22.0%  [16.8, 28.2]   B:  21.5%  [16.4, 27.7]
+  discordant A+/B- = 10, A-/B+ = 9   McNemar exact p = 1 (raw)   Cohen's g = +0.03
+  !! READ AS EFFECT SIZE, NOT AS A NULL. Doubling the reader on a FIXED E2B graph buys +0.5 pts (10 vs 9 discordants); swapping the extractor on a fixed reader buys +4.5 to +5.5 on the same 2x2. Report as 'the gap is carried by the graph, not the reader' — do NOT write 'reader scale does not matter'. Also do NOT attribute the graph effect to any single property of the E4B graph (node count, abstention rate, triple count): the crossover isolates WHICH EXTRACTOR, not WHICH PROPERTY of its output. That needs a further controlled experiment.
+
+lap_locomo200_e4b_graphrag_v3_prefix  vs  lap_locomo200_e2bread_e4bgraph_v3_prefix   (n=200 paired)
+  A:  27.5%  [21.8, 34.1]   B:  26.0%  [20.4, 32.5]
+  discordant A+/B- = 10, A-/B+ = 7   McNemar exact p = 0.6291 (raw)   Cohen's g = +0.09
+  !! READ AS EFFECT SIZE, NOT AS A NULL. Doubling the reader on a FIXED E4B graph buys +1.5 pts (10 vs 7 discordants), against +4.5 to +5.5 for swapping the extractor. Same caution as the sibling reader-effect pair: this bounds the reader contribution, it does not explain the graph contribution.
+
+lap_locomo200_e2b_vr_think_prefix  vs  lap_locomo200_e2b_vr_prefix   (n=200 paired)
+  A:  41.5%  [34.9, 48.4]   B:  36.0%  [29.7, 42.9]
+  discordant A+/B- = 22, A-/B+ = 11   McNemar exact p = 0.08014 (raw)   Cohen's g = +0.17
+
+lap_locomo200_e4b_vr_think_prefix  vs  lap_locomo200_e4b_vr_prefix   (n=200 paired)
+  A:  43.5%  [36.8, 50.4]   B:  40.5%  [33.9, 47.4]
+  discordant A+/B- = 19, A-/B+ = 13   McNemar exact p = 0.3771 (raw)   Cohen's g = +0.09
+
+lap_locomo200_e2b_grv3_think_prefix  vs  lap_locomo200_e2b_graphrag_v3_prefix   (n=200 paired)
+  A:  23.5%  [18.2, 29.8]   B:  21.5%  [16.4, 27.7]
+  discordant A+/B- = 14, A-/B+ = 10   McNemar exact p = 0.5413 (raw)   Cohen's g = +0.08
+
+lap_locomo200_e4b_grv3_think_prefix  vs  lap_locomo200_e4b_graphrag_v3_prefix   (n=200 paired)
+  A:  23.5%  [18.2, 29.8]   B:  27.5%  [21.8, 34.1]
+  discordant A+/B- = 9, A-/B+ = 17   McNemar exact p = 0.1686 (raw)   Cohen's g = -0.15
+
+lme_strat60_e2b_vr_think_prefix  vs  lme_strat60_e2b_vr_prefix   (n=60 paired)
+  A:  58.3%  [45.7, 69.9]   B:  48.3%  [36.2, 60.7]
+  discordant A+/B- = 10, A-/B+ = 4   McNemar exact p = 0.1796 (raw)   Cohen's g = +0.21
+
+lme_strat60_e4b_vr_think_prefix  vs  lme_strat60_e4b_vr_prefix   (n=60 paired)
+  A:  60.0%  [47.4, 71.4]   B:  56.7%  [44.1, 68.4]
+  discordant A+/B- = 5, A-/B+ = 3   McNemar exact p = 0.7266 (raw)   Cohen's g = +0.12
+
+lap_locomo200_e2b_fc_think  vs  lap_locomo200_e2b_fc_budget768   (n=200 paired)
+  A:   4.5%  [2.4, 8.3]   B:   9.0%  [5.8, 13.8]
+  discordant A+/B- = 2, A-/B+ = 11   McNemar exact p = 0.02246 (raw)   Cohen's g = -0.35
+
+lap_locomo200_e2b_fc_budget768  vs  lap_locomo200_e2b_fullcontext   (n=200 paired)
+  A:   9.0%  [5.8, 13.8]   B:   7.5%  [4.6, 12.0]
+  discordant A+/B- = 5, A-/B+ = 2   McNemar exact p = 0.4531 (raw)   Cohen's g = +0.21
+
+lap_locomo200_e4b_fc_think  vs  lap_locomo200_e4b_fc_budget768   (n=200 paired)
+  A:   6.0%  [3.5, 10.2]   B:   6.5%  [3.8, 10.8]
+  discordant A+/B- = 3, A-/B+ = 4   McNemar exact p = 1 (raw)   Cohen's g = -0.07
+
+lap_locomo200_e4b_fc_budget768  vs  lap_locomo200_e4b_fullcontext   (n=200 paired)
+  A:   6.5%  [3.8, 10.8]   B:  10.5%  [7.0, 15.5]
+  discordant A+/B- = 2, A-/B+ = 10   McNemar exact p = 0.03857 (raw)   Cohen's g = -0.33
+
+lap_locomo200_e2b_vr_budget768  vs  lap_locomo200_e2b_vr_prefix   (n=200 paired)
+  A:  35.5%  [29.2, 42.3]   B:  36.0%  [29.7, 42.9]
+  discordant A+/B- = 0, A-/B+ = 1   McNemar exact p = 1 (raw)   Cohen's g = -0.50
+
+lap_locomo200_e2b_grv3_budget768  vs  lap_locomo200_e2b_graphrag_v3_prefix   (n=200 paired)
+  A:  21.5%  [16.4, 27.7]   B:  21.5%  [16.4, 27.7]
+  discordant A+/B- = 0, A-/B+ = 0   McNemar exact p = 1 (raw)   Cohen's g = +0.00
+
+lap_locomo200_e2b_vr_offprompt  vs  lap_locomo200_e2b_vr_prefix   (n=200 paired)
+  A:  32.0%  [25.9, 38.8]   B:  36.0%  [29.7, 42.9]
+  discordant A+/B- = 13, A-/B+ = 21   McNemar exact p = 0.2295 (raw)   Cohen's g = -0.12
+
+lap_locomo200_e2b_grv3_offprompt  vs  lap_locomo200_e2b_graphrag_v3_prefix   (n=200 paired)
+  A:  17.5%  [12.9, 23.4]   B:  21.5%  [16.4, 27.7]
+  discordant A+/B- = 7, A-/B+ = 15   McNemar exact p = 0.1338 (raw)   Cohen's g = -0.18
+
+lap_locomo200_e2b_fc_offprompt  vs  lap_locomo200_e2b_fullcontext   (n=200 paired)
+  A:   1.5%  [0.5, 4.3]   B:   7.5%  [4.6, 12.0]
+  discordant A+/B- = 1, A-/B+ = 13   McNemar exact p = 0.001831 (raw)   Cohen's g = -0.43
+
+lap_locomo200_e4b_vr_offprompt  vs  lap_locomo200_e4b_vr_prefix   (n=200 paired)
+  A:  35.0%  [28.7, 41.8]   B:  40.5%  [33.9, 47.4]
+  discordant A+/B- = 11, A-/B+ = 22   McNemar exact p = 0.08014 (raw)   Cohen's g = -0.17
+
+lap_locomo200_e4b_grv3_offprompt  vs  lap_locomo200_e4b_graphrag_v3_prefix   (n=200 paired)
+  A:  24.5%  [19.1, 30.9]   B:  27.5%  [21.8, 34.1]
+  discordant A+/B- = 5, A-/B+ = 11   McNemar exact p = 0.2101 (raw)   Cohen's g = -0.19
+
+lap_locomo200_e4b_fc_offprompt  vs  lap_locomo200_e4b_fullcontext   (n=200 paired)
+  A:   5.5%  [3.1, 9.6]   B:  10.5%  [7.0, 15.5]
+  discordant A+/B- = 5, A-/B+ = 15   McNemar exact p = 0.04139 (raw)   Cohen's g = -0.25
+
+lap_locomo200_e2b_vr_temp1  vs  lap_locomo200_e2b_vr_prefix   (n=200 paired)
+  A:  35.0%  [28.7, 41.8]   B:  36.0%  [29.7, 42.9]
+  discordant A+/B- = 2, A-/B+ = 4   McNemar exact p = 0.6875 (raw)   Cohen's g = -0.17
+
+lap_locomo200_e2b_gr_mt4_prefix  vs  lap_locomo200_e2b_graphrag_v3_prefix   (n=200 paired)
+  A:  13.0%  [9.0, 18.4]   B:  21.5%  [16.4, 27.7]
+  discordant A+/B- = 6, A-/B+ = 23   McNemar exact p = 0.002316 (raw)   Cohen's g = -0.29
+
+lap_locomo200_e2b_gr_mt24_prefix  vs  lap_locomo200_e2b_graphrag_v3_prefix   (n=200 paired)
+  A:  29.5%  [23.6, 36.2]   B:  21.5%  [16.4, 27.7]
+  discordant A+/B- = 18, A-/B+ = 2   McNemar exact p = 0.0004025 (raw)   Cohen's g = +0.40
+
+lap_locomo200_e4b_gr_mt4_prefix  vs  lap_locomo200_e4b_graphrag_v3_prefix   (n=200 paired)
+  A:  16.0%  [11.6, 21.7]   B:  27.5%  [21.8, 34.1]
+  discordant A+/B- = 5, A-/B+ = 28   McNemar exact p = 6.619e-05 (raw)   Cohen's g = -0.35
+
+lap_locomo200_e4b_gr_mt24_prefix  vs  lap_locomo200_e4b_graphrag_v3_prefix   (n=200 paired)
+  A:  29.5%  [23.6, 36.2]   B:  27.5%  [21.8, 34.1]
+  discordant A+/B- = 8, A-/B+ = 4   McNemar exact p = 0.3877 (raw)   Cohen's g = +0.17
+
+lap_locomo200_q35_4b_gr_mt4_prefix  vs  lap_locomo200_q35_4b_graphrag_v3_prefix   (n=200 paired)
+  A:  11.5%  [7.8, 16.7]   B:  23.5%  [18.2, 29.8]
+  discordant A+/B- = 2, A-/B+ = 26   McNemar exact p = 3.032e-06 (raw)   Cohen's g = -0.43
+
+lap_locomo200_q35_4b_gr_mt24_prefix  vs  lap_locomo200_q35_4b_graphrag_v3_prefix   (n=200 paired)
+  A:  29.0%  [23.2, 35.6]   B:  23.5%  [18.2, 29.8]
+  discordant A+/B- = 15, A-/B+ = 4   McNemar exact p = 0.01921 (raw)   Cohen's g = +0.29
+
+lap_locomo200_q35_2b_gr_mt24_prefix  vs  lap_locomo200_q35_2b_graphrag_v3_prefix   (n=200 paired)
+  A:  10.0%  [6.6, 14.9]   B:   9.5%  [6.2, 14.4]
+  discordant A+/B- = 1, A-/B+ = 0   McNemar exact p = 1 (raw)   Cohen's g = +0.50
+
+lap_locomo200_q35_08b_gr_mt24_prefix  vs  lap_locomo200_q35_08b_graphrag_v3_prefix   (n=200 paired)
+  A:   7.0%  [4.2, 11.4]   B:   6.0%  [3.5, 10.2]
+  discordant A+/B- = 2, A-/B+ = 0   McNemar exact p = 0.5 (raw)   Cohen's g = +0.50
+
+lap_locomo100_e2b_vr_prefix_k5  vs  lap_locomo100_e2b_vr_prefix_k2   (n=100 paired)
+  A:  27.0%  [19.3, 36.4]   B:  18.0%  [11.7, 26.7]
+  discordant A+/B- = 13, A-/B+ = 4   McNemar exact p = 0.04904 (raw)   Cohen's g = +0.26
+
+lap_locomo100_e2b_vr_prefix_k10  vs  lap_locomo100_e2b_vr_prefix_k5   (n=100 paired)
+  A:  30.0%  [21.9, 39.6]   B:  27.0%  [19.3, 36.4]
+  discordant A+/B- = 7, A-/B+ = 4   McNemar exact p = 0.5488 (raw)   Cohen's g = +0.14
+
+lap_locomo100_e2b_vr_prefix_k20  vs  lap_locomo100_e2b_vr_prefix_k10   (n=100 paired)
+  A:  39.0%  [30.0, 48.8]   B:  30.0%  [21.9, 39.6]
+  discordant A+/B- = 11, A-/B+ = 2   McNemar exact p = 0.02246 (raw)   Cohen's g = +0.35
+
+lap_locomo100_e2b_vr_prefix_k50  vs  lap_locomo100_e2b_vr_prefix_k20   (n=100 paired)
+  A:  42.0%  [32.8, 51.8]   B:  39.0%  [30.0, 48.8]
+  discordant A+/B- = 8, A-/B+ = 5   McNemar exact p = 0.5811 (raw)   Cohen's g = +0.12
+
+lap_locomo100_e4b_vr_prefix_k50  vs  lap_locomo100_e4b_vr_prefix_k2   (n=100 paired)
+  A:  44.0%  [34.7, 53.8]   B:  17.0%  [10.9, 25.5]
+  discordant A+/B- = 30, A-/B+ = 3   McNemar exact p = 1.401e-06 (raw)   Cohen's g = +0.41
+
+lap_locomo100_e4b_vr_prefix_k2  vs  lap_locomo100_e2b_vr_prefix_k2   (n=100 paired)
+  A:  17.0%  [10.9, 25.5]   B:  18.0%  [11.7, 26.7]
+  discordant A+/B- = 2, A-/B+ = 3   McNemar exact p = 1 (raw)   Cohen's g = -0.10
+
+lap_locomo100_e4b_vr_prefix_k10  vs  lap_locomo100_e2b_vr_prefix_k10   (n=100 paired)
+  A:  35.0%  [26.4, 44.7]   B:  30.0%  [21.9, 39.6]
+  discordant A+/B- = 11, A-/B+ = 6   McNemar exact p = 0.3323 (raw)   Cohen's g = +0.15
+
+lap_locomo100_e4b_vr_prefix_k50  vs  lap_locomo100_e2b_vr_prefix_k50   (n=100 paired)
+  A:  44.0%  [34.7, 53.8]   B:  42.0%  [32.8, 51.8]
+  discordant A+/B- = 8, A-/B+ = 6   McNemar exact p = 0.7905 (raw)   Cohen's g = +0.07
+
+lap_locomo100_q35_4b_vr_prefix_k5  vs  lap_locomo100_q35_4b_vr_prefix_k2   (n=100 paired)
+  A:  29.0%  [21.0, 38.5]   B:  17.0%  [10.9, 25.5]
+  discordant A+/B- = 16, A-/B+ = 4   McNemar exact p = 0.01182 (raw)   Cohen's g = +0.30
+
+lap_locomo100_q35_4b_vr_prefix_k10  vs  lap_locomo100_q35_4b_vr_prefix_k5   (n=100 paired)
+  A:  36.0%  [27.3, 45.8]   B:  29.0%  [21.0, 38.5]
+  discordant A+/B- = 8, A-/B+ = 1   McNemar exact p = 0.03906 (raw)   Cohen's g = +0.39
+
+lap_locomo100_q35_4b_vr_prefix_k20  vs  lap_locomo100_q35_4b_vr_prefix_k10   (n=100 paired)
+  A:  36.0%  [27.3, 45.8]   B:  36.0%  [27.3, 45.8]
+  discordant A+/B- = 5, A-/B+ = 5   McNemar exact p = 1 (raw)   Cohen's g = +0.00
+
+lap_locomo100_q35_4b_vr_prefix_k50  vs  lap_locomo100_q35_4b_vr_prefix_k20   (n=100 paired)
+  A:  42.0%  [32.8, 51.8]   B:  36.0%  [27.3, 45.8]
+  discordant A+/B- = 8, A-/B+ = 2   McNemar exact p = 0.1094 (raw)   Cohen's g = +0.30
+
+lap_locomo100_q35_4b_vr_prefix_k50  vs  lap_locomo100_q35_4b_vr_prefix_k2   (n=100 paired)
+  A:  42.0%  [32.8, 51.8]   B:  17.0%  [10.9, 25.5]
+  discordant A+/B- = 28, A-/B+ = 3   McNemar exact p = 4.649e-06 (raw)   Cohen's g = +0.40
+
+lap_locomo100_q35_4b_vr_prefix_k10  vs  lap_locomo100_e2b_vr_prefix_k10   (n=100 paired)
+  A:  36.0%  [27.3, 45.8]   B:  30.0%  [21.9, 39.6]
+  discordant A+/B- = 10, A-/B+ = 4   McNemar exact p = 0.1796 (raw)   Cohen's g = +0.21
+
+lap_locomo100_q35_4b_vr_prefix_k50  vs  lap_locomo100_e2b_vr_prefix_k50   (n=100 paired)
+  A:  42.0%  [32.8, 51.8]   B:  42.0%  [32.8, 51.8]
+  discordant A+/B- = 8, A-/B+ = 8   McNemar exact p = 1 (raw)   Cohen's g = +0.00
+
+lap_locomo100_q35_2b_vr_prefix_k50  vs  lap_locomo100_q35_2b_vr_prefix_k2   (n=100 paired)
+  A:  32.0%  [23.7, 41.7]   B:  17.0%  [10.9, 25.5]
+  discordant A+/B- = 21, A-/B+ = 6   McNemar exact p = 0.005925 (raw)   Cohen's g = +0.28
+
+lap_locomo100_q35_08b_vr_prefix_k50  vs  lap_locomo100_q35_08b_vr_prefix_k2   (n=100 paired)
+  A:  26.0%  [18.4, 35.4]   B:   7.0%  [3.4, 13.7]
+  discordant A+/B- = 20, A-/B+ = 1   McNemar exact p = 2.098e-05 (raw)   Cohen's g = +0.45
+
+lap_locomo100_q35_2b_vr_prefix_k10  vs  lap_locomo100_q35_2b_vr_prefix_k2   (n=100 paired)
+  A:  28.0%  [20.1, 37.5]   B:  17.0%  [10.9, 25.5]
+  discordant A+/B- = 15, A-/B+ = 4   McNemar exact p = 0.01921 (raw)   Cohen's g = +0.29
+
+lap_locomo100_q35_08b_vr_prefix_k10  vs  lap_locomo100_q35_08b_vr_prefix_k2   (n=100 paired)
+  A:  21.0%  [14.2, 30.0]   B:   7.0%  [3.4, 13.7]
+  discordant A+/B- = 15, A-/B+ = 1   McNemar exact p = 0.0005188 (raw)   Cohen's g = +0.44
+
+lme_strat60_e2b_vr_prefix_k5  vs  lme_strat60_e2b_vr_prefix_k2   (n=60 paired)
+  A:  48.3%  [36.2, 60.7]   B:  36.7%  [25.6, 49.3]
+  discordant A+/B- = 8, A-/B+ = 1   McNemar exact p = 0.03906 (raw)   Cohen's g = +0.39
+
+lme_strat60_e2b_vr_prefix  vs  lme_strat60_e2b_vr_prefix_k5   (n=60 paired)
+  A:  48.3%  [36.2, 60.7]   B:  48.3%  [36.2, 60.7]
+  discordant A+/B- = 4, A-/B+ = 4   McNemar exact p = 1 (raw)   Cohen's g = +0.00
+
+lme_strat60_e4b_vr_prefix  vs  lme_strat60_e4b_vr_prefix_k5   (n=60 paired)
+  A:  56.7%  [44.1, 68.4]   B:  45.0%  [33.1, 57.5]
+  discordant A+/B- = 8, A-/B+ = 1   McNemar exact p = 0.03906 (raw)   Cohen's g = +0.39
+
+lme_strat60_q35_4b_vr_prefix  vs  lme_strat60_q35_4b_fc   (n=60 paired)
+  A:  50.0%  [37.7, 62.3]   B:   5.0%  [1.7, 13.7]
+  discordant A+/B- = 29, A-/B+ = 2   McNemar exact p = 4.629e-07 (raw)   Cohen's g = +0.44
+
+lme_strat60_q35_2b_vr_prefix  vs  lme_strat60_q35_2b_fc   (n=60 paired)
+  A:  38.3%  [27.1, 51.0]   B:   0.0%  [-0.0, 6.0]
+  discordant A+/B- = 23, A-/B+ = 0   McNemar exact p = 2.384e-07 (raw)   Cohen's g = +0.50
+
+lme_strat60_q35_08b_vr_prefix  vs  lme_strat60_q35_08b_fc   (n=60 paired)
+  A:  26.7%  [17.1, 39.0]   B:   1.7%  [0.3, 8.9]
+  discordant A+/B- = 15, A-/B+ = 0   McNemar exact p = 6.104e-05 (raw)   Cohen's g = +0.50
+
+lap_locomo200_q35_4b_vr_prefix  vs  lap_locomo200_q35_4b_graphrag_v3_prefix   (n=200 paired)
+  A:  39.0%  [32.5, 45.9]   B:  23.5%  [18.2, 29.8]
+  discordant A+/B- = 37, A-/B+ = 6   McNemar exact p = 1.636e-06 (raw)   Cohen's g = +0.36
+
+lap_locomo200_q35_4b_graphrag_v4_prefix  vs  lap_locomo200_q35_4b_graphrag_v3_prefix   (n=200 paired)
+  A:  32.0%  [25.9, 38.8]   B:  23.5%  [18.2, 29.8]
+  discordant A+/B- = 19, A-/B+ = 2   McNemar exact p = 0.0002213 (raw)   Cohen's g = +0.40
+
+lap_locomo200_q35_2b_vr_prefix  vs  lap_locomo200_q35_2b_fullcontext   (n=200 paired)
+  A:  32.5%  [26.4, 39.3]   B:   7.0%  [4.2, 11.4]
+  discordant A+/B- = 53, A-/B+ = 2   McNemar exact p = 8.554e-14 (raw)   Cohen's g = +0.46
+
+lap_locomo200_q35_2b_vr_prefix  vs  lap_locomo200_q35_2b_graphrag_v3_prefix   (n=200 paired)
+  A:  32.5%  [26.4, 39.3]   B:   9.5%  [6.2, 14.4]
+  discordant A+/B- = 53, A-/B+ = 7   McNemar exact p = 7.672e-10 (raw)   Cohen's g = +0.38
+
+lap_locomo200_q35_08b_vr_prefix  vs  lap_locomo200_q35_08b_fullcontext   (n=200 paired)
+  A:  22.0%  [16.8, 28.2]   B:   4.5%  [2.4, 8.3]
+  discordant A+/B- = 37, A-/B+ = 2   McNemar exact p = 2.841e-09 (raw)   Cohen's g = +0.45
+
+lap_locomo200_q35_2b_graphrag_v4_prefix  vs  lap_locomo200_q35_2b_graphrag_v3_prefix   (n=200 paired)
+  A:   9.0%  [5.8, 13.8]   B:   9.5%  [6.2, 14.4]
+  discordant A+/B- = 1, A-/B+ = 2   McNemar exact p = 1 (raw)   Cohen's g = -0.17
+
+lap_locomo200_q35_2b_grv3_extok1024  vs  lap_locomo200_q35_2b_graphrag_v3_prefix   (n=200 paired)
+  A:  11.0%  [7.4, 16.1]   B:   9.5%  [6.2, 14.4]
+  discordant A+/B- = 9, A-/B+ = 6   McNemar exact p = 0.6072 (raw)   Cohen's g = +0.10
+
+lap_locomo200_q35_08b_grv3_extok1024  vs  lap_locomo200_q35_08b_graphrag_v3_prefix   (n=200 paired)
+  A:   6.5%  [3.8, 10.8]   B:   6.0%  [3.5, 10.2]
+  discordant A+/B- = 2, A-/B+ = 1   McNemar exact p = 1 (raw)   Cohen's g = +0.17
+
+==============================================================================
+Notes: Wilson 95% CIs (item-level); exact two-sided McNemar on discordants.
+Holm correction across 9 confirmatory difference tests; the parity gate is
+the 10th family member and is reported uncorrected for the reason stated above.
+90 exploratory pairs carry raw p and must be labelled exploratory in prose.
+LoCoMo confirmatory pairs also carry a conversation-cluster bootstrap CI (10
+conversations x ~20 questions); with 10 clusters that interval is coarse by
+construction — percentile, not BCa. LongMemEval strat60 needs no correction.
+Rerun after any new judged run: python -m analysis.stats_report

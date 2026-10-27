@@ -1,0 +1,42 @@
+{
+ "gemma4-e2b": {
+  "conversations": 10,
+  "edges_mean": 745.8,
+  "speaker_edge_share": 0.828,
+  "speaker_endpoint_share": 0.443,
+  "speaker_deg_vs_median": 267.4,
+  "top2_are_speakers": "10/10"
+ },
+ "gemma4-e4b": {
+  "conversations": 10,
+  "edges_mean": 622.8,
+  "speaker_edge_share": 0.899,
+  "speaker_endpoint_share": 0.462,
+  "speaker_deg_vs_median": 258.9,
+  "top2_are_speakers": "10/10"
+ },
+ "qwen3.5-0.8b": {
+  "conversations": 10,
+  "edges_mean": 167.8,
+  "speaker_edge_share": 0.988,
+  "speaker_endpoint_share": 0.525,
+  "speaker_deg_vs_median": 75.7,
+  "top2_are_speakers": "10/10"
+ },
+ "qwen3.5-2b": {
+  "conversations": 10,
+  "edges_mean": 185.3,
+  "speaker_edge_share": 0.983,
+  "speaker_endpoint_share": 0.524,
+  "speaker_deg_vs_median": 83.0,
+  "top2_are_speakers": "10/10"
+ },
+ "qwen3.5-4b": {
+  "conversations": 10,
+  "edges_mean": 729.2,
+  "speaker_edge_share": 0.906,
+  "speaker_endpoint_share": 0.474,
+  "speaker_deg_vs_median": 285.6,
+  "top2_are_speakers": "10/10"
+ }
+}

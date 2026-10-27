@@ -1,0 +1,280 @@
+{
+  "headline": {
+    "graph_j_per_turn": 52.262525882577634,
+    "vector_j_per_turn": 2.0369049828568224,
+    "construction_energy_ratio": 25.657812378306335,
+    "graph_1000turn_kj_projected": 52.262525882577634,
+    "vector_1000turn_kj_projected": 2.0369049828568224
+  },
+  "grid": {
+    "e2b": {
+      "raw_token_pick": "graph",
+      "quality_token_pick": "vr",
+      "raw_disagreements": 19,
+      "quality_normalized_disagreements": 0,
+      "n_profiles": 20,
+      "cells": {
+        "L50_Q1": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": false
+        },
+        "L50_Q5": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": false
+        },
+        "L50_Q20": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": false
+        },
+        "L50_Q50": {
+          "raw_energy_optimal": "graph",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": false,
+          "quality_disagrees_with_tokens_per_correct": false
+        },
+        "L100_Q1": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": false
+        },
+        "L100_Q5": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": false
+        },
+        "L100_Q20": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": false
+        },
+        "L100_Q50": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": false
+        },
+        "L200_Q1": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": false
+        },
+        "L200_Q5": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": false
+        },
+        "L200_Q20": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": false
+        },
+        "L200_Q50": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": false
+        },
+        "L500_Q1": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": false
+        },
+        "L500_Q5": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": false
+        },
+        "L500_Q20": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": false
+        },
+        "L500_Q50": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": false
+        },
+        "L1000_Q1": {
+          "raw_energy_optimal": "fc",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": false
+        },
+        "L1000_Q5": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": false
+        },
+        "L1000_Q20": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": false
+        },
+        "L1000_Q50": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": false
+        }
+      }
+    },
+    "e4b": {
+      "raw_token_pick": "graph",
+      "quality_token_pick": "graph",
+      "raw_disagreements": 19,
+      "quality_normalized_disagreements": 20,
+      "n_profiles": 20,
+      "cells": {
+        "L50_Q1": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": true
+        },
+        "L50_Q5": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": true
+        },
+        "L50_Q20": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": true
+        },
+        "L50_Q50": {
+          "raw_energy_optimal": "graph",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": false,
+          "quality_disagrees_with_tokens_per_correct": true
+        },
+        "L100_Q1": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": true
+        },
+        "L100_Q5": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": true
+        },
+        "L100_Q20": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": true
+        },
+        "L100_Q50": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": true
+        },
+        "L200_Q1": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": true
+        },
+        "L200_Q5": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": true
+        },
+        "L200_Q20": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": true
+        },
+        "L200_Q50": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": true
+        },
+        "L500_Q1": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": true
+        },
+        "L500_Q5": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": true
+        },
+        "L500_Q20": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": true
+        },
+        "L500_Q50": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": true
+        },
+        "L1000_Q1": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": true
+        },
+        "L1000_Q5": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": true
+        },
+        "L1000_Q20": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": true
+        },
+        "L1000_Q50": {
+          "raw_energy_optimal": "vr",
+          "quality_energy_optimal": "vr",
+          "raw_disagrees_with_query_tokens": true,
+          "quality_disagrees_with_tokens_per_correct": true
+        }
+      }
+    }
+  },
+  "operation_energy": {
+    "embed_j_per_token": 0.03182664035713785,
+    "prefill_j_per_token": 0.34067305780401935,
+    "extract_j_per_token": 0.8166019669152755
+  },
+  "summary": {
+    "raw_disagreements": 38,
+    "quality_normalized_disagreements": 20,
+    "n_profiles": 40,
+    "status": "exploratory_appendix_only"
+  }
+}

@@ -1,0 +1,731 @@
+{
+  "cells": [
+    {
+      "mode": "vectorrag",
+      "model": "E2B",
+      "phone_acc": 0.5,
+      "n": 20,
+      "total_mah": 863.954,
+      "total_kj": 13.075656121799994,
+      "effective_voltage_v": 4.204074175824174,
+      "battery_samples": 3001,
+      "energy_method": "voltage_weighted_coulomb_counting",
+      "span_s": 3183.000668525696,
+      "mean_w": 4.1079652452151025,
+      "mah_ans": 43.1977,
+      "j_ans": 653.7828060899998,
+      "j_correct": 1307.5656121799996,
+      "cpkj": 0.7647799779108446,
+      "per_charge": 57.87345159580256,
+      "box_cpkj": 0.550641584095808
+    },
+    {
+      "mode": "fullcontext",
+      "model": "E2B",
+      "phone_acc": 0.05,
+      "n": 20,
+      "total_mah": 2060.198,
+      "total_kj": 30.311447279399996,
+      "effective_voltage_v": 4.086911290322581,
+      "battery_samples": 3330,
+      "energy_method": "voltage_weighted_coulomb_counting",
+      "span_s": 8448.791423797607,
+      "mean_w": 3.5876666565613293,
+      "mah_ans": 103.00989999999999,
+      "j_ans": 1515.5723639699997,
+      "j_correct": 30311.447279399992,
+      "cpkj": 0.032990836458000855,
+      "per_charge": 2.4269511959530106,
+      "box_cpkj": 0.049486254687001276
+    },
+    {
+      "mode": "vectorrag",
+      "model": "E4B",
+      "phone_acc": 0.4,
+      "n": 20,
+      "total_mah": 1020.605,
+      "total_kj": 15.417235394999993,
+      "effective_voltage_v": 4.196104651162789,
+      "battery_samples": 1717,
+      "energy_method": "voltage_weighted_coulomb_counting",
+      "span_s": 3271.979722261429,
+      "mean_w": 4.711898209547696,
+      "mah_ans": 51.03025,
+      "j_ans": 770.8617697499997,
+      "j_correct": 1927.154424374999,
+      "cpkj": 0.5188997764537281,
+      "per_charge": 39.192439778366754,
+      "box_cpkj": 0.5253860236593997
+    },
+    {
+      "mode": "fullcontext",
+      "model": "E4B",
+      "phone_acc": 0.05,
+      "n": 20,
+      "total_mah": 3674.178,
+      "total_kj": 51.78324097619995,
+      "effective_voltage_v": 3.9149528423772573,
+      "battery_samples": 5344,
+      "energy_method": "voltage_weighted_coulomb_counting",
+      "span_s": 14836.404163360596,
+      "mean_w": 3.4902824435102557,
+      "mah_ans": 183.7089,
+      "j_ans": 2589.1620488099975,
+      "j_correct": 51783.240976199944,
+      "cpkj": 0.019311267142580146,
+      "per_charge": 1.3608486034155123,
+      "box_cpkj": 0.04055366099941831
+    },
+    {
+      "mode": "vectorrag",
+      "model": "Q35-0.8B",
+      "phone_acc": 0.2,
+      "n": 20,
+      "total_mah": 322.796,
+      "total_kj": 4.969103585400001,
+      "effective_voltage_v": 4.276095588235296,
+      "battery_samples": 857,
+      "energy_method": "voltage_weighted_coulomb_counting",
+      "span_s": 1723.8974256515503,
+      "mean_w": 2.8824821659687316,
+      "mah_ans": 16.1398,
+      "j_ans": 248.45517927000006,
+      "j_correct": 1242.2758963500003,
+      "cpkj": 0.8049741630970668,
+      "per_charge": 61.95863641432979,
+      "box_cpkj": null
+    },
+    {
+      "mode": "fullcontext",
+      "model": "Q35-0.8B",
+      "phone_acc": 0.0,
+      "n": 20,
+      "total_mah": 427.23,
+      "total_kj": 6.599319274799998,
+      "effective_voltage_v": 4.2907666666666655,
+      "battery_samples": 749,
+      "energy_method": "voltage_weighted_coulomb_counting",
+      "span_s": 2282.1735446453094,
+      "mean_w": 2.8916816121561215,
+      "mah_ans": 21.3615,
+      "j_ans": 329.9659637399999,
+      "j_correct": null,
+      "cpkj": 0.0,
+      "per_charge": 0.0,
+      "box_cpkj": null
+    },
+    {
+      "mode": "vectorrag",
+      "model": "Q35-2B",
+      "phone_acc": 0.3,
+      "n": 20,
+      "total_mah": 574.387,
+      "total_kj": 8.741672654399997,
+      "effective_voltage_v": 4.227537190082644,
+      "battery_samples": 1130,
+      "energy_method": "voltage_weighted_coulomb_counting",
+      "span_s": 2204.578115463257,
+      "mean_w": 3.9652360662951947,
+      "mah_ans": 28.71935,
+      "j_ans": 437.08363271999985,
+      "j_correct": 1456.9454423999996,
+      "cpkj": 0.6863674993572294,
+      "per_charge": 52.22959433274082,
+      "box_cpkj": null
+    },
+    {
+      "mode": "fullcontext",
+      "model": "Q35-2B",
+      "phone_acc": 0.1,
+      "n": 20,
+      "total_mah": 1129.786,
+      "total_kj": 17.009102919600004,
+      "effective_voltage_v": 4.181987394957984,
+      "battery_samples": 1650,
+      "energy_method": "voltage_weighted_coulomb_counting",
+      "span_s": 5207.080551147461,
+      "mean_w": 3.2665334735126743,
+      "mah_ans": 56.4893,
+      "j_ans": 850.4551459800002,
+      "j_correct": 8504.5514598,
+      "cpkj": 0.11758409655428395,
+      "per_charge": 8.851233773475684,
+      "box_cpkj": null
+    },
+    {
+      "mode": "vectorrag",
+      "model": "Q35-4B",
+      "phone_acc": 0.35,
+      "n": 20,
+      "total_mah": 745.279,
+      "total_kj": 11.333087486999997,
+      "effective_voltage_v": 4.22402866242038,
+      "battery_samples": 1353,
+      "energy_method": "voltage_weighted_coulomb_counting",
+      "span_s": 3296.009461402893,
+      "mean_w": 3.4384268673113128,
+      "mah_ans": 37.26395,
+      "j_ans": 566.6543743499999,
+      "j_correct": 1619.0124981428569,
+      "cpkj": 0.6176604573140008,
+      "per_charge": 46.962278556084364,
+      "box_cpkj": null
+    },
+    {
+      "mode": "fullcontext",
+      "model": "Q35-4B",
+      "phone_acc": 0.1,
+      "n": 20,
+      "total_mah": 3014.345,
+      "total_kj": 43.31397016979999,
+      "effective_voltage_v": 3.991466929133857,
+      "battery_samples": 4335,
+      "energy_method": "voltage_weighted_coulomb_counting",
+      "span_s": 13086.321020841599,
+      "mean_w": 3.309866088476439,
+      "mah_ans": 150.71724999999998,
+      "j_ans": 2165.6985084899993,
+      "j_correct": 21656.985084899992,
+      "cpkj": 0.04617447886119823,
+      "per_charge": 3.317470296200336,
+      "box_cpkj": null
+    }
+  ],
+  "replicates": {
+    "E2B_vectorrag": {
+      "j_per_answer": [
+        653.7828060899998,
+        473.39903717999994,
+        525.0233742300002
+      ],
+      "mean": 550.7350725,
+      "sd": 92.89991707471913,
+      "cv": 0.16868349541097935,
+      "mah_per_answer": [
+        43.1977,
+        31.09285,
+        34.6531
+      ],
+      "mean_mah_per_answer": 36.31455,
+      "sd_mah_per_answer": 6.221106047761924,
+      "accuracy_by_sitting": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "correct_per_charge_at_mean_mah": 68.84292934925533,
+      "phases": [
+        {
+          "run": "phone_locomo20_e2b_vectorrag",
+          "skipped": [],
+          "build": {
+            "joules": 8153.7614514,
+            "seconds": 1901.8378248214722,
+            "units": 3435.0,
+            "mean_w": 4.287306385950865,
+            "per_unit": 2.3737296801746726
+          },
+          "query": {
+            "joules": 4921.8946704,
+            "seconds": 1281.1628437042236,
+            "units": 20.0,
+            "mean_w": 3.8417400993064517,
+            "per_unit": 246.09473352
+          }
+        },
+        {
+          "run": "phone_locomo20_e2b_vectorrag_rep2",
+          "skipped": [
+            {
+              "phase": "build",
+              "start_s": 0.0,
+              "end_s": 155.89359712600708
+            },
+            {
+              "phase": "build",
+              "start_s": 190.02053928375244,
+              "end_s": 323.30568981170654
+            },
+            {
+              "phase": "query",
+              "start_s": 155.89359712600708,
+              "end_s": 190.02053928375244
+            }
+          ],
+          "build": {
+            "joules": 5000.5477134,
+            "seconds": 1270.4963278770447,
+            "units": 2647.0,
+            "mean_w": 3.935900957506695,
+            "per_unit": 1.8891377836796375
+          },
+          "query": {
+            "joules": 3886.8103710000005,
+            "seconds": 994.6271359920502,
+            "units": 19.0,
+            "mean_w": 3.9078064838068793,
+            "per_unit": 204.56896689473686
+          }
+        },
+        {
+          "run": "phone_locomo20_e2b_vectorrag_rep3",
+          "skipped": [],
+          "build": {
+            "joules": 6347.35611,
+            "seconds": 1466.6950390338898,
+            "units": 3435.0,
+            "mean_w": 4.327659084591297,
+            "per_unit": 1.8478474847161572
+          },
+          "query": {
+            "joules": 4153.111374599999,
+            "seconds": 1035.0882439613342,
+            "units": 20.0,
+            "mean_w": 4.012325904413555,
+            "per_unit": 207.65556872999997
+          }
+        }
+      ],
+      "build_j_per_turn": 2.0369049828568224,
+      "build_j_per_turn_sd": 0.29242841814633785,
+      "query_j_per_answer": 219.43975638157895,
+      "query_j_per_answer_sd": 23.13541943448777
+    },
+    "E2B_fullcontext": {
+      "j_per_answer": [
+        1515.5723639699997,
+        1338.6829317157894,
+        1331.9352386100004
+      ],
+      "mean": 1395.3968447652633,
+      "sd": 104.12972391521299,
+      "cv": 0.07462373467866765,
+      "mah_per_answer": [
+        103.00989999999999,
+        93.94063157894738,
+        89.7183
+      ],
+      "mean_mah_per_answer": 95.55627719298245,
+      "sd_mah_per_answer": 6.791493996361405,
+      "accuracy_by_sitting": [
+        0.05,
+        0.05263157894736842,
+        0.05
+      ],
+      "correct_per_charge_at_mean_mah": null
+    },
+    "E4B_vectorrag": {
+      "j_per_answer": [
+        770.8617697499997,
+        748.2877910100001,
+        693.33575949
+      ],
+      "mean": 737.4951067499999,
+      "sd": 39.87395254875588,
+      "cv": 0.05406673506550135,
+      "mah_per_answer": [
+        51.03025,
+        50.08085,
+        46.0459
+      ],
+      "mean_mah_per_answer": 49.05233333333334,
+      "sd_mah_per_answer": 2.646567802047272,
+      "accuracy_by_sitting": [
+        0.4,
+        0.4,
+        0.4
+      ],
+      "correct_per_charge_at_mean_mah": 40.77278009201058,
+      "phases": [
+        {
+          "run": "phone_locomo20_e4b_vectorrag",
+          "skipped": [
+            {
+              "phase": "build",
+              "start_s": 0.0,
+              "end_s": 166.19968843460083
+            }
+          ],
+          "build": {
+            "joules": 6062.786751599999,
+            "seconds": 1199.873633146286,
+            "units": 3016.0,
+            "mean_w": 5.05285438742601,
+            "per_unit": 2.010207808885941
+          },
+          "query": {
+            "joules": 8406.8097804,
+            "seconds": 1905.906400680542,
+            "units": 20.0,
+            "mean_w": 4.4109247848678095,
+            "per_unit": 420.34048902000006
+          }
+        },
+        {
+          "run": "phone_locomo20_e4b_vectorrag_rep2",
+          "skipped": [],
+          "build": {
+            "joules": 6507.524637,
+            "seconds": 1417.130188703537,
+            "units": 3435.0,
+            "mean_w": 4.59204432230282,
+            "per_unit": 1.8944758768558954
+          },
+          "query": {
+            "joules": 8313.9983352,
+            "seconds": 1954.2246029376984,
+            "units": 20.0,
+            "mean_w": 4.254371950236394,
+            "per_unit": 415.69991676
+          }
+        },
+        {
+          "run": "phone_locomo20_e4b_vectorrag_rep3",
+          "skipped": [],
+          "build": {
+            "joules": 6190.8788502,
+            "seconds": 1399.9736852645874,
+            "units": 3435.0,
+            "mean_w": 4.422139441163822,
+            "per_unit": 1.8022936972925763
+          },
+          "query": {
+            "joules": 7531.5351348,
+            "seconds": 1877.6130573749542,
+            "units": 20.0,
+            "mean_w": 4.0112285676845785,
+            "per_unit": 376.57675674
+          }
+        }
+      ],
+      "build_j_per_turn": 1.9023257943448042,
+      "build_j_per_turn_sd": 0.10417910228712647,
+      "query_j_per_answer": 404.20572084,
+      "query_j_per_answer_sd": 24.03962293078633
+    },
+    "Q35-0.8B_vectorrag": {
+      "j_per_answer": [
+        248.45517927000006,
+        323.9394573600001,
+        345.07367100000005
+      ],
+      "mean": 305.82276921000005,
+      "sd": 50.79314942182935,
+      "cv": 0.16608687951207157,
+      "mah_per_answer": [
+        16.1398,
+        21.12415,
+        22.54825
+      ],
+      "mean_mah_per_answer": 19.9374,
+      "sd_mah_per_answer": 3.365017016673169,
+      "accuracy_by_sitting": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "correct_per_charge_at_mean_mah": 50.15699138302888,
+      "phases": [
+        {
+          "run": "phone_locomo20_q35_08b_vectorrag",
+          "skipped": [
+            {
+              "phase": "build",
+              "start_s": 0.0,
+              "end_s": 179.69904804229736
+            },
+            {
+              "phase": "build",
+              "start_s": 192.02512001991272,
+              "end_s": 345.64175033569336
+            },
+            {
+              "phase": "build",
+              "start_s": 355.7081153392792,
+              "end_s": 631.2781028747559
+            },
+            {
+              "phase": "query",
+              "start_s": 179.69904804229736,
+              "end_s": 192.02512001991272
+            },
+            {
+              "phase": "query",
+              "start_s": 345.64175033569336,
+              "end_s": 355.7081153392792
+            }
+          ],
+          "build": {
+            "joules": 3067.126893,
+            "seconds": 834.4205510616302,
+            "units": 1984.0,
+            "mean_w": 3.675756654240725,
+            "per_unit": 1.5459308936491936
+          },
+          "query": {
+            "joules": 801.398034,
+            "seconds": 258.1987717151642,
+            "units": 18.0,
+            "mean_w": 3.1038026582251685,
+            "per_unit": 44.522113000000004
+          }
+        },
+        {
+          "run": "phone_locomo20_q35_08b_vectorrag_rep2",
+          "skipped": [],
+          "build": {
+            "joules": 5393.3173416,
+            "seconds": 1563.0037457942963,
+            "units": 3435.0,
+            "mean_w": 3.450610631044389,
+            "per_unit": 1.5701069407860262
+          },
+          "query": {
+            "joules": 1085.4718056,
+            "seconds": 306.02345871925354,
+            "units": 20.0,
+            "mean_w": 3.547021558879294,
+            "per_unit": 54.27359027999999
+          }
+        },
+        {
+          "run": "phone_locomo20_q35_08b_vectorrag_rep3",
+          "skipped": [],
+          "build": {
+            "joules": 5746.4827488,
+            "seconds": 1458.614147901535,
+            "units": 3435.0,
+            "mean_w": 3.939686693062243,
+            "per_unit": 1.6729207420087338
+          },
+          "query": {
+            "joules": 1154.9906712000002,
+            "seconds": 312.27624440193176,
+            "units": 20.0,
+            "mean_w": 3.6986184248885996,
+            "per_unit": 57.74953356000001
+          }
+        }
+      ],
+      "build_j_per_turn": 1.5963195254813178,
+      "build_j_per_turn_sd": 0.0674309283185441,
+      "query_j_per_answer": 52.181745613333334,
+      "query_j_per_answer_sd": 6.857333610804861
+    },
+    "Q35-2B_vectorrag": {
+      "j_per_answer": [
+        437.08363271999985,
+        420.6032354700001,
+        440.68347269999987
+      ],
+      "mean": 432.79011362999995,
+      "sd": 10.70652658126868,
+      "cv": 0.024738380670178344,
+      "mah_per_answer": [
+        28.71935,
+        27.532600000000002,
+        28.9567
+      ],
+      "mean_mah_per_answer": 28.402883333333335,
+      "sd_mah_per_answer": 0.762973502707225,
+      "accuracy_by_sitting": [
+        0.3,
+        0.3,
+        0.3
+      ],
+      "correct_per_charge_at_mean_mah": 52.81153967349558,
+      "phases": [
+        {
+          "run": "phone_locomo20_q35_2b_vectorrag",
+          "skipped": [],
+          "build": {
+            "joules": 6294.1403412,
+            "seconds": 1519.1384632587433,
+            "units": 3435.0,
+            "mean_w": 4.143230188312312,
+            "per_unit": 1.8323552667248908
+          },
+          "query": {
+            "joules": 2229.9526188,
+            "seconds": 685.4396522045135,
+            "units": 20.0,
+            "mean_w": 3.2533172127232763,
+            "per_unit": 111.49763094
+          }
+        },
+        {
+          "run": "phone_locomo20_q35_2b_vectorrag_rep2",
+          "skipped": [],
+          "build": {
+            "joules": 6030.095111999999,
+            "seconds": 1497.1032664775848,
+            "units": 3435.0,
+            "mean_w": 4.027841797572007,
+            "per_unit": 1.755486204366812
+          },
+          "query": {
+            "joules": 2381.9695974,
+            "seconds": 698.458643913269,
+            "units": 20.0,
+            "mean_w": 3.4103230279383308,
+            "per_unit": 119.09847987
+          }
+        },
+        {
+          "run": "phone_locomo20_q35_2b_vectorrag_rep3",
+          "skipped": [],
+          "build": {
+            "joules": 6004.0169928,
+            "seconds": 1438.3248736858368,
+            "units": 3435.0,
+            "mean_w": 4.174312147862788,
+            "per_unit": 1.7478943210480349
+          },
+          "query": {
+            "joules": 2664.7360452,
+            "seconds": 679.842547416687,
+            "units": 20.0,
+            "mean_w": 3.9196370620309793,
+            "per_unit": 133.23680226
+          }
+        }
+      ],
+      "build_j_per_turn": 1.7785785973799126,
+      "build_j_per_turn_sd": 0.0467264036435592,
+      "query_j_per_answer": 121.27763768999999,
+      "query_j_per_answer_sd": 11.03220009895705
+    },
+    "Q35-4B_vectorrag": {
+      "j_per_answer": [
+        566.6543743499999,
+        594.3299065200001,
+        546.0905127600001
+      ],
+      "mean": 569.0249312100001,
+      "sd": 24.206908775243313,
+      "cv": 0.04254103370087609,
+      "mah_per_answer": [
+        37.26395,
+        39.400099999999995,
+        35.83985
+      ],
+      "mean_mah_per_answer": 37.5013,
+      "sd_mah_per_answer": 1.7919532032115104,
+      "accuracy_by_sitting": [
+        0.35,
+        0.35,
+        0.35
+      ],
+      "correct_per_charge_at_mean_mah": 46.665048944969904,
+      "phases": [
+        {
+          "run": "phone_locomo20_q35_4b_vectorrag",
+          "skipped": [],
+          "build": {
+            "joules": 4944.3926022000005,
+            "seconds": 1464.8703982830048,
+            "units": 3435.0,
+            "mean_w": 3.375310613140516,
+            "per_unit": 1.4394156047161573
+          },
+          "query": {
+            "joules": 6315.638554799998,
+            "seconds": 1831.1390631198883,
+            "units": 20.0,
+            "mean_w": 3.4490218039690745,
+            "per_unit": 315.7819277399999
+          }
+        },
+        {
+          "run": "phone_locomo20_q35_4b_vectorrag_rep2",
+          "skipped": [],
+          "build": {
+            "joules": 5257.3043988,
+            "seconds": 1432.3567142486572,
+            "units": 3435.0,
+            "mean_w": 3.670387653090815,
+            "per_unit": 1.5305107420087336
+          },
+          "query": {
+            "joules": 6629.2937316,
+            "seconds": 1872.5674090385437,
+            "units": 20.0,
+            "mean_w": 3.540216335925532,
+            "per_unit": 331.46468658
+          }
+        },
+        {
+          "run": "phone_locomo20_q35_4b_vectorrag_rep3",
+          "skipped": [],
+          "build": {
+            "joules": 4446.9601686,
+            "seconds": 1510.8247063159943,
+            "units": 3435.0,
+            "mean_w": 2.943399158095249,
+            "per_unit": 1.2946026691703056
+          },
+          "query": {
+            "joules": 6401.434883399999,
+            "seconds": 1944.9110095500946,
+            "units": 20.0,
+            "mean_w": 3.2913767529552973,
+            "per_unit": 320.07174417
+          }
+        }
+      ],
+      "build_j_per_turn": 1.4215096719650655,
+      "build_j_per_turn_sd": 0.11896899397889445,
+      "query_j_per_answer": 322.43945282999994,
+      "query_j_per_answer_sd": 8.105045615687754
+    },
+    "E2B_ratio": {
+      "by_sitting": [
+        23.181587980785256,
+        26.864203034837278,
+        25.369065530909324
+      ],
+      "mean": 25.13828551551062,
+      "sd": 1.8521225582323686
+    }
+  },
+  "auxiliary": {
+    "E2B_vectorrag_n100": {
+      "run": "phone_locomo100_e2b_vectorrag_n100",
+      "n_scored": 100,
+      "accuracy": 0.37,
+      "charge_mah": 2022.222,
+      "energy_kj": 29.757654664200025,
+      "joules_per_answer": 297.57654664200027,
+      "effective_voltage_v": 4.087590375586858,
+      "evidence_status": "descriptive_run_length_observation"
+    }
+  },
+  "construction": {
+    "graph": {
+      "energy_kj": 21.897998344800026,
+      "turns": 419,
+      "minutes": 92.13095496892929,
+      "j_per_turn": 52.262525882577634
+    },
+    "vector": {
+      "runs": [
+        "phone_locomo20_e2b_vectorrag",
+        "phone_locomo20_e2b_vectorrag_rep2",
+        "phone_locomo20_e2b_vectorrag_rep3"
+      ],
+      "j_per_turn_by_sitting": [
+        2.3737296801746726,
+        1.8891377836796375,
+        1.8478474847161572
+      ],
+      "j_per_turn": 2.0369049828568224,
+      "sd": 0.29242841814633785
+    },
+    "ratio": 25.657812378306335,
+    "ratio_by_sitting": [
+      22.017050348686652,
+      27.664750731299957,
+      28.282921785942488
+    ]
+  }
+}

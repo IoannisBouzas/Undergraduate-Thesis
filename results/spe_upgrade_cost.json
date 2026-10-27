@@ -1,0 +1,24 @@
+{
+  "e2b": {
+    "selected_facts": 4136,
+    "ambiguous_lines": 0,
+    "triple_cost_mean": 17.48742746615087,
+    "upgrade_cost_mean": 75.39724371373308,
+    "upgrade_cost_median": 68.0,
+    "share_upgrades_multi_turn": 0.24492263056092844,
+    "ratio_median": 3.933333333333333,
+    "share_ratio_below_2": 0.10227272727272728,
+    "pool_cost_lower_bound_mean": 727.28
+  },
+  "e4b": {
+    "selected_facts": 3776,
+    "ambiguous_lines": 0,
+    "triple_cost_mean": 19.152277542372882,
+    "upgrade_cost_mean": 74.77833686440678,
+    "upgrade_cost_median": 68.0,
+    "share_upgrades_multi_turn": 0.23278601694915255,
+    "ratio_median": 3.5,
+    "share_ratio_below_2": 0.13109110169491525,
+    "pool_cost_lower_bound_mean": 813.7
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "dataset": "locomo",
+  "mode": "fullcontext",
+  "model": "mistral:7b-instruct",
+  "n": 48,
+  "f1_mean": 0.0984596787228366,
+  "em_mean": 0.041666666666666664,
+  "contains_mean": 0.041666666666666664,
+  "ingest_seconds_mean": 0.0,
+  "generate_seconds_mean": 0.7943749999999999,
+  "by_category": {
+    "1": {
+      "n": 12,
+      "f1_mean": 0.18892048497311653,
+      "em_mean": 0.08333333333333333,
+      "contains_mean": 0.08333333333333333
+    },
+    "2": {
+      "n": 12,
+      "f1_mean": 0.05185185185185185,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "3": {
+      "n": 12,
+      "f1_mean": 0.1111111111111111,
+      "em_mean": 0.08333333333333333,
+      "contains_mean": 0.08333333333333333
+    },
+    "4": {
+      "n": 12,
+      "f1_mean": 0.04195526695526695,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    }
+  }
+}

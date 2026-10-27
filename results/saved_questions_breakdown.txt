@@ -1,0 +1,204 @@
+==================================================
+Model E2B: 27 Questions Saved by Expansion (v4 right, v3 wrong)
+==================================================
+Category breakdown: {'1': 4, '2': 5, '3': 5, '4': 13}
+
+[1] (Category 1) Q: What career path has Caroline decided to persue?
+     Gold Ref: counseling or mental health for Transgender people
+     v3 (Triples only):   Helping people
+     v4 (Triples + Text): Counseling or mental health work
+
+[2] (Category 1) Q: What is Caroline's identity?
+     Gold Ref: Transgender woman
+     v3 (Triples only):   Caroline
+     v4 (Triples + Text): transgender
+
+[3] (Category 4) Q: How do Jon and Gina both like to destress?
+     Gold Ref: by dancing
+     v3 (Triples only):   Jon needs to dance and vent.
+     v4 (Triples + Text): Dance and venting
+
+[4] (Category 4) Q: What was Gina's favorite dancing memory?
+     Gold Ref: Winning first place at a regionals dance competition
+     v3 (Triples only):   Finding freedom
+     v4 (Triples + Text): When her team won first place at a regionals at age fifteen.
+
+[5] (Category 4) Q: What did Maria donate to a homeless shelter in December 2023?
+     Gold Ref: old car
+     v3 (Triples only):   John gave out Food and supplies.
+     v4 (Triples + Text): old car
+
+[6] (Category 1) Q: What martial arts has John done?
+     Gold Ref: Kickboxing, Taekwondo
+     v3 (Triples only):   No information available
+     v4 (Triples + Text): kickboxing and taekwondo
+
+[7] (Category 4) Q: What sparked John's interest in improving education and infrastructure in the community?
+     Gold Ref: Seeing how lack of education and crumbling infrastructure affected his neighborhood while growing up.
+     v3 (Triples only):   Lack of education and crumbling infrastructure
+     v4 (Triples + Text): Lack of education and crumbling infrastructure affected his neighborhood.
+
+[8] (Category 4) Q: What type of workout class did Maria start doing in December 2023?
+     Gold Ref: aerial yoga
+     v3 (Triples only):   No
+     v4 (Triples + Text): aerial yoga
+
+[9] (Category 4) Q: What aspects of the Harry Potter universe will be discussed in John's fan project collaborations?
+     Gold Ref: characters, spells, magical creatures
+     v3 (Triples only):   Harry Potter universe aspects
+     v4 (Triples + Text): characters, spells, and magical creatures
+
+[10] (Category 4) Q: What challenge did John encounter during pre-season training?
+     Gold Ref: fitting into the new team's style of play
+     v3 (Triples only):   faced challenge
+     v4 (Triples + Text): Fitting into the new team's style of play
+
+[11] (Category 2) Q: What year did John start surfing?
+     Gold Ref: 2018
+     v3 (Triples only):   Five years ago
+     v4 (Triples + Text): 2018
+
+[12] (Category 3) Q: Which popular time management technique does Tim use to prepare for exams?
+     Gold Ref: Pomodoro technique
+     v3 (Triples only):   Breaking studying into smaller parts
+     v4 (Triples + Text): 25 minutes on, then 5 minutes off
+
+[13] (Category 1) Q: What kind of classes or groups has Audrey joined to take better care of her dogs?
+     Gold Ref: positive reinforcement training workshop to bond with pets, dog training course, agility training course, grooming course, dog-owners group
+     v3 (Triples only):   Workshop about bonding with pet
+     v4 (Triples + Text): Agility classes and a workshop about bonding with pets
+
+[14] (Category 2) Q: When did Audrey adopt Pixie?
+     Gold Ref: around April 2, 2023
+     v3 (Triples only):   22 November 2023
+     v4 (Triples + Text): 2 April 2023
+
+[15] (Category 4) Q: Which specific type of bird mesmerizes Andrew?
+     Gold Ref: Eagles
+     v3 (Triples only):   Birds
+     v4 (Triples + Text): Eagles
+
+[16] (Category 4) Q: How does James plan to make his dog-sitting app unique?
+     Gold Ref: By allowing users to customize their pup's preferences/needs
+     v3 (Triples only):   Connect pet owners with reliable dog walkers and provide helpful information on pet care.
+     v4 (Triples + Text): Users can add their pup's preferences/needs to customize it for each owner and pup.
+
+[17] (Category 4) Q: What did James offer to do for John regarding pets?
+     Gold Ref: help find the perfect pet
+     v3 (Triples only):   Getting a pet
+     v4 (Triples + Text): James offered to help find the perfect dog for John.
+
+[18] (Category 4) Q: What has John mostly found with the metal detector so far?
+     Gold Ref: bottle caps
+     v3 (Triples only):   Bottle caps, coins, gold ring
+     v4 (Triples + Text): Bottle caps
+
+[19] (Category 3) Q: In what country did Jolene's mother buy her the pendant?
+     Gold Ref: In France
+     v3 (Triples only):   Unknown
+     v4 (Triples + Text): Paris
+
+[20] (Category 4) Q: What are the names of Jolene's snakes?
+     Gold Ref: Susie, Seraphim
+     v3 (Triples only):   Susie
+     v4 (Triples + Text): Susie and Seraphim
+
+[21] (Category 2) Q: What kind of project was Jolene working on in the beginning of January 2023?
+     Gold Ref: electricity engineering project
+     v3 (Triples only):   A big project
+     v4 (Triples + Text): electrical engineering project
+
+[22] (Category 2) Q: When did Jolene's mom gift her a pendant?
+     Gold Ref: in 2010
+     v3 (Triples only):   17 September 2023
+     v4 (Triples + Text): 2010
+
+[23] (Category 3) Q: Considering their conversations and personal growth, what advice might Evan and Sam give to someone facing a major life transition or challenge?
+     Gold Ref: Evan and Sam would likely advise embracing small, consistent changes​​, finding stress-relieving activities like hiking​​, painting, and road trips​​, and the importance of friendship and support in navigating challenges​​.
+     v3 (Triples only):   Focus on self-expression, consistent action, and progress over perfection.
+     v4 (Triples + Text): Take small steps; progress over perfection matters.
+
+[24] (Category 3) Q: In light of the health and dietary changes discussed, what would be an appropriate gift for both Evan and Sam to encourage their healthy lifestyles?
+     Gold Ref: a cookbook with healthy recipes or a subscription to a healthy meal delivery service.
+     v3 (Triples only):   Healthy food basket
+     v4 (Triples + Text): A shared healthy cooking class or a subscription to a healthy food box.
+
+[25] (Category 3) Q: What electronic device could Evan gift Sam to help him keep up with his fitness goals?
+     Gold Ref: fitness tracker
+     v3 (Triples only):   Device
+     v4 (Triples + Text): Smart watch
+
+[26] (Category 4) Q: How long did Calvin plan to stay in Japan?
+     Gold Ref: A few months
+     v3 (Triples only):   No information
+     v4 (Triples + Text): a few months
+
+[27] (Category 2) Q: When did Calvin's place get flooded in Tokyo?
+     Gold Ref: On a week before 16 May, 2023
+     v3 (Triples only):   16 May 2023
+     v4 (Triples + Text): last week
+
+==================================================
+Model E4B: 12 Questions Saved by Expansion (v4 right, v3 wrong)
+==================================================
+Category breakdown: {'1': 2, '2': 1, '3': 2, '4': 7}
+
+[1] (Category 1) Q: Do Jon and Gina start businesses out of what they love?
+     Gold Ref: Yes
+     v3 (Triples only):   No
+     v4 (Triples + Text): Yes
+
+[2] (Category 4) Q: How do Jon and Gina both like to destress?
+     Gold Ref: by dancing
+     v3 (Triples only):   Not mentioned
+     v4 (Triples + Text): Gina suggested dancing; Jon mentioned dancing.
+
+[3] (Category 4) Q: What did Maria donate to a homeless shelter in December 2023?
+     Gold Ref: old car
+     v3 (Triples only):   No
+     v4 (Triples + Text): old car
+
+[4] (Category 4) Q: What type of workout class did Maria start doing in December 2023?
+     Gold Ref: aerial yoga
+     v3 (Triples only):   No information
+     v4 (Triples + Text): aerial yoga
+
+[5] (Category 1) Q: What are John's goals for his career that are not related to his basketball skills?
+     Gold Ref: get endorsements, build his brand, do charity work
+     v3 (Triples only):   More endorsements, Life after basketball
+     v4 (Triples + Text): More endorsements, building his brand, and planning for life after basketball.
+
+[6] (Category 4) Q: What aspects of the Harry Potter universe will be discussed in John's fan project collaborations?
+     Gold Ref: characters, spells, magical creatures
+     v3 (Triples only):   Harry potter universe
+     v4 (Triples + Text): characters, spells, and magical creatures
+
+[7] (Category 3) Q: Which popular time management technique does Tim use to prepare for exams?
+     Gold Ref: Pomodoro technique
+     v3 (Triples only):   Minutes on, then 5 minutes off
+     v4 (Triples + Text): 25 minutes on, then 5 minutes off
+
+[8] (Category 4) Q: What did James offer to do for John regarding pets?
+     Gold Ref: help find the perfect pet
+     v3 (Triples only):   Connect pet owners with reliable dog walkers and provide helpful information on pet care.
+     v4 (Triples + Text): help find the perfect one
+
+[9] (Category 3) Q: Is Deborah married?
+     Gold Ref: yes
+     v3 (Triples only):   No
+     v4 (Triples + Text): Yes
+
+[10] (Category 4) Q: What are the names of Jolene's snakes?
+     Gold Ref: Susie, Seraphim
+     v3 (Triples only):   Snakes
+     v4 (Triples + Text): Susie, Seraphim
+
+[11] (Category 2) Q: When did Jolene's mom gift her a pendant?
+     Gold Ref: in 2010
+     v3 (Triples only):   23 January, 2023
+     v4 (Triples + Text): 2010
+
+[12] (Category 4) Q: What advice did Calvin receive from the producer at the music festival?
+     Gold Ref: to stay true to himself and sound unique
+     v3 (Triples only):   No
+     v4 (Triples + Text): Stay true to myself and sound unique
