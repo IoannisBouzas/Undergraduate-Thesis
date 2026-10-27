@@ -1,0 +1,134 @@
+{
+  "run_id": "lap_locomo200_e2b_gr_mt4_prefix",
+  "dataset": "locomo",
+  "mode": "graphrag",
+  "model": "gemma4:e2b",
+  "n": 200,
+  "f1_mean": 0.13680857599143204,
+  "em_mean": 0.06,
+  "contains_mean": 0.07,
+  "ingest_seconds_mean": 0.0,
+  "generate_seconds_mean": 0.447865,
+  "prompt_tokens_mean": 286.61,
+  "completion_tokens_mean": 10.07,
+  "total_tokens_mean": 296.68,
+  "by_category": {
+    "1": {
+      "n": 50,
+      "f1_mean": 0.0752950324529272,
+      "em_mean": 0.02,
+      "contains_mean": 0.04
+    },
+    "2": {
+      "n": 50,
+      "f1_mean": 0.15349206349206349,
+      "em_mean": 0.02,
+      "contains_mean": 0.02
+    },
+    "3": {
+      "n": 50,
+      "f1_mean": 0.1334197909933204,
+      "em_mean": 0.1,
+      "contains_mean": 0.12
+    },
+    "4": {
+      "n": 50,
+      "f1_mean": 0.185027417027417,
+      "em_mean": 0.1,
+      "contains_mean": 0.1
+    }
+  },
+  "by_conversation": {
+    "conv-26": {
+      "n": 21,
+      "f1_mean": 0.12287712287712288,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "conv-30": {
+      "n": 15,
+      "f1_mean": 0.05914529914529914,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "conv-41": {
+      "n": 21,
+      "f1_mean": 0.13175094599243206,
+      "em_mean": 0.09523809523809523,
+      "contains_mean": 0.09523809523809523
+    },
+    "conv-42": {
+      "n": 21,
+      "f1_mean": 0.06318681318681318,
+      "em_mean": 0.047619047619047616,
+      "contains_mean": 0.09523809523809523
+    },
+    "conv-43": {
+      "n": 21,
+      "f1_mean": 0.16076516076516073,
+      "em_mean": 0.047619047619047616,
+      "contains_mean": 0.047619047619047616
+    },
+    "conv-44": {
+      "n": 21,
+      "f1_mean": 0.16477702191987906,
+      "em_mean": 0.09523809523809523,
+      "contains_mean": 0.09523809523809523
+    },
+    "conv-47": {
+      "n": 20,
+      "f1_mean": 0.18726551226551225,
+      "em_mean": 0.05,
+      "contains_mean": 0.05
+    },
+    "conv-48": {
+      "n": 20,
+      "f1_mean": 0.020833333333333336,
+      "em_mean": 0.0,
+      "contains_mean": 0.0
+    },
+    "conv-49": {
+      "n": 20,
+      "f1_mean": 0.2724107142857143,
+      "em_mean": 0.15,
+      "contains_mean": 0.2
+    },
+    "conv-50": {
+      "n": 20,
+      "f1_mean": 0.16769230769230767,
+      "em_mean": 0.1,
+      "contains_mean": 0.1
+    }
+  },
+  "config": {
+    "run_id": "lap_locomo200_e2b_gr_mt4_prefix",
+    "output_dir": "results\\lap_locomo200_e2b_gr_mt4_prefix",
+    "backend": "ollama",
+    "model": "gemma4:e2b",
+    "extraction_model": "gemma4:e2b",
+    "embed_model": "nomic-embed-text",
+    "embed_prefix": "nomic",
+    "host": "http://localhost:18080/api",
+    "num_ctx": 4096,
+    "temperature": 0.0,
+    "max_answer_tokens": 64,
+    "thinking": false,
+    "mode": "graphrag",
+    "prompt_version": "qa_short_answer_v3",
+    "prompt_style": "v3",
+    "graph_extraction_prompt_version": "triple_json_v2",
+    "decay_rate": 1.0,
+    "graph_budget_tokens": 700,
+    "prune_threshold": 0.15,
+    "max_triples": 4,
+    "query_ner": "heuristic",
+    "top_k": 10,
+    "graphrag_batch_size": 5,
+    "limit": 200,
+    "cache_policy": "enabled",
+    "examples_hash": "8f7200d571bd63911e0905d583666c6c129b33d2f41ed25dccecd96c63194adf",
+    "excluded_locomo_categories": [
+      "5"
+    ]
+  }
+}
