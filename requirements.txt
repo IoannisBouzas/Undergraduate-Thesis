@@ -1,0 +1,5 @@
+# Python 3.12
+numpy>=2.4
+requests>=2.32
+networkx>=3.6
+matplotlib>=3.10
