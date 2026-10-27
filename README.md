@@ -1,7 +1,7 @@
 # Token- and Resource-Aware Long-Term Memory for Small On-Device Agents
 
-Code, run records and thesis source for my undergraduate thesis (University of Ioannina,
-October 2026, supervised by Konstantinos Skianis).
+Code, run records and thesis source for my undergraduate thesis, both pptx and pdf files also included (University of Ioannina,
+October 2026, supervised by Konstantinos Skianis [Konstantinos's Skianis personal page](https://y3nk0.github.io/)).
 
 Small language models can now run on a phone. To act as assistants they also need to remember
 long conversations, and remembering costs prompt tokens, time, memory and battery. This project
