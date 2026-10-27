@@ -1,0 +1,14 @@
+{
+  "judge_model": "llama3.1:70b-instruct-q4_K_M",
+  "prompt_style": "official",
+  "base_url": "http://localhost:18080/v1",
+  "dataset": "locomo",
+  "temperature": 0,
+  "max_tokens": 256,
+  "reasoning_effort": null,
+  "n_rows": 100,
+  "n_scored": 100,
+  "n_abstention": 0,
+  "judge_accuracy": 0.21,
+  "judged_at": "2026-07-05T19:41:06+00:00"
+}
