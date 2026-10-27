@@ -1,0 +1,125 @@
+=== Q: What did Caroline research? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[1:56 pm on 8 May, 2023] System: Caroline attended Lgbtq support group yesterday.
+[1:14 pm on 25 May, 2023] System: Melanie offers encouragement to Caroline.
+[10:37 am on 27 June, 2023] System: Caroline greeted Melanie.
+[1:36 pm on 3 July, 2023] System: Melanie congratulated Caroline.
+[4:33 pm on 12 July, 2023] System: Melanie expresses gratitude to Caroline.
+[2:31 pm on 17 July, 2023] System: Melanie addressed Caroline.
+[2:31 pm on 17 July, 2023] System: Caroline expressed gratitude to Melanie.
+[1:33 pm on 25 August, 2023] System: Melanie said goodbye to Caroline.
+[3:19 pm on 28 August, 2023] System: Playing and singing allows Caroline to express self.
+[3:19 pm on 28 August, 2023] System: Guitar helps Caroline get emotions out.
+[10:31 am on 13 October, 2023] System: Caroline spoke to Melanie.
+[10:31 am on 13 October, 2023] System: Melanie thanked Caroline.
+
+Question: What did Caroline research?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>Lgbtq support group</answer>
+--- PARSED PREDICTION (answer_tag) ---
+Lgbtq support group
+====================
+
+=== Q: When did Caroline go to the LGBTQ support group? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[1:56 pm on 8 May, 2023] System: Caroline attended Lgbtq support group yesterday.
+[1:56 pm on 8 May, 2023] System: Caroline found The transgender stories inspiring.
+[1:56 pm on 8 May, 2023] System: Caroline felt Happy and thankful for all the support.
+[1:56 pm on 8 May, 2023] System: Caroline shared A photo of a dog walking past a wall with a painting of a woman.
+[1:36 pm on 3 July, 2023] System: Caroline attended An lgbtq+ pride parade.
+[1:36 pm on 3 July, 2023] System: Melanie congratulated Caroline.
+[2:31 pm on 17 July, 2023] System: Caroline joined A mentorship program for lgbtq youth.
+[2:31 pm on 17 July, 2023] System: Caroline participated in A mentorship program for lgbtq youth.
+[8:56 pm on 20 July, 2023] System: Caroline joined A new lgbtq activist group.
+[1:33 pm on 25 August, 2023] System: Caroline putting together An lgbtq art show.
+[1:33 pm on 25 August, 2023] System: Caroline showing paintings at An lgbtq art show.
+[3:19 pm on 28 August, 2023] System: Caroline felt fulfilled by Guiding and supporting young people.
+
+Question: When did Caroline go to the LGBTQ support group?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>8 May, 2023</answer>
+--- PARSED PREDICTION (answer_tag) ---
+8 May, 2023
+====================
+
+=== Q: What fields would Caroline be likely to pursue in her educaton? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[1:51 pm on 15 July, 2023] System: Caroline asked about Activities done together.
+[1:51 pm on 15 July, 2023] System: Melanie went on Another camping trip in the forest.
+[1:51 pm on 15 July, 2023] System: Caroline attended A pride parade.
+[1:51 pm on 15 July, 2023] System: Caroline attended A pride parade a few weeks ago.
+[1:51 pm on 15 July, 2023] System: Caroline shared photo of A photo of a parade with people walking down the street.
+[1:51 pm on 15 July, 2023] System: Caroline felt Accepted and happy.
+[1:51 pm on 15 July, 2023] System: Caroline expressed feeling about Family love and support.
+[1:33 pm on 25 August, 2023] System: Caroline putting together An lgbtq art show.
+[1:33 pm on 25 August, 2023] System: Melanie said goodbye to Caroline.
+[1:33 pm on 25 August, 2023] System: Caroline went hiking Last week.
+[1:33 pm on 25 August, 2023] System: Caroline got into a bad spot with Some people.
+[1:33 pm on 25 August, 2023] System: Caroline tried to apologize to Some people.
+
+Question: What fields would Caroline be likely to pursue in her educaton?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>Arts, social work, or related fields.</answer>
+--- PARSED PREDICTION (answer_tag) ---
+Arts, social work, or related fields.
+====================
+
+=== Q: What did the charity race raise awareness for? ===
+--- PROMPT ---
+You are answering a question based on a conversation history.
+
+Conversation history:
+[1:14 pm on 25 May, 2023] System: Caroline is proud of Melanie for taking part in the charity race.
+
+Question: What did the charity race raise awareness for?
+Rules:
+1. Answer the question in as few words as possible. 
+2. For dates, give the date only (e.g., "2022" or "7 May 2023"). Resolve relative terms like "yesterday", "last week", "last year" mathematically using the timestamp of the fact.
+3. For names, the name only. 
+4. For yes/no questions, answer "Yes" or "No". 
+5. Do not explain. 
+6. Do not repeat the question. 
+7. Put the final answer between <answer> and </answer>.
+Answer:
+--- RAW PREDICTION ---
+<answer>Melanie</answer>
+--- PARSED PREDICTION (answer_tag) ---
+Melanie
+====================
+
